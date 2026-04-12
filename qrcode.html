@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cora's Creations — QR Code</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Raleway:wght@400;600&display=swap');
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      background: #0a0612;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Raleway', sans-serif;
+      padding: 2rem;
+    }
+    .card {
+      background: #1a1030;
+      border: 1px solid rgba(168,85,247,0.3);
+      border-radius: 24px;
+      padding: 2.5rem 2rem;
+      text-align: center;
+      max-width: 380px;
+      width: 100%;
+      box-shadow: 0 0 60px rgba(124,58,237,0.3);
+    }
+    h1 {
+      font-family: 'Cinzel Decorative', cursive;
+      font-size: 1.4rem;
+      background: linear-gradient(135deg, #fcd34d, #a855f7, #2dd4bf);
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.5rem;
+    }
+    .tagline {
+      color: #a78bca; font-size: 0.85rem; margin-bottom: 1.75rem;
+    }
+    #qrcode {
+      display: inline-block;
+      background: #fff;
+      padding: 16px;
+      border-radius: 16px;
+      margin-bottom: 1.5rem;
+    }
+    .url {
+      color: #fcd34d; font-size: 0.9rem; font-weight: 600;
+      margin-bottom: 1.5rem; letter-spacing: 0.03em;
+    }
+    .btn-download {
+      display: inline-block;
+      background: linear-gradient(135deg, #7c3aed, #0d9488);
+      color: #fff; text-decoration: none;
+      padding: 0.75rem 2rem; border-radius: 50px;
+      font-weight: 700; font-size: 0.85rem;
+      letter-spacing: 0.05em; text-transform: uppercase;
+      cursor: pointer; border: none;
+      font-family: 'Raleway', sans-serif;
+      transition: opacity 0.2s;
+    }
+    .btn-download:hover { opacity: 0.88; }
+    .hint { color: #a78bca; font-size: 0.75rem; margin-top: 1rem; line-height: 1.6; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Cora's Creations</h1>
+    <p class="tagline">✨ Scan to visit the shop ✨</p>
+    <div id="qrcode"></div>
+    <p class="url">mycorascreations.com</p>
+    <button class="btn-download" onclick="downloadQR()">⬇ Download QR Code</button>
+    <p class="hint">Print this on business cards, packaging,<br>or anywhere you want customers to find you!</p>
+  </div>
+
+  <script>
+    const url = 'https://mycorascreations.com';
+    const qr = new QRCode(document.getElementById('qrcode'), {
+      text: url,
+      width: 220,
+      height: 220,
+      colorDark: '#0a0612',
+      colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.H
+    });
+
+    function downloadQR() {
+      setTimeout(() => {
+        const canvas = document.querySelector('#qrcode canvas');
+        if (!canvas) { alert('QR code still loading, try again in a second!'); return; }
+        const link = document.createElement('a');
+        link.download = 'coras-creations-qrcode.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      }, 200);
+    }
+  </script>
+</body>
+</html>

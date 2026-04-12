@@ -4,6 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cora's Creations</title>
+  <meta name="description" content="Handmade resin art & 3D printed wonders by Cora" />
+  <meta name="theme-color" content="#7c3aed" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Cora's Creations" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="apple-touch-icon" href="/icon-192.png" />
   <script src="https://web.squarecdn.com/v1/square.js"></script>
   <style>
     /* ---- FONTS ---- */
@@ -1352,6 +1359,15 @@
     e.preventDefault();
     document.getElementById('contactForm').style.display = 'none';
     document.getElementById('contactSuccess').style.display = 'block';
+  }
+
+  // ---- SERVICE WORKER (PWA) ----
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js')
+        .then(() => console.log('✅ Service worker registered'))
+        .catch(e => console.warn('SW error:', e));
+    });
   }
 </script>
 </body>
