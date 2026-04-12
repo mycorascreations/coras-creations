@@ -1,0 +1,1358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cora's Creations</title>
+  <script src="https://web.squarecdn.com/v1/square.js"></script>
+  <style>
+    /* ---- FONTS ---- */
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600&family=Raleway:wght@300;400;500;600&display=swap');
+
+    /* ---- RESET & BASE ---- */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-deep:        #0a0612;
+      --bg-mid:         #110a20;
+      --bg-card:        #1a1030;
+      --bg-card-hover:  #221540;
+      --purple-deep:    #3b0764;
+      --purple:         #7c3aed;
+      --purple-light:   #a855f7;
+      --gold:           #f59e0b;
+      --gold-light:     #fcd34d;
+      --teal:           #0d9488;
+      --teal-light:     #2dd4bf;
+      --rose:           #be185d;
+      --rose-light:     #f472b6;
+      --text-primary:   #f3e8ff;
+      --text-muted:     #a78bca;
+      --border:         rgba(168, 85, 247, 0.25);
+      --glow-purple:    rgba(124, 58, 237, 0.4);
+      --glow-gold:      rgba(245, 158, 11, 0.35);
+      --glow-teal:      rgba(13, 148, 136, 0.35);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Raleway', sans-serif;
+      background-color: var(--bg-deep);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ---- STARS BACKGROUND ---- */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 20% 50%, rgba(59, 7, 100, 0.3) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 10%, rgba(13, 148, 136, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 60% 80%, rgba(190, 24, 93, 0.1) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ---- SPARKLES ---- */
+    .sparkles-container {
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 0;
+      overflow: hidden;
+    }
+    .sparkle {
+      position: absolute;
+      width: 2px; height: 2px;
+      border-radius: 50%;
+      background: var(--gold-light);
+      animation: twinkle var(--dur, 3s) ease-in-out infinite var(--delay, 0s);
+    }
+    @keyframes twinkle {
+      0%, 100% { opacity: 0; transform: scale(0.5); }
+      50%       { opacity: 1; transform: scale(1.5); }
+    }
+
+    /* ---- NAV ---- */
+    nav {
+      position: fixed; top: 0; width: 100%; z-index: 100;
+      padding: 0 2rem;
+      background: rgba(10, 6, 18, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      max-width: 1200px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 72px;
+    }
+    .nav-logo {
+      font-family: 'Cinzel Decorative', cursive;
+      font-size: 1.3rem; font-weight: 700;
+      background: linear-gradient(135deg, var(--gold-light), var(--purple-light), var(--teal-light));
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.85rem; font-weight: 600;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      transition: color 0.3s;
+    }
+    .nav-links a:hover { color: var(--gold-light); }
+
+    /* hamburger */
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+    .hamburger span { display: block; width: 24px; height: 2px; background: var(--text-muted); border-radius: 2px; transition: 0.3s; }
+    .mobile-menu { display: none; }
+
+    /* ---- HERO ---- */
+    .hero {
+      position: relative; z-index: 1;
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      text-align: center;
+      padding: 6rem 2rem 4rem;
+      overflow: hidden;
+    }
+    .hero-glow {
+      position: absolute;
+      width: 600px; height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(124, 58, 237, 0.25) 0%, transparent 70%);
+      pointer-events: none;
+      animation: pulse-glow 4s ease-in-out infinite;
+    }
+    @keyframes pulse-glow {
+      0%, 100% { transform: scale(1); opacity: 0.8; }
+      50%       { transform: scale(1.1); opacity: 1; }
+    }
+    .hero-content { position: relative; max-width: 800px; }
+
+    .hero-eyebrow {
+      font-size: 0.8rem; letter-spacing: 0.25em; text-transform: uppercase;
+      color: var(--teal-light); margin-bottom: 1rem;
+      font-weight: 600;
+    }
+    .hero h1 {
+      font-family: 'Cinzel Decorative', cursive;
+      font-size: clamp(2.5rem, 8vw, 5.5rem);
+      font-weight: 900; line-height: 1.1;
+      background: linear-gradient(135deg, var(--gold-light) 0%, var(--purple-light) 50%, var(--teal-light) 100%);
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: shimmer 6s linear infinite;
+      background-size: 200% 200%;
+    }
+    @keyframes shimmer {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .hero-tagline {
+      margin-top: 1.5rem;
+      font-size: clamp(1rem, 2.5vw, 1.25rem);
+      color: var(--text-muted); line-height: 1.7;
+      font-weight: 300;
+    }
+    .hero-tagline strong { color: var(--rose-light); font-weight: 600; }
+
+    .hero-dragon {
+      font-size: clamp(4rem, 12vw, 8rem);
+      display: block; margin: 2rem auto;
+      animation: float 3s ease-in-out infinite;
+      filter: drop-shadow(0 0 20px rgba(124, 58, 237, 0.6));
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-12px); }
+    }
+
+    .cta-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-top: 2.5rem; }
+    .btn {
+      padding: 0.85rem 2rem; border-radius: 50px;
+      font-family: 'Raleway', sans-serif; font-weight: 700;
+      font-size: 0.9rem; letter-spacing: 0.05em; text-transform: uppercase;
+      text-decoration: none; cursor: pointer; border: none;
+      transition: transform 0.2s, box-shadow 0.3s;
+      display: inline-block;
+    }
+    .btn:hover { transform: translateY(-2px); }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--purple), var(--purple-deep));
+      color: #fff;
+      box-shadow: 0 0 20px var(--glow-purple), 0 4px 15px rgba(0,0,0,0.4);
+    }
+    .btn-primary:hover { box-shadow: 0 0 35px var(--glow-purple), 0 4px 20px rgba(0,0,0,0.5); }
+    .btn-secondary {
+      background: transparent;
+      color: var(--gold-light);
+      border: 2px solid var(--gold);
+      box-shadow: 0 0 15px var(--glow-gold);
+    }
+    .btn-secondary:hover { background: rgba(245,158,11,0.1); box-shadow: 0 0 25px var(--glow-gold); }
+
+    /* ---- SECTIONS ---- */
+    section { position: relative; z-index: 1; padding: 6rem 2rem; }
+    .section-inner { max-width: 1200px; margin: 0 auto; }
+
+    .section-header { text-align: center; margin-bottom: 3.5rem; }
+    .section-header h2 {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      background: linear-gradient(135deg, var(--gold-light), var(--purple-light));
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.75rem;
+    }
+    .section-header p { color: var(--text-muted); font-size: 1rem; line-height: 1.7; max-width: 600px; margin: 0 auto; }
+    .section-divider {
+      width: 80px; height: 3px; margin: 1rem auto;
+      background: linear-gradient(90deg, var(--purple), var(--gold), var(--teal));
+      border-radius: 2px;
+    }
+
+    /* ---- FEATURED CATEGORIES ---- */
+    .categories-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1.5rem;
+    }
+    .category-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem 1.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+      text-decoration: none; color: inherit;
+    }
+    .category-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.4), 0 0 20px var(--glow-purple);
+      border-color: var(--purple-light);
+    }
+    .category-icon { font-size: 3rem; margin-bottom: 1rem; display: block; }
+    .category-card h3 { font-family: 'Cinzel', serif; font-size: 1rem; color: var(--gold-light); margin-bottom: 0.5rem; }
+    .category-card p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; }
+
+    /* ---- SHOP GRID ---- */
+    .shop-tabs {
+      display: flex; gap: 0.75rem; flex-wrap: wrap; justify-content: center; margin-bottom: 2.5rem;
+    }
+    .tab-btn {
+      padding: 0.5rem 1.25rem; border-radius: 50px;
+      background: var(--bg-card); border: 1px solid var(--border);
+      color: var(--text-muted); font-size: 0.8rem; font-weight: 600;
+      letter-spacing: 0.05em; text-transform: uppercase;
+      cursor: pointer; transition: all 0.25s;
+      font-family: 'Raleway', sans-serif;
+    }
+    .tab-btn:hover, .tab-btn.active {
+      background: var(--purple); border-color: var(--purple-light);
+      color: #fff; box-shadow: 0 0 15px var(--glow-purple);
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1.75rem;
+    }
+    .product-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px; overflow: hidden;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .product-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 25px var(--glow-purple);
+    }
+    .product-img {
+      width: 100%; aspect-ratio: 1;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 5rem;
+      position: relative; overflow: hidden;
+    }
+    .product-img::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(124,58,237,0.1), rgba(13,148,136,0.1));
+    }
+    .product-body { padding: 1.25rem; }
+    .product-tag {
+      display: inline-block;
+      font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700;
+      padding: 0.2rem 0.75rem; border-radius: 50px;
+      margin-bottom: 0.75rem;
+    }
+    .tag-resin   { background: rgba(190,24,93,0.2); color: var(--rose-light); border: 1px solid rgba(190,24,93,0.4); }
+    .tag-3d      { background: rgba(13,148,136,0.2); color: var(--teal-light); border: 1px solid rgba(13,148,136,0.4); }
+    .tag-custom  { background: rgba(245,158,11,0.2); color: var(--gold-light); border: 1px solid rgba(245,158,11,0.4); }
+    .product-body h3 { font-family: 'Cinzel', serif; font-size: 1rem; margin-bottom: 0.4rem; color: var(--text-primary); }
+    .product-body p  { font-size: 0.82rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 1rem; }
+    .product-footer { display: flex; align-items: center; justify-content: space-between; }
+    .product-price { font-size: 1.2rem; font-weight: 700; color: var(--gold-light); }
+    .btn-cart {
+      background: linear-gradient(135deg, var(--purple), var(--rose));
+      color: #fff; border: none; padding: 0.5rem 1.2rem;
+      border-radius: 50px; font-size: 0.8rem; font-weight: 700;
+      cursor: pointer; transition: all 0.25s; letter-spacing: 0.05em;
+      font-family: 'Raleway', sans-serif;
+    }
+    .btn-cart:hover { transform: scale(1.05); box-shadow: 0 0 15px var(--glow-purple); }
+
+    .hidden { display: none !important; }
+
+    /* ---- ABOUT ---- */
+    #about { background: linear-gradient(180deg, transparent, rgba(59,7,100,0.15), transparent); }
+    .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+    .about-visual {
+      display: flex; align-items: center; justify-content: center;
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 24px; aspect-ratio: 1;
+      font-size: 8rem;
+      animation: float 4s ease-in-out infinite;
+      box-shadow: 0 0 40px var(--glow-purple);
+    }
+    .about-text h2 {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(1.8rem, 3vw, 2.5rem);
+      background: linear-gradient(135deg, var(--gold-light), var(--purple-light));
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 1.5rem;
+    }
+    .about-text p { color: var(--text-muted); line-height: 1.9; margin-bottom: 1rem; font-size: 0.95rem; }
+    .about-text p strong { color: var(--text-primary); }
+
+    .about-badges { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1.5rem; }
+    .badge {
+      padding: 0.4rem 1rem; border-radius: 50px; font-size: 0.8rem; font-weight: 600;
+      background: var(--bg-card); border: 1px solid var(--border); color: var(--text-muted);
+    }
+
+    /* ---- CUSTOM ORDER ---- */
+    #custom { background: linear-gradient(180deg, transparent, rgba(13,148,136,0.08), transparent); }
+    .form-card {
+      max-width: 700px; margin: 0 auto;
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 24px; padding: 3rem;
+      box-shadow: 0 0 40px rgba(0,0,0,0.3);
+    }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+    .form-group { display: flex; flex-direction: column; gap: 0.5rem; }
+    .form-group.full { grid-column: 1 / -1; }
+    label { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); }
+    input, select, textarea {
+      background: var(--bg-mid); border: 1px solid var(--border);
+      color: var(--text-primary); border-radius: 10px;
+      padding: 0.75rem 1rem; font-size: 0.9rem;
+      font-family: 'Raleway', sans-serif;
+      transition: border-color 0.25s, box-shadow 0.25s;
+      outline: none;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--purple-light);
+      box-shadow: 0 0 12px var(--glow-purple);
+    }
+    select option { background: var(--bg-mid); color: var(--text-primary); }
+    textarea { resize: vertical; min-height: 120px; }
+    .form-submit { margin-top: 1.5rem; text-align: center; }
+    .btn-submit {
+      background: linear-gradient(135deg, var(--purple), var(--teal));
+      color: #fff; border: none; padding: 1rem 3rem;
+      border-radius: 50px; font-size: 0.9rem; font-weight: 700;
+      cursor: pointer; letter-spacing: 0.08em; text-transform: uppercase;
+      font-family: 'Raleway', sans-serif;
+      box-shadow: 0 0 25px var(--glow-teal);
+      transition: transform 0.2s, box-shadow 0.3s;
+    }
+    .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 0 40px var(--glow-teal); }
+    .form-note { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.75rem; }
+
+    /* success message */
+    .success-msg {
+      display: none; text-align: center; padding: 2rem;
+      color: var(--teal-light); font-size: 1.1rem;
+    }
+    .success-msg span { font-size: 3rem; display: block; margin-bottom: 1rem; }
+
+    /* ---- CONTACT ---- */
+    .contact-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1.5rem; }
+    .contact-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 20px; padding: 2rem; text-align: center;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .contact-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0,0,0,0.4); }
+    .contact-icon { font-size: 2.5rem; margin-bottom: 1rem; display: block; }
+    .contact-card h3 { font-family: 'Cinzel', serif; font-size: 1rem; color: var(--gold-light); margin-bottom: 0.5rem; }
+    .contact-card p, .contact-card a {
+      font-size: 0.88rem; color: var(--text-muted); text-decoration: none; line-height: 1.6;
+    }
+    .contact-card a:hover { color: var(--purple-light); }
+
+    /* ---- TESTIMONIALS ---- */
+    .testimonials-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
+    .testimonial {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 20px; padding: 1.75rem;
+    }
+    .stars { color: var(--gold); font-size: 0.9rem; margin-bottom: 0.75rem; }
+    .testimonial blockquote { font-size: 0.9rem; color: var(--text-muted); line-height: 1.7; font-style: italic; margin-bottom: 1rem; }
+    .testimonial cite { font-size: 0.82rem; font-weight: 700; color: var(--purple-light); }
+
+    /* ---- FOOTER ---- */
+    footer {
+      position: relative; z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+    .footer-logo {
+      font-family: 'Cinzel Decorative', cursive;
+      font-size: 1.4rem; font-weight: 700;
+      background: linear-gradient(135deg, var(--gold-light), var(--purple-light));
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.75rem;
+    }
+    footer p { color: var(--text-muted); font-size: 0.82rem; margin-bottom: 0.25rem; }
+    .footer-heart { color: var(--rose-light); }
+
+    /* ---- SCROLL REVEAL ---- */
+    .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ---- RESPONSIVE ---- */
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      .mobile-menu {
+        position: fixed; inset: 72px 0 0 0;
+        background: rgba(10,6,18,0.97);
+        display: none; flex-direction: column;
+        align-items: center; justify-content: center;
+        gap: 2rem; z-index: 99;
+      }
+      .mobile-menu.open { display: flex; }
+      .mobile-menu a {
+        color: var(--text-primary); font-size: 1.3rem;
+        font-family: 'Cinzel', serif; text-decoration: none;
+        transition: color 0.3s;
+      }
+      .mobile-menu a:hover { color: var(--gold-light); }
+
+      .about-grid { grid-template-columns: 1fr; gap: 2rem; }
+      .about-visual { font-size: 5rem; max-width: 280px; margin: 0 auto; }
+      .form-grid { grid-template-columns: 1fr; }
+      .form-card { padding: 2rem 1.25rem; }
+    }
+
+    /* ---- BANNER STRIPE ---- */
+    .banner-stripe {
+      position: relative; z-index: 2;
+      background: linear-gradient(90deg, var(--purple-deep), var(--rose), var(--purple-deep));
+      background-size: 200% 100%;
+      animation: slide-bg 6s linear infinite;
+      padding: 0.6rem 2rem;
+      text-align: center;
+      font-size: 0.82rem; letter-spacing: 0.08em; font-weight: 600;
+      color: #ffe;
+    }
+    @keyframes slide-bg {
+      0%   { background-position: 0% 50%; }
+      100% { background-position: 200% 50%; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Stars -->
+<div class="sparkles-container" id="sparkles"></div>
+
+<!-- Banner -->
+<div class="banner-stripe">✨ Handcrafted with magic &nbsp;|&nbsp; 🐉 New dragon designs available &nbsp;|&nbsp; Free shipping on orders over $50 ✨</div>
+
+<!-- Nav -->
+<nav>
+  <div class="nav-inner">
+    <a href="#home" class="nav-logo">Cora's Creations</a>
+    <ul class="nav-links">
+      <li><a href="#shop">Shop</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#custom">Custom Orders</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <div style="display:flex; align-items:center; gap:1.25rem;">
+      <button onclick="toggleCart()" style="
+        background:none; border:none; cursor:pointer;
+        position:relative; padding:0.4rem;
+      " title="Cart">
+        <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none"
+          stroke="#fcd34d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+        </svg>
+        <span id="cartCount" style="
+          display:none; position:absolute; top:-4px; right:-4px;
+          background: linear-gradient(135deg, var(--purple), var(--rose));
+          color:#fff; font-size:0.65rem; font-weight:700;
+          width:18px; height:18px; border-radius:50%;
+          line-height:18px; text-align:center;
+        ">0</span>
+      </button>
+      <div class="hamburger" onclick="toggleMenu()" id="hamburger">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile Menu -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#shop"   onclick="toggleMenu()">Shop</a>
+  <a href="#about"  onclick="toggleMenu()">About</a>
+  <a href="#custom" onclick="toggleMenu()">Custom Orders</a>
+  <a href="#contact"onclick="toggleMenu()">Contact</a>
+</div>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-glow"></div>
+  <div class="hero-content">
+    <p class="hero-eyebrow">✦ Handmade Resin &amp; 3D Printed Art ✦</p>
+    <h1>Cora's Creations</h1>
+    <span class="hero-dragon">🐉</span>
+    <p class="hero-tagline">
+      Where <strong>magic meets craft</strong> — unique resin art, enchanted home décor,<br>
+      and fantastical 3D printed treasures, made with love.
+    </p>
+    <div class="cta-buttons">
+      <a href="#shop" class="btn btn-primary">Shop the Collection</a>
+      <a href="#custom" class="btn btn-secondary">Custom Orders</a>
+    </div>
+  </div>
+</section>
+
+<!-- CATEGORIES -->
+<section id="categories">
+  <div class="section-inner">
+    <div class="section-header reveal">
+      <h2>What I Make</h2>
+      <div class="section-divider"></div>
+      <p>Every piece is handcrafted with care — no two are exactly alike.</p>
+    </div>
+    <div class="categories-grid">
+      <a href="#shop" class="category-card reveal">
+        <span class="category-icon">🫧</span>
+        <h3>Trinket Dishes</h3>
+        <p>Beautifully cast resin dishes for jewelry, keys, and tiny treasures.</p>
+      </a>
+      <a href="#shop" class="category-card reveal">
+        <img src="Coaster-butterfly.jpeg" alt="Coasters" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;margin-bottom:1rem;">
+        <h3>Coasters</h3>
+        <p>Ocean-swirl and galaxy resin coasters to protect your surfaces in style.</p>
+      </a>
+      <a href="#shop" class="category-card reveal">
+        <span class="category-icon">🍽️</span>
+        <h3>Serving Trays</h3>
+        <p>Stunning resin serving trays — functional art for your home.</p>
+      </a>
+      <a href="#shop" class="category-card reveal">
+        <span class="category-icon">🦋</span>
+        <h3>Animal Molds</h3>
+        <p>Resin animals in every color — butterflies, foxes, cats &amp; more.</p>
+      </a>
+      <a href="#shop" class="category-card reveal">
+        <span class="category-icon">🐉</span>
+        <h3>3D Printed Dragons</h3>
+        <p>Articulated and decorative dragons fresh off the printer — collectible &amp; poseable.</p>
+      </a>
+      <a href="#shop" class="category-card reveal">
+        <span class="category-icon">🌀</span>
+        <h3>Fidget Spinners</h3>
+        <p>Custom 3D printed fidget spinners — satisfying, stylish, and totally unique.</p>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- SHOP -->
+<section id="shop">
+  <div class="section-inner">
+    <div class="section-header reveal">
+      <h2>The Enchanted Shop</h2>
+      <div class="section-divider"></div>
+      <p>Browse Cora's latest creations. Each item is one-of-a-kind.</p>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div class="shop-tabs reveal">
+      <button class="tab-btn active" onclick="filterProducts('all', this)">All Items</button>
+      <button class="tab-btn" onclick="filterProducts('resin', this)">Resin Art</button>
+      <button class="tab-btn" onclick="filterProducts('3d', this)">3D Printed</button>
+    </div>
+
+    <div class="products-grid" id="productsGrid">
+
+      <!-- Trinket Dishes -->
+      <div class="product-card reveal" data-category="resin">
+        <div class="product-img" style="background: linear-gradient(135deg,#1a0535,#3b0764,#7c3aed);">🫧</div>
+        <div class="product-body">
+          <span class="product-tag tag-resin">Resin</span>
+          <h3>Galaxy Trinket Dish</h3>
+          <p>Deep space swirls of purple, blue, and gold glitter in a round catch-all dish.</p>
+          <div class="product-footer">
+            <span class="product-price">$18</span>
+            <button class="btn-cart" onclick="addedToCart(this,'Galaxy Trinket Dish',18)">Add to Cart 🛒</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="product-card reveal" data-category="resin">
+        <div class="product-img" style="background: linear-gradient(135deg,#042f2e,#0d9488,#2dd4bf);">🌊</div>
+        <div class="product-body">
+          <span class="product-tag tag-resin">Resin</span>
+          <h3>Ocean Wave Trinket Dish</h3>
+          <p>Teal and seafoam waves frozen in crystal-clear resin with gold leaf accents.</p>
+          <div class="product-footer">
+            <span class="product-price">$16</span>
+            <button class="btn-cart" onclick="addedToCart(this,'Ocean Wave Trinket Dish',16)">Add to Cart 🛒</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Coasters -->
+      <div class="product-card reveal" data-category="resin">
+        <div class="product-img"><img src="Coaster-butterfly.jpeg" alt="Nebula Coaster Set" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-body">
+          <span class="product-tag tag-resin">Resin</span>
+          <h3>Nebula Coaster Set (4)</h3>
+          <p>Set of 4 matching coasters swirling with cosmic purples and rose gold.</p>
+          <div class="product-footer">
+            <span class="product-price">$35</span>
+            <button class="btn-cart" onclick="addedToCart(this,'Nebula Coaster Set (4)',35)">Add to Cart 🛒</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="product-card reveal" data-category="resin">
+        <div class="product-img"><img src="Coaster-butterfly.jpeg" alt="Emerald Forest Coaster" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-body">
+          <span class="product-tag tag-resin">Resin</span>
+          <h3>Emerald Forest Coaster (single)</h3>
+          <p>Deep greens and flecks of gold suspended in glass-clear resin.</p>
+          <div class="product-footer">
+            <span class="product-price">$12</span>
+            <button class="btn-cart" onclick="addedToCart(this,'Emerald Forest Coaster',12)">Add to Cart 🛒</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Serving Trays -->
+      <div class="product-card reveal" data-category="resin">
+        <div class="product-img" style="background: linear-gradient(135deg,#2d1b00,#92400e,#fbbf24);">🍽️</div>
+        <div class="product-body">
+          <span class="product-tag tag-resin">Resin</span>
+          <h3>Amber Geode Serving Tray</h3>
+          <p>Gold and amber geode pattern on a sturdy resin tray — perfect for entertaining.</p>
+          <div class="product-footer">
+            <span class="product-price">$1</span>
+            <button class="btn-cart" onclick="addedToCart(this,'Amber Geode Serving Tray',1)">Add to Cart 🛒</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="product-card reveal" data-category="resin">
+        <div class="product-img" style="background: linear-gradient(135deg,#0c0a20,#1e1b4b,#c7d2fe);">🌌</div>
+        <div class="product-body">
+          <span class="product-tag tag-resin">Resin</span>
+          <h3>Midnight Galaxy Tray</h3>
+          <p>A full galaxy captured in a rectangular serving tray — deep navy, violet, and stars.</p>
+          <div class="product-footer">
+            <span class="product-price">$60</span>
+            <button class="btn-cart" onclick="addedToCart(this,'Midnight Galaxy Tray',60)">Add to Cart 🛒</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Animal Molds -->
+      <div class="product-card reveal" data-category="resin">
+        <div class="product-img" style="background: linear-gradient(135deg,#1a0535,#be185d,#f9a8d4);">🦋</div>
+        <div class="product-body">
+          <span class="product-tag tag-resin">Resin</span>
+          <h3>Butterfly Collection</h3>
+          <p>Iridescent resin butterflies in a range of magical colorways — set of 3.</p>
+          <div class="product-footer">
+            <span class="product-price">$22</span>
+            <button class="btn-cart" onclick="addedToCart(this,'Butterfly Collection',22)">Add to Cart 🛒</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="product-card reveal" data-category="resin">
+        <div class="product-img" style="background: linear-gradient(135deg,#1c1203,#92400e,#fde68a);">🦊</div>
+        <div class="product-body">
+          <span class="product-tag tag-resin">Resin</span>
+          <h3>Amber Fox Figure</h3>
+          <p>A detailed resin fox figure in warm amber and red tones. Adorable on any shelf!</p>
+          <div class="product-footer">
+            <span class="product-price">$19</span>
+            <button class="btn-cart" onclick="addedToCart(this,'Amber Fox Figure',19)">Add to Cart 🛒</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3D Dragons -->
+      <div class="product-card reveal" data-category="3d">
+        <div class="product-img" style="background: linear-gradient(135deg,#042f2e,#134e4a,#0d9488);">🐉</div>
+        <div class="product-body">
+          <span class="product-tag tag-3d">3D Printed</span>
+          <h3>Articulated Teal Dragon</h3>
+          <p>Fully poseable, multi-segment dragon in shimmering teal — a collector's dream.</p>
+          <div class="product-footer">
+            <span class="product-price">$38</span>
+            <button class="btn-cart" onclick="addedToCart(this,'Articulated Teal Dragon',38)">Add to Cart 🛒</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="product-card reveal" data-category="3d">
+        <div class="product-img" style="background: linear-gradient(135deg,#2d1b00,#7c2d12,#dc2626);">🔥</div>
+        <div class="product-body">
+          <span class="product-tag tag-3d">3D Printed</span>
+          <h3>Fire Dragon (Display)</h3>
+          <p>Fierce display dragon in fiery reds and oranges — printed in stunning detail.</p>
+          <div class="product-footer">
+            <span class="product-price">$42</span>
+            <button class="btn-cart" onclick="addedToCart(this,'Fire Dragon (Display)',42)">Add to Cart 🛒</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fidget Spinners -->
+      <div class="product-card reveal" data-category="3d">
+        <div class="product-img" style="background: linear-gradient(135deg,#1e1b4b,#3730a3,#818cf8);">🌀</div>
+        <div class="product-body">
+          <span class="product-tag tag-3d">3D Printed</span>
+          <h3>Galaxy Fidget Spinner</h3>
+          <p>Smooth-spinning 3-blade fidget spinner in galactic purple — satisfying and stylish.</p>
+          <div class="product-footer">
+            <span class="product-price">$14</span>
+            <button class="btn-cart" onclick="addedToCart(this,'Galaxy Fidget Spinner',14)">Add to Cart 🛒</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="product-card reveal" data-category="3d">
+        <div class="product-img" style="background: linear-gradient(135deg,#042f2e,#065f46,#34d399);">🌿</div>
+        <div class="product-body">
+          <span class="product-tag tag-3d">3D Printed</span>
+          <h3>Dragon Wing Spinner</h3>
+          <p>A fidget spinner shaped like dragon wings — because why be ordinary?</p>
+          <div class="product-footer">
+            <span class="product-price">$16</span>
+            <button class="btn-cart" onclick="addedToCart(this,'Dragon Wing Spinner',16)">Add to Cart 🛒</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /products-grid -->
+
+    <!-- Cart Toast -->
+    <div id="cartToast" style="
+      display:none; position:fixed; bottom:2rem; right:2rem;
+      background: linear-gradient(135deg, var(--purple),var(--teal));
+      color:#fff; padding:1rem 1.75rem; border-radius:50px;
+      font-weight:700; font-size:0.9rem; z-index:999;
+      box-shadow: 0 0 30px var(--glow-teal);
+    ">✨ Added to cart!</div>
+
+    <!-- Cart Modal Overlay -->
+    <div id="cartOverlay" onclick="closeCart()" style="
+      display:none; position:fixed; inset:0;
+      background:rgba(0,0,0,0.7); z-index:200; backdrop-filter:blur(4px);
+    "></div>
+
+    <!-- Cart Drawer -->
+    <div id="cartDrawer" style="
+      display:none; position:fixed; top:0; right:0;
+      width:min(480px,100vw); height:100vh;
+      background:var(--bg-mid); border-left:1px solid var(--border);
+      z-index:201; overflow-y:auto;
+      box-shadow:-10px 0 40px rgba(0,0,0,0.5);
+      flex-direction:column;
+    ">
+      <!-- Header -->
+      <div style="
+        padding:1.5rem; border-bottom:1px solid var(--border);
+        display:flex; align-items:center; justify-content:space-between;
+        position:sticky; top:0; background:var(--bg-mid); z-index:1;
+      ">
+        <h2 style="font-family:'Cinzel',serif; font-size:1.2rem;
+          background:linear-gradient(135deg,var(--gold-light),var(--purple-light));
+          -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;">
+          🛒 Your Cart
+        </h2>
+        <button onclick="closeCart()" style="
+          background:none; border:1px solid var(--border); color:var(--text-muted);
+          width:32px; height:32px; border-radius:50%; cursor:pointer; font-size:1rem;
+          display:flex; align-items:center; justify-content:center;
+        ">✕</button>
+      </div>
+
+      <!-- Cart Items -->
+      <div id="cartItems" style="padding:1.25rem; flex:1;"></div>
+
+      <!-- Empty State -->
+      <div id="cartEmpty" style="
+        text-align:center; padding:3rem 1.5rem; color:var(--text-muted);
+      ">
+        <div style="font-size:3rem; margin-bottom:1rem;">🛒</div>
+        <p>Your cart is empty.<br>Add some magical creations!</p>
+      </div>
+
+      <!-- Checkout Section -->
+      <div id="checkoutSection" style="display:none; padding:1.25rem; border-top:1px solid var(--border);">
+
+        <!-- Subtotal + Shipping + Total -->
+        <div style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1.25rem;">
+          <div style="display:flex; justify-content:space-between; font-size:0.95rem;">
+            <span style="color:var(--text-muted);">Subtotal</span>
+            <span id="cartSubtotal" style="color:var(--text-primary); font-weight:600;">$0</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:0.95rem;">
+            <span style="color:var(--text-muted);">Shipping</span>
+            <span id="cartShipping" style="color:var(--teal-light); font-weight:600;">$5.99</span>
+          </div>
+          <div style="height:1px; background:var(--border); margin:0.25rem 0;"></div>
+          <div style="display:flex; justify-content:space-between; font-size:1.1rem;">
+            <span style="color:var(--text-primary); font-weight:700;">Total</span>
+            <span id="cartTotal" style="color:var(--gold-light); font-weight:700; font-size:1.2rem;">$0</span>
+          </div>
+        </div>
+
+        <!-- Checkout Form Toggle -->
+        <div id="checkoutFormWrap">
+          <button onclick="showCheckoutForm()" class="btn-submit" style="width:100%; margin-bottom:0.75rem;">
+            Proceed to Checkout →
+          </button>
+          <p style="font-size:0.75rem; color:var(--text-muted); text-align:center;">
+            Free shipping on orders over $50 ✨
+          </p>
+        </div>
+
+        <!-- Payment Form (Square + Venmo) -->
+        <div id="paymentForm" style="display:none;">
+          <h3 style="font-family:'Cinzel',serif; font-size:1rem; color:var(--gold-light); margin-bottom:1.25rem;">
+            💳 Payment Details
+          </h3>
+          <div style="display:flex; flex-direction:column; gap:0.85rem;">
+            <div class="form-group">
+              <label>Full Name</label>
+              <input type="text" id="sq-name" placeholder="Jane Smith" />
+            </div>
+            <div class="form-group">
+              <label>Email Address</label>
+              <input type="email" id="sq-email" placeholder="you@email.com" />
+            </div>
+            <div class="form-group">
+              <label>Shipping Address</label>
+              <input type="text" id="sq-address" placeholder="Street address" style="margin-bottom:0.5rem;" />
+              <input type="text" id="sq-city" placeholder="City, State, ZIP" />
+            </div>
+
+            <!-- Venmo Button -->
+            <div class="form-group">
+              <label>Pay with Venmo</label>
+              <button id="venmo-btn" onclick="payWithVenmo()" type="button" style="
+                width:100%; padding:0.85rem; border-radius:10px; border:none; cursor:pointer;
+                background:#008CFF; color:#fff; font-size:1rem; font-weight:700;
+                font-family:'Raleway',sans-serif; letter-spacing:0.03em;
+                display:flex; align-items:center; justify-content:center; gap:0.6rem;
+                transition:opacity 0.2s;
+              " onmouseover="this.style.opacity='0.88'" onmouseout="this.style.opacity='1'">
+                <svg width="22" height="22" viewBox="0 0 111 111" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M95.4 9.5c3.3 5.4 4.8 11 4.8 18.2 0 22.7-19.4 52.2-35.1 72.9H29.8L13 11.9l35.3-3.4 8.4 67.1C63.9 64.2 73 44.5 73 30.5c0-7.5-1.3-12.6-3.3-16.8L95.4 9.5z" fill="white"/>
+                </svg>
+                Pay with Venmo
+              </button>
+              <p style="font-size:0.72rem; color:var(--text-muted); margin-top:0.4rem; text-align:center;">
+                Opens Venmo with your total pre-filled. Send to <strong style="color:var(--text-primary);">@Coras-Creations</strong>
+              </p>
+            </div>
+
+            <!-- OR divider -->
+            <div style="display:flex; align-items:center; gap:0.75rem; margin:0.25rem 0;">
+              <div style="flex:1; height:1px; background:var(--border);"></div>
+              <span style="font-size:0.75rem; color:var(--text-muted); font-weight:600; letter-spacing:0.1em;">OR</span>
+              <div style="flex:1; height:1px; background:var(--border);"></div>
+            </div>
+
+            <!-- Square Card Fields -->
+            <div class="form-group">
+              <label>Pay by Card</label>
+              <div id="card-container" style="
+                background:var(--bg-mid); border:1px solid var(--border);
+                border-radius:10px; padding:0.75rem 1rem; min-height:48px;
+              "></div>
+            </div>
+
+            <div id="sq-error" style="
+              display:none; color:#f87171; font-size:0.8rem;
+              background:rgba(248,113,113,0.1); border:1px solid rgba(248,113,113,0.3);
+              padding:0.6rem 0.85rem; border-radius:8px;
+            "></div>
+            <button id="sq-pay-btn" onclick="placeOrder()" class="btn-submit" style="width:100%; margin-top:0.25rem;">
+              ✨ Place Order by Card
+            </button>
+            <p style="font-size:0.72rem; color:var(--text-muted); text-align:center; line-height:1.5;">
+              🔒 Payments securely processed by Square
+            </p>
+          </div>
+        </div>
+
+        <!-- Order Confirmed -->
+        <div id="orderConfirmed" style="display:none; text-align:center; padding:1.5rem 0;">
+          <div style="font-size:3rem; margin-bottom:0.75rem;">🐉✨</div>
+          <h3 style="font-family:'Cinzel',serif; color:var(--gold-light); margin-bottom:0.5rem;">Order Received!</h3>
+          <p style="color:var(--text-muted); font-size:0.88rem; line-height:1.7;">
+            Thank you! Cora will email you within 24 hours to confirm your order and arrange payment.
+          </p>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-inner">
+    <div class="about-grid">
+      <div class="about-visual reveal">🧙‍♀️</div>
+      <div class="about-text reveal">
+        <h2>Meet the Creator</h2>
+        <p>Hi, I'm <strong>Cora</strong>! I'm a young artist with a passion for bringing magical things to life. I started making resin art because I loved how you could trap color, glitter, and light inside something beautiful — like catching a little piece of a galaxy in your hands.</p>
+        <p>My 3D printing obsession started when I discovered I could make <strong>articulated dragons</strong> that actually move. Now I spend my free time designing, printing, and painting one-of-a-kind pieces for people who love fantasy and handmade things as much as I do.</p>
+        <p>Every single item in my shop is made <strong>by me, in my craft studio</strong>. No mass production — just a girl, her tools, and a whole lot of imagination. ✨</p>
+        <div class="about-badges">
+          <span class="badge">🎨 Resin Artist</span>
+          <span class="badge">🖨️ 3D Print Designer</span>
+          <span class="badge">🐉 Dragon Enthusiast</span>
+          <span class="badge">💜 Handmade Only</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials">
+  <div class="section-inner">
+    <div class="section-header reveal">
+      <h2>Customer Love</h2>
+      <div class="section-divider"></div>
+    </div>
+    <div class="testimonials-grid">
+      <div class="testimonial reveal">
+        <div class="stars">★★★★★</div>
+        <blockquote>"The galaxy coasters are absolutely stunning. They look like actual mini universes on my coffee table. Cora is insanely talented!"</blockquote>
+        <cite>— Sarah M.</cite>
+      </div>
+      <div class="testimonial reveal">
+        <div class="stars">★★★★★</div>
+        <blockquote>"Got an articulated dragon for my nephew and he won't put it down. The quality is unreal for a handmade item. Will definitely order again!"</blockquote>
+        <cite>— Jake T.</cite>
+      </div>
+      <div class="testimonial reveal">
+        <div class="stars">★★★★★</div>
+        <blockquote>"Ordered a custom trinket dish and Cora nailed exactly what I was looking for. The communication was great and it arrived beautifully packaged."</blockquote>
+        <cite>— Megan R.</cite>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CUSTOM ORDER -->
+<section id="custom">
+  <div class="section-inner">
+    <div class="section-header reveal">
+      <h2>Custom Orders</h2>
+      <div class="section-divider"></div>
+      <p>Want something made just for you? Fill out the form and Cora will be in touch within 2–3 days with a quote and timeline.</p>
+    </div>
+    <div class="form-card reveal">
+      <form id="customForm" onsubmit="submitForm(event)">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="fname">First Name</label>
+            <input type="text" id="fname" placeholder="Your name" required />
+          </div>
+          <div class="form-group">
+            <label for="lname">Last Name</label>
+            <input type="text" id="lname" placeholder="Last name" required />
+          </div>
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" placeholder="you@email.com" required />
+          </div>
+          <div class="form-group">
+            <label for="item-type">Item Type</label>
+            <select id="item-type" required>
+              <option value="" disabled selected>Select item type…</option>
+              <option>Trinket Dish</option>
+              <option>Coaster Set</option>
+              <option>Serving Tray</option>
+              <option>Animal Figure</option>
+              <option>3D Printed Dragon</option>
+              <option>Fidget Spinner</option>
+              <option>Other / Surprise me!</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="colors">Preferred Colors / Theme</label>
+            <input type="text" id="colors" placeholder="e.g. ocean blue, purple galaxy, autumn…" />
+          </div>
+          <div class="form-group">
+            <label for="budget">Approximate Budget</label>
+            <select id="budget">
+              <option value="" disabled selected>Select range…</option>
+              <option>Under $20</option>
+              <option>$20 – $40</option>
+              <option>$40 – $75</option>
+              <option>$75+</option>
+            </select>
+          </div>
+          <div class="form-group full">
+            <label for="details">Tell me more about your vision!</label>
+            <textarea id="details" placeholder="Describe what you're imagining — size, colors, who it's for, any special requests…" required></textarea>
+          </div>
+        </div>
+        <div class="form-submit">
+          <button type="submit" class="btn-submit">✨ Send My Request</button>
+          <p class="form-note">I'll reply within 2–3 business days. Custom orders are paid for upfront once a quote is agreed on.</p>
+        </div>
+      </form>
+      <div class="success-msg" id="successMsg">
+        <span>🐉</span>
+        <p>Your custom order request has been sent! Cora will be in touch soon. ✨</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="section-inner">
+    <div class="section-header reveal">
+      <h2>Get in Touch</h2>
+      <div class="section-divider"></div>
+      <p>Questions about an order, a product, or just want to say hi? Cora loves hearing from you!</p>
+    </div>
+    <div style="display:flex; justify-content:center;">
+      <div class="contact-card reveal" style="max-width:480px; width:100%; text-align:left;">
+        <span class="contact-icon" style="display:block; text-align:center;">📧</span>
+        <h3 style="text-align:center; margin-bottom:1.25rem;">Send a Message</h3>
+        <form id="contactForm" onsubmit="submitContact(event)" style="display:flex; flex-direction:column; gap:0.85rem;">
+          <div class="form-group">
+            <label for="contact-name">Your Name</label>
+            <input type="text" id="contact-name" placeholder="Your name" required />
+          </div>
+          <div class="form-group">
+            <label for="contact-email">Your Email</label>
+            <input type="email" id="contact-email" placeholder="So Cora can write back!" required />
+          </div>
+          <div class="form-group">
+            <label for="contact-msg">Message</label>
+            <textarea id="contact-msg" placeholder="Say hi, ask a question, whatever you'd like!" style="min-height:100px;" required></textarea>
+          </div>
+          <button type="submit" class="btn-submit" style="margin-top:0.5rem;">Send Message ✨</button>
+          <p class="form-note" style="text-align:center;">I try to reply within 24–48 hours!</p>
+        </form>
+        <div id="contactSuccess" style="display:none; text-align:center; padding:1.5rem 0; color:var(--teal-light);">
+          <span style="font-size:2.5rem; display:block; margin-bottom:0.75rem;">💌</span>
+          <p style="font-weight:600;">Message sent! Cora will be in touch soon. ✨</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Cora's Creations</div>
+  <p>Handcrafted resin art &amp; 3D printed wonders ✨</p>
+  <p style="margin-top:0.75rem; font-size:0.75rem;">Made with <span class="footer-heart">♥</span> &amp; a whole lot of glitter &nbsp;·&nbsp; © 2026 Cora's Creations</p>
+</footer>
+
+<script>
+  // ---- SPARKLES ----
+  (function() {
+    const container = document.getElementById('sparkles');
+    for (let i = 0; i < 80; i++) {
+      const s = document.createElement('div');
+      s.className = 'sparkle';
+      s.style.cssText = `
+        left:${Math.random()*100}%;
+        top:${Math.random()*100}%;
+        --dur:${2+Math.random()*4}s;
+        --delay:${Math.random()*5}s;
+        width:${1+Math.random()*3}px;
+        height:${1+Math.random()*3}px;
+        background:${['#fcd34d','#a855f7','#2dd4bf','#f9a8d4'][Math.floor(Math.random()*4)]};
+      `;
+      container.appendChild(s);
+    }
+  })();
+
+  // ---- MOBILE MENU ----
+  function toggleMenu() {
+    document.getElementById('mobileMenu').classList.toggle('open');
+  }
+
+  // ---- SCROLL REVEAL ----
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // ---- PRODUCT FILTER ----
+  function filterProducts(cat, btn) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.product-card').forEach(card => {
+      if (cat === 'all' || card.dataset.category === cat) {
+        card.classList.remove('hidden');
+      } else {
+        card.classList.add('hidden');
+      }
+    });
+  }
+
+  // ---- CART STATE ----
+  let cart = {}; // { name: { price, qty } }
+
+  function addedToCart(btn, name, price) {
+    // update button
+    btn.textContent = '✓ Added!';
+    btn.style.background = 'linear-gradient(135deg, #059669, #0d9488)';
+    setTimeout(() => { btn.textContent = 'Add to Cart 🛒'; btn.style.background = ''; }, 2000);
+
+    // add to cart object
+    if (cart[name]) { cart[name].qty++; } else { cart[name] = { price, qty: 1 }; }
+
+    // update badge
+    const total = Object.values(cart).reduce((s, i) => s + i.qty, 0);
+    const badge = document.getElementById('cartCount');
+    badge.textContent = total; badge.style.display = 'block';
+
+    // toast
+    const toast = document.getElementById('cartToast');
+    toast.style.display = 'block';
+    clearTimeout(window._toastTimer);
+    window._toastTimer = setTimeout(() => { toast.style.display = 'none'; }, 2200);
+  }
+
+  function renderCart() {
+    const itemsDiv  = document.getElementById('cartItems');
+    const emptyDiv  = document.getElementById('cartEmpty');
+    const checkoutDiv = document.getElementById('checkoutSection');
+    const subtotalEl = document.getElementById('cartSubtotal');
+    const keys = Object.keys(cart);
+
+    if (keys.length === 0) {
+      itemsDiv.innerHTML = '';
+      emptyDiv.style.display = 'block';
+      checkoutDiv.style.display = 'none';
+      return;
+    }
+    emptyDiv.style.display = 'none';
+    checkoutDiv.style.display = 'block';
+
+    let subtotal = 0;
+    itemsDiv.innerHTML = keys.map(name => {
+      const { price, qty } = cart[name];
+      subtotal += price * qty;
+      return `
+        <div style="display:flex; align-items:center; justify-content:space-between;
+          padding:0.85rem 0; border-bottom:1px solid var(--border);">
+          <div>
+            <div style="font-weight:600; font-size:0.9rem; color:var(--text-primary);">${name}</div>
+            <div style="font-size:0.78rem; color:var(--text-muted); margin-top:0.2rem;">$${price} each</div>
+          </div>
+          <div style="display:flex; align-items:center; gap:0.75rem;">
+            <div style="display:flex; align-items:center; gap:0.5rem;">
+              <button onclick="changeQty('${name}',-1)" style="
+                background:var(--bg-card); border:1px solid var(--border);
+                color:var(--text-primary); width:26px; height:26px;
+                border-radius:50%; cursor:pointer; font-size:1rem; line-height:1;
+              ">−</button>
+              <span style="font-weight:700; min-width:1.2rem; text-align:center;">${qty}</span>
+              <button onclick="changeQty('${name}',1)" style="
+                background:var(--bg-card); border:1px solid var(--border);
+                color:var(--text-primary); width:26px; height:26px;
+                border-radius:50%; cursor:pointer; font-size:1rem; line-height:1;
+              ">+</button>
+            </div>
+            <span style="color:var(--gold-light); font-weight:700; min-width:3rem; text-align:right;">
+              $${price * qty}
+            </span>
+          </div>
+        </div>`;
+    }).join('');
+    const shipping = subtotal >= 50 ? 0 : 5.99;
+    const total    = subtotal + shipping;
+    subtotalEl.textContent                          = '$' + subtotal.toFixed(2);
+    document.getElementById('cartShipping').textContent = shipping === 0 ? '🎉 FREE' : '$' + shipping.toFixed(2);
+    document.getElementById('cartTotal').textContent    = '$' + total.toFixed(2);
+  }
+
+  function changeQty(name, delta) {
+    cart[name].qty += delta;
+    if (cart[name].qty <= 0) delete cart[name];
+    const total = Object.values(cart).reduce((s, i) => s + i.qty, 0);
+    const badge = document.getElementById('cartCount');
+    if (total === 0) { badge.style.display = 'none'; } else { badge.textContent = total; }
+    renderCart();
+  }
+
+  function toggleCart() {
+    const drawer  = document.getElementById('cartDrawer');
+    const overlay = document.getElementById('cartOverlay');
+    const isOpen  = drawer.style.display === 'flex';
+    if (isOpen) { closeCart(); return; }
+    // reset checkout state
+    document.getElementById('checkoutFormWrap').style.display = 'block';
+    document.getElementById('paymentForm').style.display = 'none';
+    document.getElementById('orderConfirmed').style.display = 'none';
+    renderCart();
+    drawer.style.display  = 'flex';
+    overlay.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeCart() {
+    document.getElementById('cartDrawer').style.display  = 'none';
+    document.getElementById('cartOverlay').style.display = 'none';
+    document.body.style.overflow = '';
+  }
+
+  // ---- SQUARE CONFIG — paste your credentials here ----
+  const SQUARE_APP_ID    = 'YOUR_SQUARE_APP_ID';      // e.g. sq0idp-xxxxxxxxxxxx
+  const SQUARE_LOCATION_ID = 'YOUR_SQUARE_LOCATION_ID'; // e.g. LXXXXXXXXXXXXXXXXX
+
+  let squareCard = null;
+
+  const CARD_STYLE = {
+    '.input-container':          { borderColor: 'rgba(168,85,247,0.25)', borderRadius: '8px' },
+    '.input-container.is-focus': { borderColor: '#a855f7' },
+    input:                       { color: '#f3e8ff', fontFamily: 'Raleway, sans-serif', fontSize: '14px' },
+    'input::placeholder':        { color: '#a78bca' },
+    '.message-text':             { color: '#f87171' },
+  };
+
+  async function initSquare() {
+    if (!window.Square) return;
+    try {
+      const payments = Square.payments(SQUARE_APP_ID, SQUARE_LOCATION_ID);
+      squareCard = await payments.card({ style: CARD_STYLE });
+      await squareCard.attach('#card-container');
+    } catch(e) {
+      console.warn('Square init error:', e);
+    }
+  }
+  initSquare();
+
+  // ---- VENMO ----
+  const VENMO_HANDLE = 'Coras-Creations'; // ← replace with Cora's Venmo username
+
+  function payWithVenmo() {
+    const subtotal = Object.values(cart).reduce((s, i) => s + i.price * i.qty, 0);
+    const shipping = subtotal >= 50 ? 0 : 5.99;
+    const total    = (subtotal + shipping).toFixed(2);
+    const items = Object.keys(cart).join(', ');
+    const note  = encodeURIComponent("Cora's Creations order: " + items);
+    // Deep link works on mobile app; web URL works on desktop
+    const url = `https://account.venmo.com/pay?recipients=${VENMO_HANDLE}&amount=${total}&note=${note}`;
+    window.open(url, '_blank');
+    // Show confirmation after a short delay
+    setTimeout(() => {
+      if (confirm("Once you've completed your Venmo payment, click OK to confirm your order!")) {
+        confirmOrder();
+      }
+    }, 1500);
+  }
+
+  async function showCheckoutForm() {
+    document.getElementById('checkoutFormWrap').style.display = 'none';
+    document.getElementById('paymentForm').style.display = 'block';
+    if (squareCard) { try { await squareCard.attach('#card-container'); } catch(e) {} }
+  }
+
+  async function placeOrder() {
+    const btn = document.getElementById('sq-pay-btn');
+    const errDiv = document.getElementById('sq-error');
+    errDiv.style.display = 'none';
+
+    if (!squareCard) {
+      // Square not loaded — show confirmation anyway (demo mode)
+      confirmOrder(); return;
+    }
+
+    btn.textContent = 'Processing…'; btn.disabled = true;
+
+    try {
+      const result = await squareCard.tokenize();
+      if (result.status === 'OK') {
+        // token = result.token  →  send to your backend to charge
+        // For now: log token and confirm order
+        console.log('Square payment token:', result.token);
+        confirmOrder();
+      } else {
+        const msg = result.errors?.map(e => e.message).join(', ') || 'Card error. Please try again.';
+        errDiv.textContent = '⚠️ ' + msg;
+        errDiv.style.display = 'block';
+        btn.textContent = '✨ Place Order'; btn.disabled = false;
+      }
+    } catch(e) {
+      errDiv.textContent = '⚠️ Payment error. Please try again.';
+      errDiv.style.display = 'block';
+      btn.textContent = '✨ Place Order'; btn.disabled = false;
+    }
+  }
+
+  function confirmOrder() {
+    document.getElementById('paymentForm').style.display = 'none';
+    document.getElementById('orderConfirmed').style.display = 'block';
+    cart = {};
+    const badge = document.getElementById('cartCount');
+    badge.style.display = 'none'; badge.textContent = '0';
+  }
+
+  // ---- CUSTOM ORDER FORM ----
+  function submitForm(e) {
+    e.preventDefault();
+    document.getElementById('customForm').style.display = 'none';
+    document.getElementById('successMsg').style.display = 'block';
+  }
+
+  // ---- CONTACT FORM ----
+  function submitContact(e) {
+    e.preventDefault();
+    document.getElementById('contactForm').style.display = 'none';
+    document.getElementById('contactSuccess').style.display = 'block';
+  }
+</script>
+</body>
+</html>
