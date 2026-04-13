@@ -11,6 +11,7 @@
   <meta name="apple-mobile-web-app-title" content="Cora's Creations" />
   <link rel="manifest" href="/manifest.json" />
   <link rel="apple-touch-icon" href="/icon-192.png" />
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC0TLO6KYgIqldjpwkx62MSdZwxceyV05A&libraries=places" async defer></script>
   <script src="https://web.squarecdn.com/v1/square.js"></script>
   <style>
     /* ---- FONTS ---- */
@@ -115,9 +116,10 @@
     .nav-links a:hover { color: var(--gold-light); }
 
     /* hamburger */
-    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; z-index: 101; }
     .hamburger span { display: block; width: 24px; height: 2px; background: var(--text-muted); border-radius: 2px; transition: 0.3s; }
     .mobile-menu { display: none; }
+    .nav-right { display: flex; align-items: center; gap: 1.25rem; }
 
     /* ---- HERO ---- */
     .hero {
@@ -318,6 +320,36 @@
 
     .hidden { display: none !important; }
 
+    /* Shipping rate options */
+    .ship-opt {
+      display:flex; align-items:center; gap:0.6rem;
+      background:var(--bg-mid); border:1px solid var(--border);
+      border-radius:10px; padding:0.6rem 0.75rem;
+      cursor:pointer; transition:border-color 0.2s, background 0.2s;
+    }
+    .ship-opt:hover { border-color: var(--purple-light); }
+    .selected-opt {
+      border-color: var(--purple) !important;
+      background: rgba(124,58,237,0.12) !important;
+    }
+
+    /* Address autocomplete dropdown */
+    .autocomplete-wrap { position: relative; }
+    .autocomplete-list {
+      position:absolute; top:100%; left:0; right:0; z-index:500;
+      background:var(--bg-card); border:1px solid var(--purple);
+      border-top:none; border-radius:0 0 10px 10px;
+      max-height:200px; overflow-y:auto; display:none;
+    }
+    .autocomplete-list.open { display:block; }
+    .autocomplete-item {
+      padding:0.6rem 1rem; font-size:0.82rem; color:var(--text-muted);
+      cursor:pointer; border-bottom:1px solid var(--border);
+      transition:background 0.15s;
+    }
+    .autocomplete-item:last-child { border-bottom:none; }
+    .autocomplete-item:hover { background:rgba(124,58,237,0.15); color:var(--text-primary); }
+
     /* ---- ABOUT ---- */
     #about { background: linear-gradient(180deg, transparent, rgba(59,7,100,0.15), transparent); }
     .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
@@ -442,26 +474,56 @@
     /* ---- RESPONSIVE ---- */
     @media (max-width: 768px) {
       .nav-links { display: none; }
+      .nav-right { display: flex; }
       .hamburger { display: flex; }
+
+      /* slide-in panel from the left */
       .mobile-menu {
-        position: fixed; inset: 72px 0 0 0;
-        background: rgba(10,6,18,0.97);
-        display: none; flex-direction: column;
-        align-items: center; justify-content: center;
-        gap: 2rem; z-index: 99;
+        position: fixed;
+        top: 0; left: -280px; bottom: 0;
+        width: 260px;
+        background: rgba(10,6,18,0.98);
+        border-right: 1px solid var(--border);
+        backdrop-filter: blur(16px);
+        display: flex; flex-direction: column;
+        align-items: flex-start; justify-content: center;
+        gap: 0; padding: 2rem 0;
+        z-index: 200;
+        transition: left 0.3s ease;
+        box-shadow: 4px 0 30px rgba(0,0,0,0.5);
       }
-      .mobile-menu.open { display: flex; }
+      .mobile-menu.open { left: 0; }
       .mobile-menu a {
-        color: var(--text-primary); font-size: 1.3rem;
+        color: var(--text-muted); font-size: 1rem;
         font-family: 'Cinzel', serif; text-decoration: none;
-        transition: color 0.3s;
+        padding: 1rem 2rem; width: 100%;
+        border-bottom: 1px solid rgba(168,85,247,0.1);
+        transition: color 0.2s, background 0.2s;
+        display: flex; align-items: center; gap: 0.75rem;
       }
-      .mobile-menu a:hover { color: var(--gold-light); }
+      .mobile-menu a:hover {
+        color: var(--gold-light);
+        background: rgba(124,58,237,0.1);
+      }
+
+      /* dim overlay when menu open */
+      .menu-overlay {
+        display: none; position: fixed; inset: 0;
+        background: rgba(0,0,0,0.5); z-index: 199;
+      }
+      .menu-overlay.open { display: block; }
 
       .about-grid { grid-template-columns: 1fr; gap: 2rem; }
       .about-visual { font-size: 5rem; max-width: 280px; margin: 0 auto; }
       .form-grid { grid-template-columns: 1fr; }
       .form-card { padding: 2rem 1.25rem; }
+    }
+
+    /* desktop: hide hamburger, show nav links */
+    @media (min-width: 769px) {
+      .hamburger { display: none; }
+      .nav-links { display: flex; }
+      .mobile-menu { display: none !important; }
     }
 
     /* ---- BANNER STRIPE ---- */
@@ -492,6 +554,10 @@
 <!-- Nav -->
 <nav>
   <div class="nav-inner">
+    <!-- Hamburger on LEFT -->
+    <div class="hamburger" onclick="toggleMenu()" id="hamburger">
+      <span></span><span></span><span></span>
+    </div>
     <a href="#home" class="nav-logo">Cora's Creations</a>
     <ul class="nav-links">
       <li><a href="#shop">Shop</a></li>
@@ -499,7 +565,8 @@
       <li><a href="#custom">Custom Orders</a></li>
       <li><a href="#contact">Contact</a></li>
     </ul>
-    <div style="display:flex; align-items:center; gap:1.25rem;">
+    <!-- Cart on RIGHT -->
+    <div class="nav-right">
       <button onclick="toggleCart()" style="
         background:none; border:none; cursor:pointer;
         position:relative; padding:0.4rem;
@@ -517,19 +584,19 @@
           line-height:18px; text-align:center;
         ">0</span>
       </button>
-      <div class="hamburger" onclick="toggleMenu()" id="hamburger">
-        <span></span><span></span><span></span>
-      </div>
     </div>
   </div>
 </nav>
 
-<!-- Mobile Menu -->
+<!-- Mobile overlay -->
+<div class="menu-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
+
+<!-- Mobile Menu — slides from left -->
 <div class="mobile-menu" id="mobileMenu">
-  <a href="#shop"   onclick="toggleMenu()">Shop</a>
-  <a href="#about"  onclick="toggleMenu()">About</a>
-  <a href="#custom" onclick="toggleMenu()">Custom Orders</a>
-  <a href="#contact"onclick="toggleMenu()">Contact</a>
+  <a href="#shop"   onclick="toggleMenu()">🛍️ Shop</a>
+  <a href="#about"  onclick="toggleMenu()">🧙‍♀️ About</a>
+  <a href="#custom" onclick="toggleMenu()">✨ Custom Orders</a>
+  <a href="#contact"onclick="toggleMenu()">📧 Contact</a>
 </div>
 
 <!-- HERO -->
@@ -773,6 +840,7 @@
         </div>
       </div>
 
+
     </div><!-- /products-grid -->
 
     <!-- Cart Toast -->
@@ -831,15 +899,50 @@
       <!-- Checkout Section -->
       <div id="checkoutSection" style="display:none; padding:1.25rem; border-top:1px solid var(--border);">
 
-        <!-- Subtotal + Shipping + Total -->
-        <div style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1.25rem;">
+        <!-- Subtotal + UPS Shipping + Total -->
+        <div style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1rem;">
           <div style="display:flex; justify-content:space-between; font-size:0.95rem;">
             <span style="color:var(--text-muted);">Subtotal</span>
             <span id="cartSubtotal" style="color:var(--text-primary); font-weight:600;">$0</span>
           </div>
+
+          <!-- UPS Service Selector -->
+          <div style="margin:0.4rem 0;">
+            <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.6rem;">
+              <span style="font-size:1rem;">📦</span>
+              <span style="font-size:0.75rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-muted);">UPS Shipping</span>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:0.4rem;">
+              <label class="ship-opt selected-opt" onclick="selectShipping(this,'UPSGround',8.99)">
+                <input type="radio" name="shipping" checked style="accent-color:var(--purple);">
+                <div style="flex:1;">
+                  <div style="font-size:0.85rem; font-weight:600; color:var(--text-primary);">UPS Ground</div>
+                  <div style="font-size:0.72rem; color:var(--text-muted);">1–5 business days</div>
+                </div>
+                <span style="color:var(--gold-light); font-weight:700;">$8.99</span>
+              </label>
+              <label class="ship-opt" onclick="selectShipping(this,'UPS2ndDayAir',19.99)">
+                <input type="radio" name="shipping" style="accent-color:var(--purple);">
+                <div style="flex:1;">
+                  <div style="font-size:0.85rem; font-weight:600; color:var(--text-primary);">UPS 2nd Day Air</div>
+                  <div style="font-size:0.72rem; color:var(--text-muted);">2 business days</div>
+                </div>
+                <span style="color:var(--gold-light); font-weight:700;">$19.99</span>
+              </label>
+              <label class="ship-opt" onclick="selectShipping(this,'UPSNextDayAir',39.99)">
+                <input type="radio" name="shipping" style="accent-color:var(--purple);">
+                <div style="flex:1;">
+                  <div style="font-size:0.85rem; font-weight:600; color:var(--text-primary);">UPS Next Day Air</div>
+                  <div style="font-size:0.72rem; color:var(--text-muted);">Next business day</div>
+                </div>
+                <span style="color:var(--gold-light); font-weight:700;">$39.99</span>
+              </label>
+            </div>
+          </div>
+
           <div style="display:flex; justify-content:space-between; font-size:0.95rem;">
             <span style="color:var(--text-muted);">Shipping</span>
-            <span id="cartShipping" style="color:var(--teal-light); font-weight:600;">$5.99</span>
+            <span id="cartShipping" style="color:var(--teal-light); font-weight:600;">$8.99</span>
           </div>
           <div style="height:1px; background:var(--border); margin:0.25rem 0;"></div>
           <div style="display:flex; justify-content:space-between; font-size:1.1rem;">
@@ -866,17 +969,34 @@
           <div style="display:flex; flex-direction:column; gap:0.85rem;">
             <div class="form-group">
               <label>Full Name</label>
-              <input type="text" id="sq-name" placeholder="Jane Smith" />
+              <input type="text" id="sq-name" placeholder="Jane Smith" autocomplete="name" />
             </div>
             <div class="form-group">
               <label>Email Address</label>
-              <input type="email" id="sq-email" placeholder="you@email.com" />
+              <input type="email" id="sq-email" placeholder="you@email.com" autocomplete="email" />
+            </div>
+            <!-- Shipping Address with Google Places autocomplete -->
+            <div class="form-group">
+              <label>Street Address</label>
+              <div class="autocomplete-wrap">
+                <input type="text" id="sq-address" placeholder="Start typing your address…"
+                  autocomplete="off" />
+                <div class="autocomplete-list" id="addressDropdown"></div>
+              </div>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.6rem;">
+              <div class="form-group">
+                <label>City</label>
+                <input type="text" id="sq-city" placeholder="City" autocomplete="address-level2" />
+              </div>
+              <div class="form-group">
+                <label>State</label>
+                <input type="text" id="sq-state" placeholder="ST" maxlength="2" autocomplete="address-level1" style="text-transform:uppercase;" />
+              </div>
             </div>
             <div class="form-group">
-              <label>Shipping Address</label>
-              <input type="text" id="sq-address" placeholder="Street address" style="margin-bottom:0.5rem;" />
-              <input type="text" id="sq-city" placeholder="City, State, ZIP" />
-            </div>
+              <label>ZIP Code</label>
+              <input type="text" id="sq-zip" placeholder="12345" maxlength="5" autocomplete="postal-code" /></div>
 
             <!-- Venmo Button -->
             <div class="form-group">
@@ -931,10 +1051,21 @@
         <!-- Order Confirmed -->
         <div id="orderConfirmed" style="display:none; text-align:center; padding:1.5rem 0;">
           <div style="font-size:3rem; margin-bottom:0.75rem;">🐉✨</div>
-          <h3 style="font-family:'Cinzel',serif; color:var(--gold-light); margin-bottom:0.5rem;">Order Received!</h3>
-          <p style="color:var(--text-muted); font-size:0.88rem; line-height:1.7;">
-            Thank you! Cora will email you within 24 hours to confirm your order and arrange payment.
+          <h3 style="font-family:'Cinzel',serif; color:var(--gold-light); margin-bottom:0.75rem;">Order Received!</h3>
+          <p style="color:var(--text-muted); font-size:0.88rem; line-height:1.7; margin-bottom:1rem;">
+            Thank you! Your order is being prepared with love by Cora.
           </p>
+          <!-- Tracking Number Block -->
+          <div id="trackingBlock" style="display:none; background:var(--bg-mid); border:1px solid var(--border); border-radius:12px; padding:1rem; margin-bottom:1rem;">
+            <p style="font-size:0.72rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-muted); margin-bottom:0.4rem;">📦 UPS Tracking Number</p>
+            <p id="trackingNumber" style="font-size:1rem; font-weight:700; color:var(--teal-light); letter-spacing:0.05em;"></p>
+            <a id="trackingLink" href="#" target="_blank" style="font-size:0.78rem; color:var(--purple-light); text-decoration:none; margin-top:0.4rem; display:inline-block;">Track your package →</a>
+          </div>
+          <div id="trackingPending" style="background:var(--bg-mid); border:1px solid var(--border); border-radius:12px; padding:1rem;">
+            <p style="font-size:0.78rem; color:var(--text-muted); line-height:1.6;">
+              📧 A UPS tracking number will be emailed to you once your order ships — usually within 1–2 business days!
+            </p>
+          </div>
         </div>
 
       </div>
@@ -1126,6 +1257,9 @@
   // ---- MOBILE MENU ----
   function toggleMenu() {
     document.getElementById('mobileMenu').classList.toggle('open');
+    document.getElementById('menuOverlay').classList.toggle('open');
+    document.body.style.overflow =
+      document.getElementById('mobileMenu').classList.contains('open') ? 'hidden' : '';
   }
 
   // ---- SCROLL REVEAL ----
@@ -1218,10 +1352,10 @@
           </div>
         </div>`;
     }).join('');
-    const shipping = subtotal >= 50 ? 0 : 5.99;
+    const shipping = window.selectedShipping?.rate ?? 8.99;
     const total    = subtotal + shipping;
-    subtotalEl.textContent                          = '$' + subtotal.toFixed(2);
-    document.getElementById('cartShipping').textContent = shipping === 0 ? '🎉 FREE' : '$' + shipping.toFixed(2);
+    subtotalEl.textContent = '$' + subtotal.toFixed(2);
+    document.getElementById('cartShipping').textContent = '$' + shipping.toFixed(2);
     document.getElementById('cartTotal').textContent    = '$' + total.toFixed(2);
   }
 
@@ -1284,9 +1418,100 @@
   // ---- VENMO ----
   const VENMO_HANDLE = 'Coras-Creations'; // ← replace with Cora's Venmo username
 
+  // ---- PIRATE SHIP RATE SELECTOR ----
+  // ---- UPS SHIPPING SELECTION ----
+  window.selectedShipping = { service: 'UPSGround', rate: 8.99 };
+
+  function selectShipping(label, service, rate) {
+    document.querySelectorAll('.ship-opt').forEach(el => el.classList.remove('selected-opt'));
+    label.classList.add('selected-opt');
+    window.selectedShipping = { service, rate };
+    renderCart();
+  }
+
+  // ---- GOOGLE PLACES AUTOCOMPLETE ----
+  let placesAutocomplete = null;
+  let placesInitialized = false;
+  function initPlaces() {
+    const input = document.getElementById('sq-address');
+    if (!input || !window.google || placesInitialized) return;
+    placesInitialized = true;
+    placesAutocomplete = new google.maps.places.Autocomplete(input, {
+      types: ['address'], componentRestrictions: { country: 'us' }
+    });
+    placesAutocomplete.addListener('place_changed', () => {
+      const place = placesAutocomplete.getPlace();
+      if (!place.address_components) return;
+      let street = '', city = '', state = '', zip = '';
+      place.address_components.forEach(c => {
+        if (c.types.includes('street_number')) street = c.long_name;
+        if (c.types.includes('route'))         street += (street ? ' ' : '') + c.long_name;
+        if (c.types.includes('locality'))      city   = c.long_name;
+        if (c.types.includes('administrative_area_level_1')) state = c.short_name;
+        if (c.types.includes('postal_code'))   zip    = c.long_name;
+      });
+      document.getElementById('sq-address').value = street;
+      document.getElementById('sq-city').value    = city;
+      document.getElementById('sq-state').value   = state;
+      document.getElementById('sq-zip').value     = zip;
+    });
+  }
+
+  // Fallback: free Nominatim autocomplete if Google key not set
+  let nominatimTimer = null;
+  function addressInput(input) {
+    if (window.google) return; // Google Places handles it
+    clearTimeout(nominatimTimer);
+    const q = input.value.trim();
+    const dropdown = document.getElementById('addressDropdown');
+    if (q.length < 4) { dropdown.classList.remove('open'); return; }
+    nominatimTimer = setTimeout(async () => {
+      try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&addressdetails=1&limit=5&countrycodes=us`);
+        const data = await res.json();
+        dropdown.innerHTML = data.map((r, i) =>
+          `<div class="autocomplete-item" onclick="selectAddress(${i})">${r.display_name}</div>`
+        ).join('');
+        dropdown._data = data;
+        dropdown.classList.toggle('open', data.length > 0);
+      } catch(e) {}
+    }, 350);
+  }
+
+  function selectAddress(i) {
+    const dropdown = document.getElementById('addressDropdown');
+    const r = dropdown._data[i];
+    const a = r.address;
+    const street = [(a.house_number || ''), (a.road || '')].filter(Boolean).join(' ');
+    document.getElementById('sq-address').value = street || r.display_name.split(',')[0];
+    document.getElementById('sq-city').value    = a.city || a.town || a.village || '';
+    document.getElementById('sq-state').value   = a.state_code || a.state || '';
+    document.getElementById('sq-zip').value     = a.postcode || '';
+    dropdown.classList.remove('open');
+  }
+
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.autocomplete-wrap')) {
+      document.getElementById('addressDropdown')?.classList.remove('open');
+    }
+  });
+
+  // ---- EASYPOST LABEL VIA NETLIFY FUNCTION ----
+  async function createShippingLabel(orderData) {
+    try {
+      const res = await fetch('/.netlify/functions/create-shipment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderData)
+      });
+      if (!res.ok) return null;
+      return await res.json();
+    } catch(e) { return null; }
+  }
+
   function payWithVenmo() {
     const subtotal = Object.values(cart).reduce((s, i) => s + i.price * i.qty, 0);
-    const shipping = subtotal >= 50 ? 0 : 5.99;
+    const shipping = window.selectedShipping?.rate ?? 8.99;
     const total    = (subtotal + shipping).toFixed(2);
     const items = Object.keys(cart).join(', ');
     const note  = encodeURIComponent("Cora's Creations order: " + items);
@@ -1305,43 +1530,68 @@
     document.getElementById('checkoutFormWrap').style.display = 'none';
     document.getElementById('paymentForm').style.display = 'block';
     if (squareCard) { try { await squareCard.attach('#card-container'); } catch(e) {} }
+    setTimeout(() => {
+      initPlaces();
+      // Fallback: attach Nominatim listener if Google didn't load
+      const addrInput = document.getElementById('sq-address');
+      if (addrInput && !addrInput._listenerAdded) {
+        addrInput._listenerAdded = true;
+        addrInput.addEventListener('input', function() { addressInput(this); });
+      }
+    }, 150);
   }
 
   async function placeOrder() {
-    const btn = document.getElementById('sq-pay-btn');
+    const btn    = document.getElementById('sq-pay-btn');
     const errDiv = document.getElementById('sq-error');
     errDiv.style.display = 'none';
 
-    if (!squareCard) {
-      // Square not loaded — show confirmation anyway (demo mode)
-      confirmOrder(); return;
-    }
+    if (!squareCard) { confirmOrder(); return; }
 
     btn.textContent = 'Processing…'; btn.disabled = true;
 
     try {
       const result = await squareCard.tokenize();
       if (result.status === 'OK') {
-        // token = result.token  →  send to your backend to charge
-        // For now: log token and confirm order
-        console.log('Square payment token:', result.token);
-        confirmOrder();
+        console.log('Square token:', result.token);
+        await confirmOrder();
       } else {
-        const msg = result.errors?.map(e => e.message).join(', ') || 'Card error. Please try again.';
-        errDiv.textContent = '⚠️ ' + msg;
+        errDiv.textContent = '⚠️ ' + (result.errors?.map(e => e.message).join(', ') || 'Card error.');
         errDiv.style.display = 'block';
-        btn.textContent = '✨ Place Order'; btn.disabled = false;
+        btn.textContent = '✨ Place Order by Card'; btn.disabled = false;
       }
     } catch(e) {
       errDiv.textContent = '⚠️ Payment error. Please try again.';
       errDiv.style.display = 'block';
-      btn.textContent = '✨ Place Order'; btn.disabled = false;
+      btn.textContent = '✨ Place Order by Card'; btn.disabled = false;
     }
   }
 
-  function confirmOrder() {
-    document.getElementById('paymentForm').style.display = 'none';
+  async function confirmOrder() {
+    document.getElementById('paymentForm').style.display  = 'none';
     document.getElementById('orderConfirmed').style.display = 'block';
+
+    // Call EasyPost via Netlify Function to generate UPS label
+    const orderData = {
+      name:    document.getElementById('sq-name')?.value    || '',
+      email:   document.getElementById('sq-email')?.value   || '',
+      address: document.getElementById('sq-address')?.value || '',
+      city:    document.getElementById('sq-city')?.value    || '',
+      state:   document.getElementById('sq-state')?.value   || '',
+      zip:     document.getElementById('sq-zip')?.value     || '',
+      service: window.selectedShipping?.service || 'UPSGround',
+      items:   Object.entries(cart).map(([name,{qty,price}]) => ({name,qty,price})),
+    };
+
+    const shipping = await createShippingLabel(orderData);
+    if (shipping?.tracking_number) {
+      document.getElementById('trackingPending').style.display  = 'none';
+      document.getElementById('trackingBlock').style.display    = 'block';
+      document.getElementById('trackingNumber').textContent     = shipping.tracking_number;
+      document.getElementById('trackingLink').href =
+        `https://www.ups.com/track?tracknum=${shipping.tracking_number}`;
+    }
+
     cart = {};
     const badge = document.getElementById('cartCount');
     badge.style.display = 'none'; badge.textContent = '0';
