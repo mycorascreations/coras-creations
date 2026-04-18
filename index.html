@@ -11,6 +11,9 @@
   <meta name="apple-mobile-web-app-title" content="Cora's Creations" />
   <link rel="manifest" href="/manifest.json" />
   <link rel="apple-touch-icon" href="/icon-192.png" />
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <style>
     /* ---- FONTS ---- */
     @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600&family=Raleway:wght@300;400;500;600&display=swap');
@@ -1460,17 +1463,47 @@
     const custState   = document.getElementById('sq-state')?.value   || '';
     const custZip     = document.getElementById('sq-zip')?.value     || '';
     const subtotalAmt  = Object.values(cart).reduce((s,i) => s + i.price * i.qty, 0);
-    const shippingCost = getShipping(subtotalAmt).toFixed(2);
-    const shipping     = parseFloat(shippingCost) === 0 ? 'FREE' : '$5.99 Flat Rate';
+    const shippingCost = getShipping(subtotalAmt);
+    const total        = (subtotalAmt + shippingCost).toFixed(2);
+    const orderNumber  = generateOrderNumber();
 
-    const itemLines = Object.entries(cart).map(([name, {qty, price}]) =>
-      `  • ${name} x${qty} — $${(price * qty).toFixed(2)}`
-    ).join('\n');
-    const subtotal = Object.values(cart).reduce((s,i) => s + i.price * i.qty, 0);
-    const total    = (subtotal + parseFloat(shippingCost)).toFixed(2);
+    // Central Time date + time
+    const now = new Date();
+    const ctOptions = { timeZone: 'America/Chicago', hour12: true };
+    const dateReceived = now.toLocaleDateString('en-US', { timeZone: 'America/Chicago' });
+    const timeReceived = now.toLocaleTimeString('en-US', ctOptions);
 
+    const orderItems = Object.entries(cart).map(([name, {qty, price}]) => ({
+      name, qty, price, lineTotal: parseFloat((price * qty).toFixed(2))
+    }));
+
+    // Save to Firebase database
+    const orderRecord = {
+      orderNumber,
+      dateReceived,
+      timeReceived,
+      fullName:      custName,
+      email:         custEmail,
+      streetAddress: custAddress,
+      city:          custCity,
+      state:         custState,
+      zipCode:       custZip,
+      orderItems,
+      subtotal:      parseFloat(subtotalAmt.toFixed(2)),
+      shipping:      shippingCost,
+      total:         parseFloat(total),
+      status:        'received',
+      timestamp:     new Date().toISOString()
+    };
+    await saveOrderToDatabase(orderRecord);
+
+    // Send email notification
+    const itemLines = orderItems.map(i => `  • ${i.name} x${i.qty} — $${i.lineTotal.toFixed(2)}`).join('\n');
     const msg = `
 New Order Received!
+
+ORDER #${orderNumber}
+Date: ${dateReceived} at ${timeReceived} CT
 
 CUSTOMER
 Name: ${custName}
@@ -1479,20 +1512,61 @@ Email: ${custEmail}
 SHIPPING ADDRESS
 ${custAddress}
 ${custCity}, ${custState} ${custZip}
-Shipping Method: ${shipping} ($${shippingCost})
 
 ORDER ITEMS
 ${itemLines}
 
-Subtotal: $${subtotal.toFixed(2)}
-Shipping: $${shippingCost}
+Subtotal: $${subtotalAmt.toFixed(2)}
+Shipping: ${shippingCost === 0 ? 'FREE' : '$5.99'}
 TOTAL: $${total}
     `.trim();
-
     await sendEmail("New Order Cora's Creations", msg);
+
+    // Show order number to customer
+    const confirmedDiv = document.getElementById('orderConfirmed');
+    const onElem = confirmedDiv.querySelector('h3');
+    if (onElem) onElem.insertAdjacentHTML('afterend',
+      `<p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:0.5rem;">Order #<strong style="color:var(--gold-light)">${orderNumber}</strong></p>`
+    );
 
     cart = {};
     updateBadge();
+  }
+
+  // ---- FIREBASE CONFIG ----
+  const firebaseConfig = {
+    apiKey:            "AIzaSyBCXQ8mkQxhSoarijKvFjIjnJ0upfeqoiI",
+    authDomain:        "cora-s-creations.firebaseapp.com",
+    projectId:         "cora-s-creations",
+    storageBucket:     "cora-s-creations.firebasestorage.app",
+    messagingSenderId: "433472237838",
+    appId:             "1:433472237838:web:839b78b924a7742bce675f",
+    measurementId:     "G-XM09Z3RVS8"
+  };
+  let db = null;
+  try {
+    firebase.initializeApp(firebaseConfig);
+    db = firebase.firestore();
+  } catch(e) { console.warn('Firebase not configured yet'); }
+
+  function generateOrderNumber() {
+    const now = new Date();
+    const date = now.toLocaleDateString('en-US', { timeZone: 'America/Chicago' })
+      .replace(/\//g, '').padStart(8,'0');
+    const rand = Math.floor(1000 + Math.random() * 9000);
+    return `CC-${date}-${rand}`;
+  }
+
+  async function saveOrderToDatabase(orderRecord) {
+    if (!db || firebaseConfig.apiKey === 'YOUR_API_KEY') return null;
+    try {
+      const docRef = await db.collection('orders').add(orderRecord);
+      console.log('Order saved:', docRef.id);
+      return docRef.id;
+    } catch(e) {
+      console.warn('Database save failed:', e);
+      return null;
+    }
   }
 
   // ---- EMAIL via Web3Forms ----
