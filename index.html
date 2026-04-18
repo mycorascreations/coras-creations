@@ -980,7 +980,7 @@
           </p>
         </div>
 
-        <!-- Payment Form (Square + Venmo) -->
+        <!-- Payment Form -->
         <div id="paymentForm" style="display:none;">
           <h3 style="font-family:'Cinzel',serif; font-size:1rem; color:var(--gold-light); margin-bottom:1.25rem;">
             💳 Payment Details
@@ -1037,33 +1037,10 @@
               </p>
             </div>
 
-            <!-- OR divider -->
-            <div style="display:flex; align-items:center; gap:0.75rem; margin:0.25rem 0;">
-              <div style="flex:1; height:1px; background:var(--border);"></div>
-              <span style="font-size:0.75rem; color:var(--text-muted); font-weight:600; letter-spacing:0.1em;">OR</span>
-              <div style="flex:1; height:1px; background:var(--border);"></div>
-            </div>
 
-            <!-- Square Card Fields -->
-            <div class="form-group">
-              <label>Pay by Card</label>
-              <div id="card-container" style="
-                background:var(--bg-mid); border:1px solid var(--border);
-                border-radius:10px; padding:0.75rem 1rem; min-height:48px;
-              "></div>
-            </div>
-
-            <div id="sq-error" style="
-              display:none; color:#f87171; font-size:0.8rem;
-              background:rgba(248,113,113,0.1); border:1px solid rgba(248,113,113,0.3);
-              padding:0.6rem 0.85rem; border-radius:8px;
-            "></div>
-            <button id="sq-pay-btn" onclick="placeOrder()" class="btn-submit" style="width:100%; margin-top:0.25rem;">
-              ✨ Place Order by Card
+            <button onclick="confirmOrder()" class="btn-submit" style="width:100%; margin-top:0.25rem;">
+              ✨ Confirm Order
             </button>
-            <p style="font-size:0.72rem; color:var(--text-muted); text-align:center; line-height:1.5;">
-              🔒 Payments securely processed by Square
-            </p>
           </div>
         </div>
 
@@ -1408,31 +1385,6 @@
     document.body.style.overflow = '';
   }
 
-  // ---- SQUARE CONFIG — paste your credentials here ----
-  const SQUARE_APP_ID    = 'YOUR_SQUARE_APP_ID';      // e.g. sq0idp-xxxxxxxxxxxx
-  const SQUARE_LOCATION_ID = 'YOUR_SQUARE_LOCATION_ID'; // e.g. LXXXXXXXXXXXXXXXXX
-
-  let squareCard = null;
-
-  const CARD_STYLE = {
-    '.input-container':          { borderColor: 'rgba(168,85,247,0.25)', borderRadius: '8px' },
-    '.input-container.is-focus': { borderColor: '#a855f7' },
-    input:                       { color: '#f3e8ff', fontFamily: 'Raleway, sans-serif', fontSize: '14px' },
-    'input::placeholder':        { color: '#a78bca' },
-    '.message-text':             { color: '#f87171' },
-  };
-
-  async function initSquare() {
-    if (!window.Square) return;
-    if (SQUARE_APP_ID === 'YOUR_SQUARE_APP_ID') return; // skip if not configured
-    try {
-      const payments = Square.payments(SQUARE_APP_ID, SQUARE_LOCATION_ID);
-      squareCard = await payments.card({ style: CARD_STYLE });
-    } catch(e) {
-      console.warn('Square init error:', e);
-    }
-  }
-  initSquare();
 
   // ---- VENMO ----
   const VENMO_HANDLE = 'Coras-Creations'; // ← replace with Cora's Venmo username
@@ -1545,10 +1497,9 @@
     }, 1500);
   }
 
-  async function showCheckoutForm() {
+  function showCheckoutForm() {
     document.getElementById('checkoutFormWrap').style.display = 'none';
     document.getElementById('paymentForm').style.display = 'block';
-    if (squareCard) { try { await squareCard.attach('#card-container'); } catch(e) {} }
     setTimeout(() => {
       initPlaces();
       // Fallback: attach Nominatim listener if Google didn't load
@@ -1560,31 +1511,6 @@
     }, 150);
   }
 
-  async function placeOrder() {
-    const btn    = document.getElementById('sq-pay-btn');
-    const errDiv = document.getElementById('sq-error');
-    errDiv.style.display = 'none';
-
-    if (!squareCard) { confirmOrder(); return; }
-
-    btn.textContent = 'Processing…'; btn.disabled = true;
-
-    try {
-      const result = await squareCard.tokenize();
-      if (result.status === 'OK') {
-        console.log('Square token:', result.token);
-        await confirmOrder();
-      } else {
-        errDiv.textContent = '⚠️ ' + (result.errors?.map(e => e.message).join(', ') || 'Card error.');
-        errDiv.style.display = 'block';
-        btn.textContent = '✨ Place Order by Card'; btn.disabled = false;
-      }
-    } catch(e) {
-      errDiv.textContent = '⚠️ Payment error. Please try again.';
-      errDiv.style.display = 'block';
-      btn.textContent = '✨ Place Order by Card'; btn.disabled = false;
-    }
-  }
 
   async function confirmOrder() {
     document.getElementById('paymentForm').style.display  = 'none';
@@ -1632,17 +1558,13 @@
 
   // ---- SERVICE WORKER — CLEAR ALL CACHES ----
   if ('serviceWorker' in navigator) {
-    // Unregister every service worker and delete every cache
     navigator.serviceWorker.getRegistrations().then(regs => {
       regs.forEach(reg => reg.unregister());
     });
-    caches.keys().then(keys => {
-      keys.forEach(k => caches.delete(k));
-    });
+    caches.keys().then(keys => { keys.forEach(k => caches.delete(k)); });
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js')
-        .then(() => console.log('✅ Cache cleared'))
-        .catch(() => {});
+      navigator.serviceWorker.register('/sw.js').catch(() => {});
+    });
   }
 </script>
 </body>
