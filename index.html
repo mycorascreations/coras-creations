@@ -1399,6 +1399,20 @@
     document.body.style.overflow = 'hidden';
   }
 
+  function toggleCart() {
+    const drawer = document.getElementById('cartDrawer');
+    const overlay = document.getElementById('cartOverlay');
+    const isOpen = drawer.style.display === 'flex';
+    if (isOpen) {
+      closeCart();
+    } else {
+      renderCart();
+      drawer.style.display  = 'flex';
+      overlay.style.display = 'block';
+      document.body.style.overflow = 'hidden';
+    }
+  }
+
   function closeCart() {
     document.getElementById('cartDrawer').style.display  = 'none';
     document.getElementById('cartOverlay').style.display = 'none';
