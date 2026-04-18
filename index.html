@@ -918,45 +918,15 @@
       <!-- Checkout Section -->
       <div id="checkoutSection" style="display:none; padding:1.25rem; border-top:1px solid var(--border);">
 
-        <!-- Subtotal + UPS Shipping + Total -->
+        <!-- Subtotal + Flat Rate Shipping + Total -->
         <div style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1rem;">
           <div style="display:flex; justify-content:space-between; font-size:0.95rem;">
             <span style="color:var(--text-muted);">Subtotal</span>
             <span id="cartSubtotal" style="color:var(--text-primary); font-weight:600;">$0</span>
           </div>
-
-          <!-- UPS Service Selector -->
-          <div style="margin:0.4rem 0;">
-            <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.6rem;">
-              <span style="font-size:1rem;">📦</span>
-              <span style="font-size:0.75rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-muted);">UPS Shipping</span>
-            </div>
-            <div style="display:flex; flex-direction:column; gap:0.4rem;">
-              <label class="ship-opt selected-opt" onclick="selectShipping(this,'UPSGround',8.99)">
-                <input type="radio" name="shipping" checked style="accent-color:var(--purple);">
-                <div style="flex:1;">
-                  <div style="font-size:0.85rem; font-weight:600; color:var(--text-primary);">UPS Ground</div>
-                  <div style="font-size:0.72rem; color:var(--text-muted);">1–5 business days</div>
-                </div>
-                <span style="color:var(--gold-light); font-weight:700;">$8.99</span>
-              </label>
-              <label class="ship-opt" onclick="selectShipping(this,'UPS2ndDayAir',19.99)">
-                <input type="radio" name="shipping" style="accent-color:var(--purple);">
-                <div style="flex:1;">
-                  <div style="font-size:0.85rem; font-weight:600; color:var(--text-primary);">UPS 2nd Day Air</div>
-                  <div style="font-size:0.72rem; color:var(--text-muted);">2 business days</div>
-                </div>
-                <span style="color:var(--gold-light); font-weight:700;">$19.99</span>
-              </label>
-              <label class="ship-opt" onclick="selectShipping(this,'UPSNextDayAir',39.99)">
-                <input type="radio" name="shipping" style="accent-color:var(--purple);">
-                <div style="flex:1;">
-                  <div style="font-size:0.85rem; font-weight:600; color:var(--text-primary);">UPS Next Day Air</div>
-                  <div style="font-size:0.72rem; color:var(--text-muted);">Next business day</div>
-                </div>
-                <span style="color:var(--gold-light); font-weight:700;">$39.99</span>
-              </label>
-            </div>
+          <div style="display:flex; align-items:center; gap:0.5rem; padding:0.5rem 0.75rem; background:var(--bg-card); border-radius:8px; border:1px solid var(--border);">
+            <span style="font-size:1rem;">📦</span>
+            <span style="font-size:0.82rem; color:var(--text-muted); flex:1;">Flat Rate Shipping <span style="color:var(--teal-light); font-size:0.75rem;">(Free over $50!)</span></span>
           </div>
 
           <div style="display:flex; justify-content:space-between; font-size:0.95rem;">
@@ -1347,10 +1317,10 @@
           </div>
         </div>`;
     }).join('');
-    const shipping = window.selectedShipping?.rate ?? 8.99;
+    const shipping = subtotal >= 50 ? 0 : 5.99;
     const total    = subtotal + shipping;
     subtotalEl.textContent = '$' + subtotal.toFixed(2);
-    document.getElementById('cartShipping').textContent = '$' + shipping.toFixed(2);
+    document.getElementById('cartShipping').textContent = shipping === 0 ? 'FREE 🎉' : '$5.99';
     document.getElementById('cartTotal').textContent    = '$' + total.toFixed(2);
   }
 
@@ -1389,16 +1359,7 @@
   // ---- VENMO ----
   const VENMO_HANDLE = 'Coras-Creations'; // ← replace with Cora's Venmo username
 
-  // ---- PIRATE SHIP RATE SELECTOR ----
-  // ---- UPS SHIPPING SELECTION ----
-  window.selectedShipping = { service: 'UPSGround', rate: 8.99 };
-
-  function selectShipping(label, service, rate) {
-    document.querySelectorAll('.ship-opt').forEach(el => el.classList.remove('selected-opt'));
-    label.classList.add('selected-opt');
-    window.selectedShipping = { service, rate };
-    renderCart();
-  }
+  function getShipping(subtotal) { return subtotal >= 50 ? 0 : 5.99; }
 
   // ---- GOOGLE PLACES AUTOCOMPLETE ----
   let placesAutocomplete = null;
@@ -1482,7 +1443,7 @@
 
   function payWithVenmo() {
     const subtotal = Object.values(cart).reduce((s, i) => s + i.price * i.qty, 0);
-    const shipping = window.selectedShipping?.rate ?? 8.99;
+    const shipping = getShipping(subtotal);
     const total    = (subtotal + shipping).toFixed(2);
     const items = Object.keys(cart).join(', ');
     const note  = encodeURIComponent("Cora's Creations order: " + items);
@@ -1522,8 +1483,9 @@
     const custCity    = document.getElementById('sq-city')?.value    || '';
     const custState   = document.getElementById('sq-state')?.value   || '';
     const custZip     = document.getElementById('sq-zip')?.value     || '';
-    const shipping    = window.selectedShipping?.service || 'UPS Ground';
-    const shippingCost = (window.selectedShipping?.rate ?? 8.99).toFixed(2);
+    const subtotalAmt  = Object.values(cart).reduce((s,i) => s + i.price * i.qty, 0);
+    const shippingCost = getShipping(subtotalAmt).toFixed(2);
+    const shipping     = parseFloat(shippingCost) === 0 ? 'FREE' : '$5.99 Flat Rate';
 
     const itemLines = Object.entries(cart).map(([name, {qty, price}]) =>
       `  • ${name} x${qty} — $${(price * qty).toFixed(2)}`
