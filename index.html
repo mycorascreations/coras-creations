@@ -1513,45 +1513,110 @@
 
 
   async function confirmOrder() {
-    document.getElementById('paymentForm').style.display  = 'none';
+    document.getElementById('paymentForm').style.display    = 'none';
     document.getElementById('orderConfirmed').style.display = 'block';
 
-    // Call EasyPost via Netlify Function to generate UPS label
-    const orderData = {
-      name:    document.getElementById('sq-name')?.value    || '',
-      email:   document.getElementById('sq-email')?.value   || '',
-      address: document.getElementById('sq-address')?.value || '',
-      city:    document.getElementById('sq-city')?.value    || '',
-      state:   document.getElementById('sq-state')?.value   || '',
-      zip:     document.getElementById('sq-zip')?.value     || '',
-      service: window.selectedShipping?.service || 'UPSGround',
-      items:   Object.entries(cart).map(([name,{qty,price}]) => ({name,qty,price})),
-    };
+    const custName    = document.getElementById('sq-name')?.value    || '';
+    const custEmail   = document.getElementById('sq-email')?.value   || '';
+    const custAddress = document.getElementById('sq-address')?.value || '';
+    const custCity    = document.getElementById('sq-city')?.value    || '';
+    const custState   = document.getElementById('sq-state')?.value   || '';
+    const custZip     = document.getElementById('sq-zip')?.value     || '';
+    const shipping    = window.selectedShipping?.service || 'UPS Ground';
+    const shippingCost = (window.selectedShipping?.rate ?? 8.99).toFixed(2);
 
-    const shipping = await createShippingLabel(orderData);
-    if (shipping?.tracking_number) {
-      document.getElementById('trackingPending').style.display  = 'none';
-      document.getElementById('trackingBlock').style.display    = 'block';
-      document.getElementById('trackingNumber').textContent     = shipping.tracking_number;
-      document.getElementById('trackingLink').href =
-        `https://www.ups.com/track?tracknum=${shipping.tracking_number}`;
-    }
+    const itemLines = Object.entries(cart).map(([name, {qty, price}]) =>
+      `  • ${name} x${qty} — $${(price * qty).toFixed(2)}`
+    ).join('\n');
+    const subtotal = Object.values(cart).reduce((s,i) => s + i.price * i.qty, 0);
+    const total    = (subtotal + parseFloat(shippingCost)).toFixed(2);
+
+    const msg = `
+New Order Received!
+
+CUSTOMER
+Name: ${custName}
+Email: ${custEmail}
+
+SHIPPING ADDRESS
+${custAddress}
+${custCity}, ${custState} ${custZip}
+Shipping Method: ${shipping} ($${shippingCost})
+
+ORDER ITEMS
+${itemLines}
+
+Subtotal: $${subtotal.toFixed(2)}
+Shipping: $${shippingCost}
+TOTAL: $${total}
+    `.trim();
+
+    await sendEmail("New Order Cora's Creations", msg);
 
     cart = {};
-    const badge = document.getElementById('cartCount');
-    badge.style.display = 'none'; badge.textContent = '0';
+    updateBadge();
+  }
+
+  // ---- EMAIL via Web3Forms ----
+  const W3F_KEY = 'YOUR_WEB3FORMS_KEY'; // ← replace with key from web3forms.com
+
+  async function sendEmail(subject, message) {
+    try {
+      await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          access_key: W3F_KEY,
+          subject: subject,
+          message: message,
+          from_name: "Cora's Creations Website"
+        })
+      });
+    } catch(e) { console.warn('Email send failed:', e); }
   }
 
   // ---- CUSTOM ORDER FORM ----
-  function submitForm(e) {
+  async function submitForm(e) {
     e.preventDefault();
+    const name     = (document.getElementById('fname')?.value || '') + ' ' + (document.getElementById('lname')?.value || '');
+    const email    = document.getElementById('email')?.value || '';
+    const itemType = document.getElementById('item-type')?.value || '';
+    const colors   = document.getElementById('colors')?.value || '';
+    const budget   = document.getElementById('budget')?.value || '';
+    const details  = document.getElementById('details')?.value || '';
+    const msg = `
+New Custom Order Request
+
+Name: ${name.trim()}
+Email: ${email}
+Item Type: ${itemType}
+Colors / Theme: ${colors}
+Budget: ${budget}
+
+Vision / Details:
+${details}
+    `.trim();
+    await sendEmail("Cora's Creations Custom Order", msg);
     document.getElementById('customForm').style.display = 'none';
     document.getElementById('successMsg').style.display = 'block';
   }
 
   // ---- CONTACT FORM ----
-  function submitContact(e) {
+  async function submitContact(e) {
     e.preventDefault();
+    const name    = document.getElementById('contact-name')?.value || '';
+    const email   = document.getElementById('contact-email')?.value || '';
+    const message = document.getElementById('contact-msg')?.value || '';
+    const msg = `
+New Message from Website
+
+Name: ${name}
+Email: ${email}
+
+Message:
+${message}
+    `.trim();
+    await sendEmail("Cora's Creations Feedback", msg);
     document.getElementById('contactForm').style.display = 'none';
     document.getElementById('contactSuccess').style.display = 'block';
   }
