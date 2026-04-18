@@ -1314,11 +1314,16 @@
     const badge = document.getElementById('cartCount');
     badge.textContent = total; badge.style.display = 'block';
 
-    // toast
-    const toast = document.getElementById('cartToast');
-    toast.style.display = 'block';
-    clearTimeout(window._toastTimer);
-    window._toastTimer = setTimeout(() => { toast.style.display = 'none'; }, 2200);
+    // open cart drawer automatically
+    const drawer  = document.getElementById('cartDrawer');
+    const overlay = document.getElementById('cartOverlay');
+    document.getElementById('checkoutFormWrap').style.display = 'block';
+    document.getElementById('paymentForm').style.display = 'none';
+    document.getElementById('orderConfirmed').style.display = 'none';
+    renderCart();
+    drawer.style.display  = 'flex';
+    overlay.style.display = 'block';
+    document.body.style.overflow = 'hidden';
   }
 
   function renderCart() {
@@ -1421,10 +1426,10 @@
 
   async function initSquare() {
     if (!window.Square) return;
+    if (SQUARE_APP_ID === 'YOUR_SQUARE_APP_ID') return; // skip if not configured
     try {
       const payments = Square.payments(SQUARE_APP_ID, SQUARE_LOCATION_ID);
       squareCard = await payments.card({ style: CARD_STYLE });
-      await squareCard.attach('#card-container');
     } catch(e) {
       console.warn('Square init error:', e);
     }
