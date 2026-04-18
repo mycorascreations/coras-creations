@@ -468,8 +468,8 @@
     .footer-heart { color: var(--rose-light); }
 
     /* ---- SCROLL REVEAL ---- */
-    .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
-    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal { opacity: 1; transform: none; }
+    .reveal.visible { opacity: 1; transform: none; }
 
     /* ---- RESPONSIVE ---- */
     @media (max-width: 768px) {
@@ -1282,18 +1282,7 @@
       document.getElementById('mobileMenu').classList.contains('open') ? 'hidden' : '';
   }
 
-  // ---- SCROLL REVEAL ----
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
-  }, { threshold: 0.05, rootMargin: '0px 0px -20px 0px' });
-  document.querySelectorAll('.reveal').forEach(el => {
-    const rect = el.getBoundingClientRect();
-    if (rect.top < window.innerHeight) {
-      el.classList.add('visible'); // immediately show if already in viewport
-    } else {
-      observer.observe(el);
-    }
-  });
+  // Scroll reveal disabled — all content visible by default
 
   // ---- PRODUCT FILTER ----
   function filterProducts(cat, btn) {
