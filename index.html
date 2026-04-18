@@ -11,7 +11,6 @@
   <meta name="apple-mobile-web-app-title" content="Cora's Creations" />
   <link rel="manifest" href="/manifest.json" />
   <link rel="apple-touch-icon" href="/icon-192.png" />
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC0TLO6KYgIqldjpwkx62MSdZwxceyV05A&libraries=places" async defer></script>
   <style>
     /* ---- FONTS ---- */
     @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600&family=Raleway:wght@300;400;500;600&display=swap');
@@ -1361,79 +1360,30 @@
 
   function getShipping(subtotal) { return subtotal >= 50 ? 0 : 5.99; }
 
-  // ---- GOOGLE PLACES AUTOCOMPLETE ----
-  let placesAutocomplete = null;
+  // ---- ADDRESS AUTOCOMPLETE (OpenStreetMap — free, no API key) ----
+  let addrTimer = null;
 
   function initPlaces() {
     const input = document.getElementById('sq-address');
-    if (!input) return;
-    if (placesAutocomplete) return; // already attached
-
-    // Wait for Google to be ready, retry up to 10 times
-    if (!window.google || !window.google.maps || !window.google.maps.places) {
-      let tries = 0;
-      const poll = setInterval(() => {
-        tries++;
-        if (window.google && window.google.maps && window.google.maps.places) {
-          clearInterval(poll);
-          attachPlaces(input);
-        } else if (tries >= 10) {
-          clearInterval(poll); // give up, Nominatim fallback will handle it
-        }
-      }, 300);
-      return;
-    }
-    attachPlaces(input);
-  }
-
-  function attachPlaces(input) {
-    try {
-      placesAutocomplete = new google.maps.places.Autocomplete(input, {
-        types: ['address'],
-        componentRestrictions: { country: 'us' },
-        fields: ['address_components']
-      });
-      placesAutocomplete.addListener('place_changed', () => {
-        const place = placesAutocomplete.getPlace();
-        if (!place.address_components) return;
-        let street = '', city = '', state = '', zip = '';
-        place.address_components.forEach(c => {
-          if (c.types.includes('street_number')) street = c.long_name;
-          if (c.types.includes('route'))         street += (street ? ' ' : '') + c.long_name;
-          if (c.types.includes('locality'))      city   = c.long_name;
-          if (c.types.includes('administrative_area_level_1')) state = c.short_name;
-          if (c.types.includes('postal_code'))   zip    = c.long_name;
-        });
-        document.getElementById('sq-address').value = street;
-        document.getElementById('sq-city').value    = city;
-        document.getElementById('sq-state').value   = state;
-        document.getElementById('sq-zip').value     = zip;
-      });
-    } catch(e) {
-      console.warn('Places attach failed:', e);
-      placesAutocomplete = null; // allow retry
-    }
-  }
-
-  // Fallback: free Nominatim autocomplete if Google key not set
-  let nominatimTimer = null;
-  function addressInput(input) {
-    if (window.google) return; // Google Places handles it
-    clearTimeout(nominatimTimer);
-    const q = input.value.trim();
-    const dropdown = document.getElementById('addressDropdown');
-    if (q.length < 4) { dropdown.classList.remove('open'); return; }
-    nominatimTimer = setTimeout(async () => {
-      try {
-        const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&addressdetails=1&limit=5&countrycodes=us`);
-        const data = await res.json();
-        dropdown.innerHTML = data.map((r, i) =>
-          `<div class="autocomplete-item" onclick="selectAddress(${i})">${r.display_name}</div>`
-        ).join('');
-        dropdown._data = data;
-        dropdown.classList.toggle('open', data.length > 0);
-      } catch(e) {}
-    }, 350);
+    if (!input || input._listenerAdded) return;
+    input._listenerAdded = true;
+    input.addEventListener('input', () => {
+      clearTimeout(addrTimer);
+      const q = input.value.trim();
+      const dropdown = document.getElementById('addressDropdown');
+      if (q.length < 4) { dropdown.classList.remove('open'); return; }
+      addrTimer = setTimeout(async () => {
+        try {
+          const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&addressdetails=1&limit=6&countrycodes=us`);
+          const data = await res.json();
+          dropdown.innerHTML = data.map((r, i) =>
+            `<div class="autocomplete-item" onclick="selectAddress(${i})">${r.display_name}</div>`
+          ).join('');
+          dropdown._data = data;
+          dropdown.classList.toggle('open', data.length > 0);
+        } catch(e) {}
+      }, 400);
+    });
   }
 
   function selectAddress(i) {
