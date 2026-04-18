@@ -12,7 +12,6 @@
   <link rel="manifest" href="/manifest.json" />
   <link rel="apple-touch-icon" href="/icon-192.png" />
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC0TLO6KYgIqldjpwkx62MSdZwxceyV05A&libraries=places" async defer></script>
-  <script src="https://web.squarecdn.com/v1/square.js"></script>
   <style>
     /* ---- FONTS ---- */
     @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600&family=Raleway:wght@300;400;500;600&display=swap');
@@ -1298,32 +1297,30 @@
   }
 
   // ---- CART STATE ----
-  let cart = {}; // { name: { price, qty } }
+  let cart = {};
 
-  function addedToCart(btn, name, price) {
-    // update button
-    btn.textContent = '✓ Added!';
-    btn.style.background = 'linear-gradient(135deg, #059669, #0d9488)';
-    setTimeout(() => { btn.textContent = 'Add to Cart 🛒'; btn.style.background = ''; }, 2000);
-
-    // add to cart object
-    if (cart[name]) { cart[name].qty++; } else { cart[name] = { price, qty: 1 }; }
-
-    // update badge
+  function updateBadge() {
     const total = Object.values(cart).reduce((s, i) => s + i.qty, 0);
     const badge = document.getElementById('cartCount');
-    badge.textContent = total; badge.style.display = 'block';
+    if (!badge) return;
+    badge.textContent = total;
+    badge.style.display = total > 0 ? 'block' : 'none';
+  }
 
-    // open cart drawer automatically
-    const drawer  = document.getElementById('cartDrawer');
-    const overlay = document.getElementById('cartOverlay');
-    document.getElementById('checkoutFormWrap').style.display = 'block';
-    document.getElementById('paymentForm').style.display = 'none';
-    document.getElementById('orderConfirmed').style.display = 'none';
-    renderCart();
-    drawer.style.display  = 'flex';
-    overlay.style.display = 'block';
-    document.body.style.overflow = 'hidden';
+  function addedToCart(btn, name, price) {
+    // flash button green
+    btn.textContent = '✓ Added!';
+    btn.style.background = 'linear-gradient(135deg,#059669,#0d9488)';
+    setTimeout(() => { btn.textContent = 'Add to Cart 🛒'; btn.style.background = ''; }, 2000);
+
+    // add item to cart
+    if (cart[name]) { cart[name].qty++; } else { cart[name] = { price, qty: 1 }; }
+
+    // update nav badge
+    updateBadge();
+
+    // open cart drawer
+    openCart();
   }
 
   function renderCart() {
@@ -1381,27 +1378,28 @@
   }
 
   function changeQty(name, delta) {
+    if (!cart[name]) return;
     cart[name].qty += delta;
     if (cart[name].qty <= 0) delete cart[name];
-    const total = Object.values(cart).reduce((s, i) => s + i.qty, 0);
-    const badge = document.getElementById('cartCount');
-    if (total === 0) { badge.style.display = 'none'; } else { badge.textContent = total; }
+    updateBadge();
     renderCart();
   }
 
-  function toggleCart() {
+  function openCart() {
     const drawer  = document.getElementById('cartDrawer');
     const overlay = document.getElementById('cartOverlay');
-    const isOpen  = drawer.style.display === 'flex';
-    if (isOpen) { closeCart(); return; }
-    // reset checkout state
     document.getElementById('checkoutFormWrap').style.display = 'block';
-    document.getElementById('paymentForm').style.display = 'none';
-    document.getElementById('orderConfirmed').style.display = 'none';
+    document.getElementById('paymentForm').style.display      = 'none';
+    document.getElementById('orderConfirmed').style.display   = 'none';
     renderCart();
     drawer.style.display  = 'flex';
     overlay.style.display = 'block';
     document.body.style.overflow = 'hidden';
+  }
+
+  function toggleCart() {
+    const drawer = document.getElementById('cartDrawer');
+    if (drawer.style.display === 'flex') { closeCart(); } else { openCart(); }
   }
 
   function closeCart() {
