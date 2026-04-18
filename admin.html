@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cora's Creations — Order Admin</title>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', sans-serif; background: #0f0f1a; color: #e0e0f0; min-height: 100vh; }
+
+    /* ── LOGIN SCREEN ── */
+    #loginScreen {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; min-height: 100vh; padding: 2rem;
+    }
+    .login-card {
+      background: #1a1a2e; border: 1px solid #2a2a4a; border-radius: 16px;
+      padding: 2.5rem; width: 100%; max-width: 400px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+    .login-card h1 {
+      font-size: 1.5rem; margin-bottom: 0.25rem;
+      background: linear-gradient(135deg,#a78bfa,#f472b6);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .login-card p { color: #888; font-size: 0.85rem; margin-bottom: 1.5rem; }
+    .login-card input {
+      width: 100%; padding: 0.75rem 1rem; margin-bottom: 1rem;
+      background: #0f0f1a; border: 1px solid #2a2a4a; border-radius: 8px;
+      color: #e0e0f0; font-size: 1rem; outline: none;
+      transition: border-color 0.2s;
+    }
+    .login-card input:focus { border-color: #a78bfa; }
+    .login-btn {
+      width: 100%; padding: 0.85rem; border: none; border-radius: 8px;
+      background: linear-gradient(135deg,#7c3aed,#db2777); color: #fff;
+      font-size: 1rem; font-weight: 600; cursor: pointer; transition: opacity 0.2s;
+    }
+    .login-btn:hover { opacity: 0.9; }
+    .login-error { color: #f87171; font-size: 0.85rem; margin-top: 0.75rem; text-align: center; }
+
+    /* ── ADMIN SCREEN ── */
+    #adminScreen { display: none; padding: 1.5rem; }
+    .top-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;
+    }
+    .top-bar h1 {
+      font-size: 1.4rem;
+      background: linear-gradient(135deg,#a78bfa,#f472b6);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .top-bar .controls { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; }
+    .top-bar input[type="text"] {
+      padding: 0.5rem 0.9rem; background: #1a1a2e; border: 1px solid #2a2a4a;
+      border-radius: 8px; color: #e0e0f0; font-size: 0.9rem; outline: none;
+      width: 220px; transition: border-color 0.2s;
+    }
+    .top-bar input[type="text"]:focus { border-color: #a78bfa; }
+    .btn-sm {
+      padding: 0.5rem 1rem; border: none; border-radius: 8px; font-size: 0.85rem;
+      font-weight: 600; cursor: pointer; transition: opacity 0.2s;
+    }
+    .btn-sm:hover { opacity: 0.85; }
+    .btn-refresh { background: #1a1a2e; color: #a78bfa; border: 1px solid #a78bfa; }
+    .btn-export  { background: linear-gradient(135deg,#059669,#0d9488); color: #fff; }
+    .btn-logout  { background: #1a1a2e; color: #f87171; border: 1px solid #f87171; }
+
+    /* stats row */
+    .stats { display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+    .stat-card {
+      background: #1a1a2e; border: 1px solid #2a2a4a; border-radius: 12px;
+      padding: 1rem 1.5rem; flex: 1; min-width: 140px;
+    }
+    .stat-card .label { font-size: 0.75rem; color: #888; text-transform: uppercase; letter-spacing: 0.05em; }
+    .stat-card .value { font-size: 1.6rem; font-weight: 700; color: #a78bfa; margin-top: 0.2rem; }
+
+    /* table */
+    .table-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid #2a2a4a; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    thead { background: #1a1a2e; }
+    thead th {
+      padding: 0.85rem 1rem; text-align: left; color: #a78bfa;
+      font-weight: 600; font-size: 0.75rem; text-transform: uppercase;
+      letter-spacing: 0.05em; white-space: nowrap; cursor: pointer; user-select: none;
+    }
+    thead th:hover { color: #f472b6; }
+    thead th .sort-arrow { margin-left: 4px; opacity: 0.5; }
+    tbody tr { border-top: 1px solid #1e1e35; transition: background 0.15s; }
+    tbody tr:hover { background: #1a1a2e; }
+    tbody td { padding: 0.85rem 1rem; vertical-align: top; }
+    .order-num { font-family: monospace; color: #f472b6; font-weight: 600; white-space: nowrap; }
+    .customer-name { font-weight: 600; color: #e0e0f0; }
+    .email-cell { color: #888; font-size: 0.8rem; }
+    .address-cell { color: #aaa; font-size: 0.8rem; line-height: 1.4; }
+    .items-cell { color: #c4b5fd; font-size: 0.8rem; line-height: 1.6; max-width: 220px; }
+    .total-cell { font-weight: 700; color: #34d399; white-space: nowrap; }
+    .date-cell { color: #888; font-size: 0.8rem; white-space: nowrap; }
+    .status-badge {
+      display: inline-block; padding: 0.2rem 0.6rem; border-radius: 20px;
+      font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .status-received { background: #1d4ed820; color: #60a5fa; border: 1px solid #1d4ed8; }
+
+    .empty-state {
+      text-align: center; padding: 4rem 2rem; color: #555;
+    }
+    .empty-state .icon { font-size: 3rem; margin-bottom: 1rem; }
+
+    .loading { text-align: center; padding: 3rem; color: #888; }
+    .spinner {
+      display: inline-block; width: 28px; height: 28px;
+      border: 3px solid #2a2a4a; border-top-color: #a78bfa;
+      border-radius: 50%; animation: spin 0.7s linear infinite;
+      margin-bottom: 0.75rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .row-count { font-size: 0.8rem; color: #666; margin-bottom: 0.75rem; }
+  </style>
+</head>
+<body>
+
+<!-- ══════════ LOGIN ══════════ -->
+<div id="loginScreen">
+  <div class="login-card">
+    <h1>Cora's Creations</h1>
+    <p>Order Admin — Sign in to continue</p>
+    <input type="email" id="loginEmail" placeholder="Email address" autocomplete="email"/>
+    <input type="password" id="loginPassword" placeholder="Password" autocomplete="current-password"
+           onkeydown="if(event.key==='Enter') signIn()"/>
+    <button class="login-btn" onclick="signIn()">Sign In</button>
+    <div class="login-error" id="loginError"></div>
+  </div>
+</div>
+
+<!-- ══════════ ADMIN ══════════ -->
+<div id="adminScreen">
+  <div class="top-bar">
+    <h1>🛍️ Cora's Creations — Orders</h1>
+    <div class="controls">
+      <input type="text" id="searchBox" placeholder="Search name, email, order #…" oninput="renderTable()"/>
+      <button class="btn-sm btn-refresh" onclick="loadOrders()">↻ Refresh</button>
+      <button class="btn-sm btn-export" onclick="exportCSV()">⬇ Export CSV</button>
+      <button class="btn-sm btn-logout" onclick="signOut()">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat-card"><div class="label">Total Orders</div><div class="value" id="statTotal">—</div></div>
+    <div class="stat-card"><div class="label">Total Revenue</div><div class="value" id="statRevenue">—</div></div>
+    <div class="stat-card"><div class="label">Avg Order</div><div class="value" id="statAvg">—</div></div>
+  </div>
+
+  <div class="row-count" id="rowCount"></div>
+
+  <div class="table-wrap">
+    <div class="loading" id="loadingMsg">
+      <div class="spinner"></div><br/>Loading orders…
+    </div>
+    <table id="ordersTable" style="display:none">
+      <thead>
+        <tr>
+          <th onclick="sortBy('orderNumber')">Order # <span class="sort-arrow">↕</span></th>
+          <th onclick="sortBy('dateReceived')">Date <span class="sort-arrow">↕</span></th>
+          <th onclick="sortBy('fullName')">Customer <span class="sort-arrow">↕</span></th>
+          <th>Address</th>
+          <th>Items</th>
+          <th onclick="sortBy('total')">Total <span class="sort-arrow">↕</span></th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="ordersBody"></tbody>
+    </table>
+    <div class="empty-state" id="emptyState" style="display:none">
+      <div class="icon">📭</div>
+      <div>No orders found</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const firebaseConfig = {
+    apiKey:            "AIzaSyBCXQ8mkQxhSoarijKvFjIjnJ0upfeqoiI",
+    authDomain:        "cora-s-creations.firebaseapp.com",
+    projectId:         "cora-s-creations",
+    storageBucket:     "cora-s-creations.firebasestorage.app",
+    messagingSenderId: "433472237838",
+    appId:             "1:433472237838:web:839b78b924a7742bce675f",
+    measurementId:     "G-XM09Z3RVS8"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db   = firebase.firestore();
+
+  let allOrders  = [];
+  let sortKey    = 'timestamp';
+  let sortAsc    = false;
+
+  // ── Auth ──────────────────────────────────────────
+  auth.onAuthStateChanged(user => {
+    if (user) {
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('adminScreen').style.display = 'block';
+      loadOrders();
+    } else {
+      document.getElementById('loginScreen').style.display = 'flex';
+      document.getElementById('adminScreen').style.display = 'none';
+    }
+  });
+
+  async function signIn() {
+    const email    = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const errEl    = document.getElementById('loginError');
+    errEl.textContent = '';
+    try {
+      await auth.signInWithEmailAndPassword(email, password);
+    } catch(e) {
+      errEl.textContent = 'Invalid email or password. Try again.';
+    }
+  }
+
+  async function signOut() {
+    await auth.signOut();
+  }
+
+  // ── Load orders ───────────────────────────────────
+  async function loadOrders() {
+    document.getElementById('loadingMsg').style.display  = 'block';
+    document.getElementById('ordersTable').style.display = 'none';
+    document.getElementById('emptyState').style.display  = 'none';
+    try {
+      const snap = await db.collection('orders').orderBy('timestamp','desc').get();
+      allOrders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderTable();
+    } catch(e) {
+      document.getElementById('loadingMsg').innerHTML =
+        '<span style="color:#f87171">Error loading orders: ' + e.message + '</span>';
+    }
+  }
+
+  // ── Render ────────────────────────────────────────
+  function renderTable() {
+    const q = (document.getElementById('searchBox').value || '').toLowerCase();
+
+    let filtered = allOrders.filter(o => {
+      if (!q) return true;
+      return (o.fullName     || '').toLowerCase().includes(q) ||
+             (o.email        || '').toLowerCase().includes(q) ||
+             (o.orderNumber  || '').toLowerCase().includes(q) ||
+             (o.streetAddress|| '').toLowerCase().includes(q);
+    });
+
+    // sort
+    filtered.sort((a,b) => {
+      let av = a[sortKey] ?? '', bv = b[sortKey] ?? '';
+      if (sortKey === 'total') { av = parseFloat(av)||0; bv = parseFloat(bv)||0; }
+      if (av < bv) return sortAsc ? -1 : 1;
+      if (av > bv) return sortAsc ?  1 : -1;
+      return 0;
+    });
+
+    document.getElementById('loadingMsg').style.display = 'none';
+
+    if (filtered.length === 0) {
+      document.getElementById('ordersTable').style.display = 'none';
+      document.getElementById('emptyState').style.display  = 'block';
+      document.getElementById('rowCount').textContent = '';
+    } else {
+      document.getElementById('ordersTable').style.display = 'table';
+      document.getElementById('emptyState').style.display  = 'none';
+      document.getElementById('rowCount').textContent =
+        `Showing ${filtered.length} of ${allOrders.length} order${allOrders.length !== 1 ? 's' : ''}`;
+    }
+
+    // stats (always based on all orders)
+    const totalRev = allOrders.reduce((s,o) => s + (parseFloat(o.total)||0), 0);
+    const avg      = allOrders.length ? totalRev / allOrders.length : 0;
+    document.getElementById('statTotal').textContent   = allOrders.length;
+    document.getElementById('statRevenue').textContent = '$' + totalRev.toFixed(2);
+    document.getElementById('statAvg').textContent     = '$' + avg.toFixed(2);
+
+    // rows
+    const tbody = document.getElementById('ordersBody');
+    tbody.innerHTML = filtered.map(o => {
+      const items = Array.isArray(o.orderItems)
+        ? o.orderItems.map(i => `${i.name} x${i.qty} — $${(i.price * i.qty).toFixed(2)}`).join('<br/>')
+        : (o.orderItems || '');
+      const addr = [o.streetAddress, o.city, o.state, o.zipCode].filter(Boolean).join(', ');
+      return `
+        <tr>
+          <td><span class="order-num">${o.orderNumber || o.id}</span></td>
+          <td class="date-cell">${o.dateReceived || ''}<br/>${o.timeReceived || ''}</td>
+          <td>
+            <div class="customer-name">${o.fullName || ''}</div>
+            <div class="email-cell">${o.email || ''}</div>
+          </td>
+          <td class="address-cell">${addr}</td>
+          <td class="items-cell">${items}</td>
+          <td class="total-cell">$${parseFloat(o.total||0).toFixed(2)}</td>
+          <td><span class="status-badge status-received">${o.status || 'received'}</span></td>
+        </tr>`;
+    }).join('');
+  }
+
+  function sortBy(key) {
+    if (sortKey === key) sortAsc = !sortAsc;
+    else { sortKey = key; sortAsc = true; }
+    renderTable();
+  }
+
+  // ── CSV Export ────────────────────────────────────
+  function exportCSV() {
+    if (!allOrders.length) return alert('No orders to export.');
+    const headers = ['Order #','Date','Time','Full Name','Email','Street','City','State','Zip','Items','Subtotal','Shipping','Total','Status'];
+    const rows = allOrders.map(o => {
+      const items = Array.isArray(o.orderItems)
+        ? o.orderItems.map(i => `${i.name} x${i.qty}`).join(' | ')
+        : (o.orderItems || '');
+      return [
+        o.orderNumber, o.dateReceived, o.timeReceived,
+        o.fullName, o.email,
+        o.streetAddress, o.city, o.state, o.zipCode,
+        items,
+        o.subtotal, o.shipping, o.total, o.status
+      ].map(v => `"${String(v||'').replace(/"/g,'""')}"`);
+    });
+    const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `coras-creations-orders-${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+  }
+</script>
+</body>
+</html>
