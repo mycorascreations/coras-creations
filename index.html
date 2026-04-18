@@ -1633,9 +1633,19 @@
 
   // ---- SERVICE WORKER (PWA) ----
   if ('serviceWorker' in navigator) {
+    // Unregister any old service workers and clear caches on every load
+    navigator.serviceWorker.getRegistrations().then(regs => {
+      regs.forEach(reg => reg.update()); // force check for new sw.js
+    });
+    caches.keys().then(keys => {
+      keys.filter(k => k !== 'coras-creations-v4').forEach(k => caches.delete(k));
+    });
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js')
-        .then(() => console.log('✅ Service worker registered'))
+      navigator.serviceWorker.register('/sw.js?v=4')
+        .then(reg => {
+          reg.update(); // always check for updates
+          console.log('✅ Service worker registered');
+        })
         .catch(e => console.warn('SW error:', e));
     });
   }
