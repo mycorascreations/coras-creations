@@ -1363,30 +1363,56 @@
 
   // ---- GOOGLE PLACES AUTOCOMPLETE ----
   let placesAutocomplete = null;
-  let placesInitialized = false;
+
   function initPlaces() {
     const input = document.getElementById('sq-address');
-    if (!input || !window.google || placesInitialized) return;
-    placesInitialized = true;
-    placesAutocomplete = new google.maps.places.Autocomplete(input, {
-      types: ['address'], componentRestrictions: { country: 'us' }
-    });
-    placesAutocomplete.addListener('place_changed', () => {
-      const place = placesAutocomplete.getPlace();
-      if (!place.address_components) return;
-      let street = '', city = '', state = '', zip = '';
-      place.address_components.forEach(c => {
-        if (c.types.includes('street_number')) street = c.long_name;
-        if (c.types.includes('route'))         street += (street ? ' ' : '') + c.long_name;
-        if (c.types.includes('locality'))      city   = c.long_name;
-        if (c.types.includes('administrative_area_level_1')) state = c.short_name;
-        if (c.types.includes('postal_code'))   zip    = c.long_name;
+    if (!input) return;
+    if (placesAutocomplete) return; // already attached
+
+    // Wait for Google to be ready, retry up to 10 times
+    if (!window.google || !window.google.maps || !window.google.maps.places) {
+      let tries = 0;
+      const poll = setInterval(() => {
+        tries++;
+        if (window.google && window.google.maps && window.google.maps.places) {
+          clearInterval(poll);
+          attachPlaces(input);
+        } else if (tries >= 10) {
+          clearInterval(poll); // give up, Nominatim fallback will handle it
+        }
+      }, 300);
+      return;
+    }
+    attachPlaces(input);
+  }
+
+  function attachPlaces(input) {
+    try {
+      placesAutocomplete = new google.maps.places.Autocomplete(input, {
+        types: ['address'],
+        componentRestrictions: { country: 'us' },
+        fields: ['address_components']
       });
-      document.getElementById('sq-address').value = street;
-      document.getElementById('sq-city').value    = city;
-      document.getElementById('sq-state').value   = state;
-      document.getElementById('sq-zip').value     = zip;
-    });
+      placesAutocomplete.addListener('place_changed', () => {
+        const place = placesAutocomplete.getPlace();
+        if (!place.address_components) return;
+        let street = '', city = '', state = '', zip = '';
+        place.address_components.forEach(c => {
+          if (c.types.includes('street_number')) street = c.long_name;
+          if (c.types.includes('route'))         street += (street ? ' ' : '') + c.long_name;
+          if (c.types.includes('locality'))      city   = c.long_name;
+          if (c.types.includes('administrative_area_level_1')) state = c.short_name;
+          if (c.types.includes('postal_code'))   zip    = c.long_name;
+        });
+        document.getElementById('sq-address').value = street;
+        document.getElementById('sq-city').value    = city;
+        document.getElementById('sq-state').value   = state;
+        document.getElementById('sq-zip').value     = zip;
+      });
+    } catch(e) {
+      console.warn('Places attach failed:', e);
+      placesAutocomplete = null; // allow retry
+    }
   }
 
   // Fallback: free Nominatim autocomplete if Google key not set
