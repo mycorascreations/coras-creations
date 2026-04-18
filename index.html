@@ -605,6 +605,7 @@
   <div class="hero-content">
     <p class="hero-eyebrow">✦ Handmade Resin &amp; 3D Printed Art ✦</p>
     <h1>Cora's Creations</h1>
+    <p style="font-family:'Cinzel',serif; font-size:0.85rem; letter-spacing:0.2em; color:var(--gold); text-transform:uppercase; margin-top:-0.5rem; margin-bottom:0.5rem; opacity:0.85;">⚠ Under Development ⚠</p>
     <span class="hero-dragon">🐉</span>
     <p class="hero-tagline">
       Where <strong>magic meets craft</strong> — unique resin art, enchanted home décor,<br>
@@ -627,9 +628,9 @@
     </div>
     <div class="categories-grid">
       <a href="#shop" class="category-card reveal">
-        <span class="category-icon">🫧</span>
-        <h3>Trinket Dishes</h3>
-        <p>Beautifully cast resin dishes for jewelry, keys, and tiny treasures.</p>
+        <img src="flower-dish.jpeg" alt="Containers" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;margin-bottom:1rem;">
+        <h3>Containers</h3>
+        <p>Beautifully crafted resin containers — perfect for storage and display.</p>
       </a>
       <a href="#shop" class="category-card reveal">
         <img src="Coaster-butterfly.jpeg" alt="Coasters" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;margin-bottom:1rem;">
@@ -637,14 +638,19 @@
         <p>Ocean-swirl and galaxy resin coasters to protect your surfaces in style.</p>
       </a>
       <a href="#shop" class="category-card reveal">
-        <span class="category-icon">🍽️</span>
+        <img src="galaxy-tray.jpeg" alt="Animal Molds" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;margin-bottom:1rem;">
+        <h3>Animal Molds</h3>
+        <p>Resin animals in every color — butterflies, foxes, cats &amp; more.</p>
+      </a>
+      <a href="#shop" class="category-card reveal">
+        <img src="dragon-figure.jpeg" alt="Serving Trays" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;margin-bottom:1rem;">
         <h3>Serving Trays</h3>
         <p>Stunning resin serving trays — functional art for your home.</p>
       </a>
       <a href="#shop" class="category-card reveal">
-        <span class="category-icon">🦋</span>
-        <h3>Animal Molds</h3>
-        <p>Resin animals in every color — butterflies, foxes, cats &amp; more.</p>
+        <img src="dragon-jar.jpeg" alt="Trinket Dishes" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;margin-bottom:1rem;">
+        <h3>Trinket Dishes</h3>
+        <p>Handcrafted resin containers with lids — stunning storage for little treasures.</p>
       </a>
       <a href="#shop" class="category-card reveal">
         <span class="category-icon">🐉</span>
@@ -680,14 +686,14 @@
 
       <!-- Trinket Dishes -->
       <div class="product-card reveal" data-category="resin">
-        <div class="product-img" style="background: linear-gradient(135deg,#1a0535,#3b0764,#7c3aed);">🫧</div>
+        <div class="product-img"><img src="flower-dish.jpeg" alt="Galaxy Trinket Dish" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Galaxy Trinket Dish</h3>
           <p>Deep space swirls of purple, blue, and gold glitter in a round catch-all dish.</p>
           <div class="product-footer">
-            <span class="product-price">$18</span>
-            <button class="btn-cart" onclick="addedToCart(this,'Galaxy Trinket Dish',18)">Add to Cart 🛒</button>
+            <span class="product-price">$5</span>
+            <button class="btn-cart" onclick="addedToCart(this,'Galaxy Trinket Dish',5)">Add to Cart 🛒</button>
           </div>
         </div>
       </div>
@@ -734,7 +740,7 @@
 
       <!-- Serving Trays -->
       <div class="product-card reveal" data-category="resin">
-        <div class="product-img" style="background: linear-gradient(135deg,#2d1b00,#92400e,#fbbf24);">🍽️</div>
+        <div class="product-img"><img src="galaxy-tray.jpeg" alt="Amber Geode Serving Tray" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Amber Geode Serving Tray</h3>
@@ -759,9 +765,23 @@
         </div>
       </div>
 
+      <!-- Containers -->
+      <div class="product-card reveal" data-category="resin">
+        <div class="product-img"><img src="dragon-jar.jpeg" alt="Dragon Scale Jar" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-body">
+          <span class="product-tag tag-resin">Resin</span>
+          <h3>Dragon Scale Jar</h3>
+          <p>Intricately textured dragon scale jar with matching lid — a magical keepsake container.</p>
+          <div class="product-footer">
+            <span class="product-price">$20</span>
+            <button class="btn-cart" onclick="addedToCart(this,'Dragon Scale Jar',20)">Add to Cart 🛒</button>
+          </div>
+        </div>
+      </div>
+
       <!-- Animal Molds -->
       <div class="product-card reveal" data-category="resin">
-        <div class="product-img" style="background: linear-gradient(135deg,#1a0535,#be185d,#f9a8d4);">🦋</div>
+        <div class="product-img"><img src="dragon-figure.jpeg" alt="Dragon Figure" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Butterfly Collection</h3>
@@ -774,7 +794,7 @@
       </div>
 
       <div class="product-card reveal" data-category="resin">
-        <div class="product-img" style="background: linear-gradient(135deg,#1c1203,#92400e,#fde68a);">🦊</div>
+        <div class="product-img"><img src="dragon-figure.jpeg" alt="Amber Fox Figure" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Amber Fox Figure</h3>
@@ -794,8 +814,8 @@
           <h3>Articulated Teal Dragon</h3>
           <p>Fully poseable, multi-segment dragon in shimmering teal — a collector's dream.</p>
           <div class="product-footer">
-            <span class="product-price">$38</span>
-            <button class="btn-cart" onclick="addedToCart(this,'Articulated Teal Dragon',38)">Add to Cart 🛒</button>
+            <span class="product-price">$10</span>
+            <button class="btn-cart" onclick="addedToCart(this,'Articulated Teal Dragon',10)">Add to Cart 🛒</button>
           </div>
         </div>
       </div>
@@ -807,8 +827,8 @@
           <h3>Fire Dragon (Display)</h3>
           <p>Fierce display dragon in fiery reds and oranges — printed in stunning detail.</p>
           <div class="product-footer">
-            <span class="product-price">$42</span>
-            <button class="btn-cart" onclick="addedToCart(this,'Fire Dragon (Display)',42)">Add to Cart 🛒</button>
+            <span class="product-price">$20</span>
+            <button class="btn-cart" onclick="addedToCart(this,'Fire Dragon (Display)',20)">Add to Cart 🛒</button>
           </div>
         </div>
       </div>
@@ -821,8 +841,8 @@
           <h3>Galaxy Fidget Spinner</h3>
           <p>Smooth-spinning 3-blade fidget spinner in galactic purple — satisfying and stylish.</p>
           <div class="product-footer">
-            <span class="product-price">$14</span>
-            <button class="btn-cart" onclick="addedToCart(this,'Galaxy Fidget Spinner',14)">Add to Cart 🛒</button>
+            <span class="product-price">$30</span>
+            <button class="btn-cart" onclick="addedToCart(this,'Galaxy Fidget Spinner',30)">Add to Cart 🛒</button>
           </div>
         </div>
       </div>
@@ -834,8 +854,8 @@
           <h3>Dragon Wing Spinner</h3>
           <p>A fidget spinner shaped like dragon wings — because why be ordinary?</p>
           <div class="product-footer">
-            <span class="product-price">$16</span>
-            <button class="btn-cart" onclick="addedToCart(this,'Dragon Wing Spinner',16)">Add to Cart 🛒</button>
+            <span class="product-price">$40</span>
+            <button class="btn-cart" onclick="addedToCart(this,'Dragon Wing Spinner',40)">Add to Cart 🛒</button>
           </div>
         </div>
       </div>
