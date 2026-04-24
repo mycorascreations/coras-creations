@@ -1550,8 +1550,10 @@
     }
   }
 
+  let squareInitializing = false;
   async function initSquareCard() {
-    if (squareCard) return; // already initialized
+    if (squareCard || squareInitializing) return; // already initialized or in progress
+    squareInitializing = true;
     if (SQUARE_APP_ID === 'YOUR_SQUARE_APP_ID') {
       document.getElementById('sq-card-loading').innerHTML =
         '⚠️ Square not configured yet. Add your App ID and Location ID.';
@@ -1636,7 +1638,7 @@
       await confirmOrder();
 
     } catch(e) {
-      errEl.textContent = 'Unexpected error. Please try again.';
+      errEl.textContent = 'Error: ' + (e?.message || 'Unexpected error. Please try again.');
       errEl.style.display = 'block';
       btn.disabled = false;
       btn.textContent = 'Pay ' + document.getElementById('payCardAmount').textContent + ' by Card';
