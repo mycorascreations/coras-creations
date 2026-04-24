@@ -857,8 +857,8 @@
           <h3>Dragon Wing Spinner</h3>
           <p>A fidget spinner shaped like dragon wings — because why be ordinary?</p>
           <div class="product-footer">
-            <span class="product-price">$40</span>
-            <button class="btn-cart" onclick="addedToCart(this,'Dragon Wing Spinner',40)">Add to Cart 🛒</button>
+            <span class="product-price">$1</span>
+            <button class="btn-cart" onclick="addedToCart(this,'Dragon Wing Spinner',1)">Add to Cart 🛒</button>
           </div>
         </div>
       </div>
@@ -1429,7 +1429,11 @@
   // ---- VENMO ----
   const VENMO_HANDLE = 'Coras-Creations'; // ← replace with Cora's Venmo username
 
-  function getShipping(subtotal) { return subtotal >= 50 ? 0 : 5.99; }
+  function getShipping(subtotal) {
+    const keys = Object.keys(cart);
+    if (keys.length === 1 && keys[0] === 'Dragon Wing Spinner') return 0;
+    return subtotal >= 50 ? 0 : 5.99;
+  }
 
   // ---- ADDRESS AUTOCOMPLETE (OpenStreetMap — free, no API key) ----
   let addrTimer = null;
