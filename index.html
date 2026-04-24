@@ -1669,10 +1669,7 @@
       initPlaces();
       // Fallback: attach Nominatim listener if Google didn't load
       const addrInput = document.getElementById('sq-address');
-      if (addrInput && !addrInput._listenerAdded) {
-        addrInput._listenerAdded = true;
-        addrInput.addEventListener('input', function() { addressInput(this); });
-      }
+      // listener is handled by initPlaces()
     }, 150);
   }
 
