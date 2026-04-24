@@ -1634,7 +1634,7 @@
       const amountCents = Math.round(total * 100);
 
       // Send to Netlify function to complete charge
-      const chargeRes = await fetch('/.netlify/functions/process-payment', {
+      const chargeRes = await fetch('https://coruscating-souffle-9fcf42.netlify.app/.netlify/functions/process-payment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sourceId: token, amountCents, currency: 'USD', locationId: SQUARE_LOCATION_ID })
