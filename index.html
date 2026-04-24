@@ -1385,7 +1385,7 @@
           </div>
         </div>`;
     }).join('');
-    const shipping = subtotal >= 50 ? 0 : 5.99;
+    const shipping = getShipping(subtotal);
     const total    = subtotal + shipping;
     subtotalEl.textContent = '$' + subtotal.toFixed(2);
     document.getElementById('cartShipping').textContent = shipping === 0 ? 'FREE 🎉' : '$5.99';
