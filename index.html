@@ -1639,7 +1639,10 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sourceId: token, amountCents, currency: 'USD', locationId: SQUARE_LOCATION_ID })
       });
-      const chargeData = await chargeRes.json();
+      const rawText = await chargeRes.text();
+      let chargeData;
+      try { chargeData = JSON.parse(rawText); }
+      catch(e) { throw new Error('Server response (status ' + chargeRes.status + '): ' + rawText.slice(0, 300)); }
 
       if (!chargeRes.ok || chargeData.error) {
         errEl.textContent = chargeData.error || 'Payment failed. Please try again.';
