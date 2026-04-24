@@ -901,22 +901,24 @@
           -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;">
           🛒 Your Cart
         </h2>
-        <div style="display:flex; align-items:center; gap:0.6rem;">
-          <button onclick="closeCart()" type="button" style="
-            background:none; border:1px solid var(--border); color:var(--text-muted);
-            padding:0.35rem 0.75rem; border-radius:20px; cursor:pointer; font-size:0.8rem;
-            font-family:'Raleway',sans-serif; font-weight:600;
-            display:flex; align-items:center; gap:0.3rem; transition:all 0.2s;
-          " onmouseover="this.style.borderColor='var(--purple-light)';this.style.color='var(--text-primary)'"
-             onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-muted)'">
-            ← Keep Shopping
-          </button>
-          <button onclick="closeCart()" style="
-            background:none; border:1px solid var(--border); color:var(--text-muted);
-            width:32px; height:32px; border-radius:50%; cursor:pointer; font-size:1rem;
-            display:flex; align-items:center; justify-content:center;
-          ">✕</button>
-        </div>
+        <button onclick="closeCart()" style="
+          background:none; border:1px solid var(--border); color:var(--text-muted);
+          width:32px; height:32px; border-radius:50%; cursor:pointer; font-size:1rem;
+          display:flex; align-items:center; justify-content:center;
+        ">✕</button>
+      </div>
+
+      <!-- Keep Shopping -->
+      <div style="padding:0.75rem 1.25rem; border-bottom:1px solid var(--border);">
+        <button onclick="closeCart()" type="button" style="
+          background:none; border:1px solid var(--border); color:var(--text-muted);
+          padding:0.4rem 1rem; border-radius:20px; cursor:pointer; font-size:0.82rem;
+          font-family:'Raleway',sans-serif; font-weight:600;
+          display:flex; align-items:center; gap:0.4rem; transition:all 0.2s;
+        " onmouseover="this.style.borderColor='var(--purple-light)';this.style.color='var(--text-primary)'"
+           onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-muted)'">
+          ← Keep Shopping
+        </button>
       </div>
 
       <!-- Cart Items -->
