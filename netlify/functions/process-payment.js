@@ -1,20 +1,16 @@
 // Cora's Creations — Square Payment Processor
-// Env var required in Netlify → Project configuration → Environment variables:
-//   SQUARE_ACCESS_TOKEN = your Square production access token
+// Env var required: SQUARE_ACCESS_TOKEN (set in Netlify → Project configuration → Environment variables)
+
+const https = require('https');
 
 exports.handler = async (event) => {
-  // Only allow POST
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: JSON.stringify({ error: 'Method not allowed' }) };
   }
 
-  // Parse body
   let body;
-  try {
-    body = JSON.parse(event.body || '{}');
-  } catch {
-    return { statusCode: 400, body: JSON.stringify({ error: 'Invalid JSON body' }) };
-  }
+  try { body = JSON.parse(event.body || '{}'); }
+  catch { return { statusCode: 400, body: JSON.stringify({ error: 'Invalid JSON body' }) }; }
 
   const { sourceId, amountCents, currency = 'USD', locationId } = body;
   if (!sourceId || !amountCents || !locationId) {
@@ -23,46 +19,47 @@ exports.handler = async (event) => {
 
   const accessToken = process.env.SQUARE_ACCESS_TOKEN;
   if (!accessToken) {
-    return { statusCode: 500, body: JSON.stringify({ error: 'Square access token not configured' }) };
+    return { statusCode: 500, body: JSON.stringify({ error: 'Square access token not configured on server' }) };
   }
 
-  const idempotencyKey = `cc-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+  const payload = JSON.stringify({
+    source_id: sourceId,
+    idempotency_key: `cc-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+    amount_money: { amount: amountCents, currency },
+    location_id: locationId
+  });
 
-  try {
-    const response = await fetch('https://connect.squareup.com/v2/payments', {
+  return new Promise((resolve) => {
+    const req = https.request({
+      hostname: 'connect.squareup.com',
+      path: '/v2/payments',
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${accessToken}`,
-        'Square-Version': '2024-01-17'
-      },
-      body: JSON.stringify({
-        source_id: sourceId,
-        idempotency_key: idempotencyKey,
-        amount_money: { amount: amountCents, currency },
-        location_id: locationId
-      })
+        'Square-Version': '2024-01-17',
+        'Content-Length': Buffer.byteLength(payload)
+      }
+    }, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        try {
+          const parsed = JSON.parse(data);
+          if (res.statusCode === 200 && parsed.payment?.status === 'COMPLETED') {
+            resolve({ statusCode: 200, body: JSON.stringify({ success: true, paymentId: parsed.payment.id }) });
+          } else {
+            const msg = parsed.errors?.[0]?.detail || parsed.errors?.[0]?.code || 'Payment declined';
+            resolve({ statusCode: 400, body: JSON.stringify({ error: msg }) });
+          }
+        } catch {
+          resolve({ statusCode: 500, body: JSON.stringify({ error: 'Invalid response from Square' }) });
+        }
+      });
     });
 
-    const data = await response.json();
-
-    if (response.ok && data.payment?.status === 'COMPLETED') {
-      return {
-        statusCode: 200,
-        body: JSON.stringify({ success: true, paymentId: data.payment.id })
-      };
-    }
-
-    const errorMsg = data.errors?.[0]?.detail || data.errors?.[0]?.code || 'Payment declined';
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ error: errorMsg })
-    };
-
-  } catch (err) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: 'Network error: ' + err.message })
-    };
-  }
+    req.on('error', (e) => resolve({ statusCode: 500, body: JSON.stringify({ error: e.message }) }));
+    req.write(payload);
+    req.end();
+  });
 };
