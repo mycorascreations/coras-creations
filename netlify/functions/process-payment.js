@@ -1,25 +1,45 @@
 // Cora's Creations — Square Payment Processor
-// Env var required: SQUARE_ACCESS_TOKEN (set in Netlify → Project configuration → Environment variables)
 
 const https = require('https');
 
+const CORS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'Content-Type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS, GET'
+};
+
 exports.handler = async (event) => {
+  // CORS preflight
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 200, headers: CORS, body: '' };
+  }
+
+  // Health check
+  if (event.httpMethod === 'GET') {
+    const hasToken = !!process.env.SQUARE_ACCESS_TOKEN;
+    return {
+      statusCode: 200,
+      headers: { ...CORS, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ok: true, tokenConfigured: hasToken })
+    };
+  }
+
   if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: JSON.stringify({ error: 'Method not allowed' }) };
+    return { statusCode: 405, headers: CORS, body: JSON.stringify({ error: 'Method not allowed' }) };
   }
 
   let body;
   try { body = JSON.parse(event.body || '{}'); }
-  catch { return { statusCode: 400, body: JSON.stringify({ error: 'Invalid JSON body' }) }; }
+  catch { return { statusCode: 400, headers: CORS, body: JSON.stringify({ error: 'Invalid JSON body' }) }; }
 
   const { sourceId, amountCents, currency = 'USD', locationId } = body;
   if (!sourceId || !amountCents || !locationId) {
-    return { statusCode: 400, body: JSON.stringify({ error: 'Missing required fields' }) };
+    return { statusCode: 400, headers: CORS, body: JSON.stringify({ error: 'Missing required fields' }) };
   }
 
   const accessToken = process.env.SQUARE_ACCESS_TOKEN;
   if (!accessToken) {
-    return { statusCode: 500, body: JSON.stringify({ error: 'Square access token not configured on server' }) };
+    return { statusCode: 500, headers: CORS, body: JSON.stringify({ error: 'Square access token not configured' }) };
   }
 
   const payload = JSON.stringify({
@@ -47,18 +67,35 @@ exports.handler = async (event) => {
         try {
           const parsed = JSON.parse(data);
           if (res.statusCode === 200 && parsed.payment?.status === 'COMPLETED') {
-            resolve({ statusCode: 200, body: JSON.stringify({ success: true, paymentId: parsed.payment.id }) });
+            resolve({
+              statusCode: 200,
+              headers: { ...CORS, 'Content-Type': 'application/json' },
+              body: JSON.stringify({ success: true, paymentId: parsed.payment.id })
+            });
           } else {
             const msg = parsed.errors?.[0]?.detail || parsed.errors?.[0]?.code || 'Payment declined';
-            resolve({ statusCode: 400, body: JSON.stringify({ error: msg }) });
+            resolve({
+              statusCode: 400,
+              headers: { ...CORS, 'Content-Type': 'application/json' },
+              body: JSON.stringify({ error: msg })
+            });
           }
         } catch {
-          resolve({ statusCode: 500, body: JSON.stringify({ error: 'Invalid response from Square' }) });
+          resolve({
+            statusCode: 500,
+            headers: { ...CORS, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ error: 'Invalid response from Square' })
+          });
         }
       });
     });
 
-    req.on('error', (e) => resolve({ statusCode: 500, body: JSON.stringify({ error: e.message }) }));
+    req.on('error', (e) => resolve({
+      statusCode: 500,
+      headers: { ...CORS, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ error: e.message })
+    }));
+
     req.write(payload);
     req.end();
   });
