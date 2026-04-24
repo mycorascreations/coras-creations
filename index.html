@@ -901,11 +901,22 @@
           -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;">
           🛒 Your Cart
         </h2>
-        <button onclick="closeCart()" style="
-          background:none; border:1px solid var(--border); color:var(--text-muted);
-          width:32px; height:32px; border-radius:50%; cursor:pointer; font-size:1rem;
-          display:flex; align-items:center; justify-content:center;
-        ">✕</button>
+        <div style="display:flex; align-items:center; gap:0.6rem;">
+          <button onclick="closeCart()" type="button" style="
+            background:none; border:1px solid var(--border); color:var(--text-muted);
+            padding:0.35rem 0.75rem; border-radius:20px; cursor:pointer; font-size:0.8rem;
+            font-family:'Raleway',sans-serif; font-weight:600;
+            display:flex; align-items:center; gap:0.3rem; transition:all 0.2s;
+          " onmouseover="this.style.borderColor='var(--purple-light)';this.style.color='var(--text-primary)'"
+             onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-muted)'">
+            ← Keep Shopping
+          </button>
+          <button onclick="closeCart()" style="
+            background:none; border:1px solid var(--border); color:var(--text-muted);
+            width:32px; height:32px; border-radius:50%; cursor:pointer; font-size:1rem;
+            display:flex; align-items:center; justify-content:center;
+          ">✕</button>
+        </div>
       </div>
 
       <!-- Cart Items -->
@@ -948,15 +959,6 @@
         <div id="checkoutFormWrap">
           <button onclick="showCheckoutForm()" class="btn-submit" style="width:100%; margin-bottom:0.75rem;">
             Proceed to Checkout →
-          </button>
-          <button onclick="closeCart()" type="button" style="
-            width:100%; padding:0.75rem; border-radius:10px; margin-bottom:0.5rem;
-            border:1px solid var(--border); background:transparent;
-            color:var(--text-muted); font-size:0.92rem; font-weight:600;
-            font-family:'Raleway',sans-serif; cursor:pointer; transition:all 0.2s;
-          " onmouseover="this.style.borderColor='var(--purple-light)';this.style.color='var(--text-primary)'"
-             onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-muted)'">
-            ← Keep Shopping
           </button>
           <p style="font-size:0.75rem; color:var(--text-muted); text-align:center;">
             Free shipping on orders over $50 ✨
@@ -1518,6 +1520,7 @@
     const tabCard  = document.getElementById('tabCard');
     const panelVenmo = document.getElementById('panelVenmo');
     const panelCard  = document.getElementById('panelCard');
+    if (!tabVenmo || !tabCard || !panelVenmo || !panelCard) return;
 
     if (tab === 'venmo') {
       tabVenmo.style.border = '2px solid #008CFF';
@@ -1665,12 +1668,10 @@
   function showCheckoutForm() {
     document.getElementById('checkoutFormWrap').style.display = 'none';
     document.getElementById('paymentForm').style.display = 'block';
-    setTimeout(() => {
-      initPlaces();
-      // Fallback: attach Nominatim listener if Google didn't load
-      const addrInput = document.getElementById('sq-address');
-      // listener is handled by initPlaces()
-    }, 150);
+    // Scroll cart drawer back to top so form is visible
+    const drawer = document.getElementById('cartDrawer');
+    if (drawer) drawer.scrollTop = 0;
+    setTimeout(() => { initPlaces(); }, 150);
   }
 
 
