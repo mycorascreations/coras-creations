@@ -959,7 +959,7 @@
 
         <!-- Checkout Form Toggle -->
         <div id="checkoutFormWrap">
-          <button onclick="showCheckoutForm()" class="btn-submit" style="width:100%; margin-bottom:0.75rem;">
+          <button type="button" onclick="showCheckoutForm()" class="btn-submit" style="width:100%; margin-bottom:0.75rem;">
             Proceed to Checkout →
           </button>
           <p style="font-size:0.75rem; color:var(--text-muted); text-align:center;">
@@ -1411,7 +1411,8 @@
     document.getElementById('paymentForm').style.display      = 'none';
     document.getElementById('orderConfirmed').style.display   = 'none';
     // Reset payment tab to Venmo and clear state
-    squareCard = null; // reset so card form re-initializes fresh
+    squareCard = null;          // reset so card form re-initializes fresh
+    squareInitializing = false; // allow re-init on next card tab click
     selectPayTab('venmo');
     const confirmWrap = document.getElementById('paymentConfirmWrap');
     if (confirmWrap) confirmWrap.style.display = 'none';
@@ -1670,12 +1671,13 @@
   }
 
   function showCheckoutForm() {
-    document.getElementById('checkoutFormWrap').style.display = 'none';
-    document.getElementById('paymentForm').style.display = 'block';
-    // Scroll cart drawer back to top so form is visible
-    const drawer = document.getElementById('cartDrawer');
-    if (drawer) drawer.scrollTop = 0;
-    setTimeout(() => { initPlaces(); }, 150);
+    const formWrap = document.getElementById('checkoutFormWrap');
+    const payForm  = document.getElementById('paymentForm');
+    const drawer   = document.getElementById('cartDrawer');
+    if (formWrap) formWrap.style.display = 'none';
+    if (payForm)  payForm.style.display  = 'block';
+    if (drawer)   drawer.scrollTop = 0;
+    setTimeout(() => { try { initPlaces(); } catch(e) {} }, 150);
   }
 
 
