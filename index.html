@@ -543,6 +543,8 @@
       100% { background-position: 200% 50%; }
     }
   </style>
+  <!-- Square Web Payments SDK — loaded async, initialized only when card tab selected -->
+  <script src="https://web.squarecdn.com/v1/square.js"></script>
 </head>
 <body>
 
@@ -685,8 +687,8 @@
 
     <div class="products-grid" id="productsGrid">
 
-      <!-- Trinket Dishes -->
-      <div class="product-card reveal" data-category="resin">
+      <!-- Containers -->
+      <div class="product-card reveal" data-category="resin" data-section="containers">
         <div class="product-img"><img src="flower-dish.jpeg" alt="Honeycomb Container" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
@@ -699,7 +701,7 @@
         </div>
       </div>
 
-      <div class="product-card reveal" data-category="resin">
+      <div class="product-card reveal" data-category="resin" data-section="containers">
         <div class="product-img" style="background: linear-gradient(135deg,#042f2e,#0d9488,#2dd4bf);">🌊</div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
@@ -713,7 +715,7 @@
       </div>
 
       <!-- Coasters -->
-      <div class="product-card reveal" data-category="resin">
+      <div class="product-card reveal" data-category="resin" data-section="coasters">
         <div class="product-img"><img src="Coaster-butterfly.jpeg" alt="Nebula Coaster Set" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
@@ -726,7 +728,7 @@
         </div>
       </div>
 
-      <div class="product-card reveal" data-category="resin">
+      <div class="product-card reveal" data-category="resin" data-section="coasters">
         <div class="product-img"><img src="Coaster-butterfly.jpeg" alt="Butterfly Coaster" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
@@ -739,8 +741,8 @@
         </div>
       </div>
 
-      <!-- Serving Trays -->
-      <div class="product-card reveal" data-category="resin">
+      <!-- Animal Molds -->
+      <div class="product-card reveal" data-category="resin" data-section="animal-molds">
         <div class="product-img"><img src="galaxy-tray.jpeg" alt="Small Dog" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
@@ -753,7 +755,7 @@
         </div>
       </div>
 
-      <div class="product-card reveal" data-category="resin">
+      <div class="product-card reveal" data-category="resin" data-section="animal-molds">
         <div class="product-img" style="background: linear-gradient(135deg,#0c0a20,#1e1b4b,#c7d2fe);">🌌</div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
@@ -766,8 +768,8 @@
         </div>
       </div>
 
-      <!-- Containers -->
-      <div class="product-card reveal" data-category="resin">
+      <!-- Trinket Dishes -->
+      <div class="product-card reveal" data-category="resin" data-section="trinket-dishes">
         <div class="product-img"><img src="dragon-jar.jpeg" alt="Snowflake Trinket Dish" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
@@ -780,8 +782,8 @@
         </div>
       </div>
 
-      <!-- Animal Molds -->
-      <div class="product-card reveal" data-category="resin">
+      <!-- Serving Trays -->
+      <div class="product-card reveal" data-category="resin" data-section="serving-trays">
         <div class="product-img"><img src="dragon-figure.jpeg" alt="Dragon Figure" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
@@ -794,7 +796,7 @@
         </div>
       </div>
 
-      <div class="product-card reveal" data-category="resin">
+      <div class="product-card reveal" data-category="resin" data-section="serving-trays">
         <div class="product-img"><img src="dragon-figure.jpeg" alt="Amber Fox Figure" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
@@ -808,7 +810,7 @@
       </div>
 
       <!-- 3D Dragons -->
-      <div class="product-card reveal" data-category="3d">
+      <div class="product-card reveal" data-category="3d" data-section="3d-dragons">
         <div class="product-img" style="background: linear-gradient(135deg,#042f2e,#134e4a,#0d9488);">🐉</div>
         <div class="product-body">
           <span class="product-tag tag-3d">3D Printed</span>
@@ -989,9 +991,34 @@
               <label>ZIP Code</label>
               <input type="text" id="sq-zip" placeholder="12345" maxlength="5" autocomplete="postal-code" /></div>
 
-            <!-- Venmo Button -->
+            <!-- Payment Method Toggle -->
             <div class="form-group">
-              <label>Pay with Venmo</label>
+              <label>Payment Method</label>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin-top:0.25rem;">
+                <button id="tabVenmo" onclick="selectPayTab('venmo')" type="button" style="
+                  padding:0.7rem; border-radius:10px; border:2px solid #008CFF;
+                  background:rgba(0,140,255,0.15); color:#fff; font-size:0.9rem;
+                  font-weight:700; cursor:pointer; font-family:'Raleway',sans-serif;
+                  display:flex; align-items:center; justify-content:center; gap:0.4rem;
+                  transition:all 0.2s;">
+                  <svg width="16" height="16" viewBox="0 0 111 111" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M95.4 9.5c3.3 5.4 4.8 11 4.8 18.2 0 22.7-19.4 52.2-35.1 72.9H29.8L13 11.9l35.3-3.4 8.4 67.1C63.9 64.2 73 44.5 73 30.5c0-7.5-1.3-12.6-3.3-16.8L95.4 9.5z" fill="white"/>
+                  </svg>
+                  Venmo
+                </button>
+                <button id="tabCard" onclick="selectPayTab('card')" type="button" style="
+                  padding:0.7rem; border-radius:10px; border:2px solid var(--border);
+                  background:transparent; color:var(--text-muted); font-size:0.9rem;
+                  font-weight:700; cursor:pointer; font-family:'Raleway',sans-serif;
+                  display:flex; align-items:center; justify-content:center; gap:0.4rem;
+                  transition:all 0.2s;">
+                  💳 Card
+                </button>
+              </div>
+            </div>
+
+            <!-- Venmo Panel -->
+            <div id="panelVenmo">
               <button id="venmo-btn" onclick="payWithVenmo()" type="button" style="
                 width:100%; padding:0.85rem; border-radius:10px; border:none; cursor:pointer;
                 background:#008CFF; color:#fff; font-size:1rem; font-weight:700;
@@ -1002,32 +1029,47 @@
                 <svg width="22" height="22" viewBox="0 0 111 111" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M95.4 9.5c3.3 5.4 4.8 11 4.8 18.2 0 22.7-19.4 52.2-35.1 72.9H29.8L13 11.9l35.3-3.4 8.4 67.1C63.9 64.2 73 44.5 73 30.5c0-7.5-1.3-12.6-3.3-16.8L95.4 9.5z" fill="white"/>
                 </svg>
-                Pay with Venmo
+                Open Venmo
               </button>
               <p style="font-size:0.72rem; color:var(--text-muted); margin-top:0.4rem; text-align:center;">
                 Opens Venmo with your total pre-filled. Send to <strong style="color:var(--text-primary);">@Coras-Creations</strong>
               </p>
+
+              <!-- Venmo payment confirmation checkbox -->
+              <div id="paymentConfirmWrap" style="display:none; margin-top:0.75rem; padding:0.9rem 1rem;
+                background:rgba(0,140,255,0.08); border:1px solid rgba(0,140,255,0.3); border-radius:10px;">
+                <label style="display:flex; align-items:flex-start; gap:0.6rem; cursor:pointer; font-size:0.88rem; color:var(--text-primary); font-weight:500;">
+                  <input type="checkbox" id="paymentConfirmCheck" onchange="toggleConfirmBtn()"
+                    style="margin-top:2px; accent-color:#008CFF; width:16px; height:16px; flex-shrink:0;"/>
+                  I have completed my Venmo payment to <strong>&nbsp;@Coras-Creations</strong>
+                </label>
+              </div>
+
+              <button id="confirmOrderBtn" onclick="confirmOrder()" class="btn-submit"
+                style="width:100%; margin-top:0.75rem; opacity:0.4; cursor:not-allowed;"
+                disabled>
+                ✨ Confirm Order
+              </button>
+              <p id="confirmOrderHint" style="font-size:0.72rem; color:var(--text-muted); text-align:center; margin-top:0.4rem;">
+                Complete your Venmo payment above to place your order.
+              </p>
             </div>
 
-            <!-- Payment confirmation — shown after Venmo button clicked -->
-            <div id="paymentConfirmWrap" style="display:none; margin-top:0.75rem; padding:0.9rem 1rem;
-              background:rgba(0,140,255,0.08); border:1px solid rgba(0,140,255,0.3);
-              border-radius:10px;">
-              <label style="display:flex; align-items:flex-start; gap:0.6rem; cursor:pointer; font-size:0.88rem; color:var(--text-primary); font-weight:500;">
-                <input type="checkbox" id="paymentConfirmCheck" onchange="toggleConfirmBtn()"
-                  style="margin-top:2px; accent-color:#008CFF; width:16px; height:16px; flex-shrink:0;"/>
-                I have completed my Venmo payment to <strong>&nbsp;@Coras-Creations</strong>
-              </label>
+            <!-- Card Panel (Square) -->
+            <div id="panelCard" style="display:none;">
+              <div id="sq-card-container" style="
+                background:var(--bg-card); border:1px solid var(--border);
+                border-radius:10px; padding:1rem; min-height:90px;">
+                <div id="sq-card-loading" style="text-align:center; color:var(--text-muted); font-size:0.85rem; padding:1.5rem 0;">
+                  Loading card form…
+                </div>
+              </div>
+              <div id="sq-card-error" style="display:none; color:#f87171; font-size:0.82rem; margin-top:0.5rem; text-align:center;"></div>
+              <button id="payCardBtn" onclick="payWithCard()" class="btn-submit"
+                style="width:100%; margin-top:0.75rem;">
+                Pay <span id="payCardAmount"></span> by Card
+              </button>
             </div>
-
-            <button id="confirmOrderBtn" onclick="confirmOrder()" class="btn-submit"
-              style="width:100%; margin-top:0.75rem; opacity:0.4; cursor:not-allowed;"
-              disabled>
-              ✨ Confirm Order
-            </button>
-            <p id="confirmOrderHint" style="font-size:0.72rem; color:var(--text-muted); text-align:center; margin-top:0.4rem;">
-              Complete your Venmo payment above to place your order.
-            </p>
           </div>
         </div>
 
@@ -1355,7 +1397,9 @@
     document.getElementById('checkoutFormWrap').style.display = 'block';
     document.getElementById('paymentForm').style.display      = 'none';
     document.getElementById('orderConfirmed').style.display   = 'none';
-    // Reset payment confirmation state
+    // Reset payment tab to Venmo and clear state
+    squareCard = null; // reset so card form re-initializes fresh
+    selectPayTab('venmo');
     const confirmWrap = document.getElementById('paymentConfirmWrap');
     if (confirmWrap) confirmWrap.style.display = 'none';
     const confirmCheck = document.getElementById('paymentConfirmCheck');
@@ -1442,6 +1486,143 @@
       if (!res.ok) return null;
       return await res.json();
     } catch(e) { return null; }
+  }
+
+  // ---- SQUARE CONFIG ----
+  // Get these from: developers.squareup.com → Your App → Credentials
+  const SQUARE_APP_ID      = 'sq0idp-a0uCUJhdUIbnsQqHZnZrbw';
+  const SQUARE_LOCATION_ID = 'LE5NDNAVPV59F';
+  // Set SQUARE_ACCESS_TOKEN as an env var in Netlify Dashboard → Site settings → Env vars
+  // DO NOT put the access token here — it must stay server-side only
+
+  let squareCard = null;
+  let squarePayments = null;
+  let activePayTab = 'venmo';
+
+  function selectPayTab(tab) {
+    activePayTab = tab;
+    const tabVenmo = document.getElementById('tabVenmo');
+    const tabCard  = document.getElementById('tabCard');
+    const panelVenmo = document.getElementById('panelVenmo');
+    const panelCard  = document.getElementById('panelCard');
+
+    if (tab === 'venmo') {
+      tabVenmo.style.border = '2px solid #008CFF';
+      tabVenmo.style.background = 'rgba(0,140,255,0.15)';
+      tabVenmo.style.color = '#fff';
+      tabCard.style.border  = '2px solid var(--border)';
+      tabCard.style.background = 'transparent';
+      tabCard.style.color = 'var(--text-muted)';
+      panelVenmo.style.display = 'block';
+      panelCard.style.display  = 'none';
+    } else {
+      tabCard.style.border = '2px solid #7c3aed';
+      tabCard.style.background = 'rgba(124,58,237,0.15)';
+      tabCard.style.color = '#fff';
+      tabVenmo.style.border  = '2px solid var(--border)';
+      tabVenmo.style.background = 'transparent';
+      tabVenmo.style.color = 'var(--text-muted)';
+      panelVenmo.style.display = 'none';
+      panelCard.style.display  = 'block';
+      initSquareCard();
+      // Update pay button amount
+      const subtotal = Object.values(cart).reduce((s, i) => s + i.price * i.qty, 0);
+      const total = (subtotal + getShipping(subtotal)).toFixed(2);
+      document.getElementById('payCardAmount').textContent = '$' + total;
+    }
+  }
+
+  async function initSquareCard() {
+    if (squareCard) return; // already initialized
+    if (SQUARE_APP_ID === 'YOUR_SQUARE_APP_ID') {
+      document.getElementById('sq-card-loading').innerHTML =
+        '⚠️ Square not configured yet. Add your App ID and Location ID.';
+      return;
+    }
+    try {
+      squarePayments = Square.payments(SQUARE_APP_ID, SQUARE_LOCATION_ID);
+      squareCard = await squarePayments.card({
+        style: {
+          '.input-container': { borderColor: '#2a2a4a', borderRadius: '8px' },
+          '.input-container.is-focus': { borderColor: '#7c3aed' },
+          input: { color: '#e0e0f0', backgroundColor: '#0f0f1a' },
+          'input::placeholder': { color: '#555' },
+          '.message-text': { color: '#f87171' },
+        }
+      });
+      await squareCard.attach('#sq-card-container');
+      document.getElementById('sq-card-loading').style.display = 'none';
+    } catch(e) {
+      document.getElementById('sq-card-loading').innerHTML =
+        '⚠️ Could not load card form. Check your Square App ID.';
+      console.error('Square init error:', e);
+    }
+  }
+
+  async function payWithCard() {
+    if (!squareCard) return;
+    const errEl = document.getElementById('sq-card-error');
+    const btn   = document.getElementById('payCardBtn');
+    errEl.style.display = 'none';
+    btn.disabled = true;
+    btn.textContent = 'Processing…';
+
+    // Validate form fields first
+    const name  = document.getElementById('sq-name').value.trim();
+    const email = document.getElementById('sq-email').value.trim();
+    const addr  = document.getElementById('sq-address').value.trim();
+    const city  = document.getElementById('sq-city').value.trim();
+    const state = document.getElementById('sq-state').value.trim();
+    const zip   = document.getElementById('sq-zip').value.trim();
+    if (!name || !email || !addr || !city || !state || !zip) {
+      errEl.textContent = 'Please fill in all fields above before paying.';
+      errEl.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Pay ' + document.getElementById('payCardAmount').textContent + ' by Card';
+      return;
+    }
+
+    try {
+      const result = await squareCard.tokenize();
+      if (result.status !== 'OK') {
+        errEl.textContent = result.errors?.[0]?.message || 'Card error. Please check your details.';
+        errEl.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'Pay ' + document.getElementById('payCardAmount').textContent + ' by Card';
+        return;
+      }
+
+      const token    = result.token;
+      const subtotal = Object.values(cart).reduce((s, i) => s + i.price * i.qty, 0);
+      const shipping = getShipping(subtotal);
+      const total    = subtotal + shipping;
+      const amountCents = Math.round(total * 100);
+
+      // Send to Netlify function to complete charge
+      const chargeRes = await fetch('/.netlify/functions/process-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sourceId: token, amountCents, currency: 'USD', locationId: SQUARE_LOCATION_ID })
+      });
+      const chargeData = await chargeRes.json();
+
+      if (!chargeRes.ok || chargeData.error) {
+        errEl.textContent = chargeData.error || 'Payment failed. Please try again.';
+        errEl.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'Pay ' + document.getElementById('payCardAmount').textContent + ' by Card';
+        return;
+      }
+
+      // Payment successful — confirm order
+      await confirmOrder();
+
+    } catch(e) {
+      errEl.textContent = 'Unexpected error. Please try again.';
+      errEl.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Pay ' + document.getElementById('payCardAmount').textContent + ' by Card';
+    }
   }
 
   function payWithVenmo() {
