@@ -543,8 +543,6 @@
       100% { background-position: 200% 50%; }
     }
   </style>
-  <!-- Square Web Payments SDK — loaded async, initialized only when card tab selected -->
-  <script src="https://web.squarecdn.com/v1/square.js"></script>
 </head>
 <body>
 
@@ -1552,9 +1550,25 @@
   }
 
   let squareInitializing = false;
+  async function loadSquareSDK() {
+    if (window.Square) return; // already loaded
+    return new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = 'https://web.squarecdn.com/v1/square.js';
+      s.onload = resolve;
+      s.onerror = reject;
+      document.head.appendChild(s);
+    });
+  }
+
   async function initSquareCard() {
-    if (squareCard || squareInitializing) return; // already initialized or in progress
+    if (squareCard || squareInitializing) return;
     squareInitializing = true;
+    try { await loadSquareSDK(); } catch(e) {
+      document.getElementById('sq-card-loading').innerHTML = '⚠️ Could not load Square SDK. Check your connection.';
+      squareInitializing = false;
+      return;
+    }
     if (SQUARE_APP_ID === 'YOUR_SQUARE_APP_ID') {
       document.getElementById('sq-card-loading').innerHTML =
         '⚠️ Square not configured yet. Add your App ID and Location ID.';
