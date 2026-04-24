@@ -6,7 +6,13 @@
   publish   = "."          # serve files from root
   functions = "netlify/functions"
 
-# Redirect all routes to index.html (SPA support)
+# Let Netlify functions pass through
+[[redirects]]
+  from   = "/.netlify/functions/*"
+  to     = "/.netlify/functions/:splat"
+  status = 200
+
+# Redirect all other routes to index.html (SPA support)
 [[redirects]]
   from   = "/*"
   to     = "/index.html"
