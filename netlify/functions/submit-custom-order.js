@@ -126,18 +126,34 @@ function moderateImage(imageBuffer, filename, mimetype, apiUser, apiSecret) {
       res.on('end', () => {
         try {
           const r = JSON.parse(data);
-          if (r.status !== 'success') { resolve({ safe: true }); return; } // allow if API error
+          console.log('Sightengine response:', JSON.stringify(r));
 
-          const nudeSafe    = (r.nudity?.none    ?? 1) > 0.7;
-          const goreSafe    = (r.gore?.prob      ?? 0) < 0.5;
-          const weaponSafe  = Object.values(r.weapon?.classes  ?? {}).every(p => p < 0.7);
+          // If API returned an error (bad credentials, etc.) — BLOCK the image
+          if (r.status !== 'success') {
+            console.error('Sightengine API error:', r.error || r);
+            resolve({ safe: false, reason: 'moderation_error' });
+            return;
+          }
 
-          resolve({ safe: nudeSafe && goreSafe && weaponSafe, detail: r });
-        } catch { resolve({ safe: true }); } // allow on parse error
+          // Tightened thresholds — err on the side of blocking
+          const nudeSafe   = (r.nudity?.none ?? 0) > 0.85;
+          const goreSafe   = (r.gore?.prob   ?? 1) < 0.2;
+          const weaponSafe = Object.values(r.weapon?.classes ?? {}).every(p => p < 0.5);
+          const safe       = nudeSafe && goreSafe && weaponSafe;
+
+          console.log('Moderation result:', { nudeSafe, goreSafe, weaponSafe, safe });
+          resolve({ safe, detail: r });
+        } catch(e) {
+          console.error('Sightengine parse error:', e.message, 'raw:', data.slice(0, 200));
+          resolve({ safe: false, reason: 'parse_error' }); // BLOCK on parse error
+        }
       });
     });
 
-    req.on('error', () => resolve({ safe: true })); // allow if moderation unreachable
+    req.on('error', (e) => {
+      console.error('Sightengine network error:', e.message);
+      resolve({ safe: false, reason: 'network_error' }); // BLOCK if moderation unreachable
+    });
     req.write(multipart);
     req.end();
   });
