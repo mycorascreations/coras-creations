@@ -2168,7 +2168,7 @@ TOTAL: $${total}
     } catch(err) {
       btn.disabled = false;
       btn.textContent = '✨ Send My Request';
-      document.getElementById('attachError').textContent = 'Could not send request. Please check your connection and try again.';
+      document.getElementById('attachError').textContent = 'Error: ' + (err?.message || 'Could not send request. Please check your connection and try again.');
       document.getElementById('attachError').style.display = 'block';
       return;
     }
