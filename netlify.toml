@@ -6,6 +6,11 @@
   publish   = "."          # serve files from root
   functions = "netlify/functions"
 
+[build.environment]
+  # Firebase API keys are intentionally public — security is enforced by Firestore rules.
+  # Disable secret scanning to prevent false-positive on the AIza*** Firebase key pattern.
+  SECRETS_SCAN_SMART_DETECTION_ENABLED = "false"
+
 # Redirect all routes to index.html (SPA support)
 # Note: /.netlify/functions/* is handled by Netlify infrastructure before this rule
 [[redirects]]

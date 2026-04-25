@@ -545,6 +545,13 @@
   </style>
 </head>
 <body>
+<!-- Hidden forms so Netlify detects them at build time -->
+<form name="contact" data-netlify="true" netlify-honeypot="bot-field" hidden>
+  <input name="name" /><input name="email" /><input name="message" /><input name="bot-field" />
+</form>
+<form name="order-notification" data-netlify="true" netlify-honeypot="bot-field" hidden>
+  <input name="subject" /><input name="message" /><input name="bot-field" />
+</form>
 
 <!-- Stars -->
 <div class="sparkles-container" id="sparkles"></div>
@@ -1348,18 +1355,20 @@
       <div class="contact-card reveal" style="max-width:480px; width:100%; text-align:left;">
         <span class="contact-icon" style="display:block; text-align:center;">📧</span>
         <h3 style="text-align:center; margin-bottom:1.25rem;">Send a Message</h3>
-        <form id="contactForm" onsubmit="submitContact(event)" style="display:flex; flex-direction:column; gap:0.85rem;">
+        <form id="contactForm" name="contact" data-netlify="true" netlify-honeypot="bot-field" onsubmit="submitContact(event)" style="display:flex; flex-direction:column; gap:0.85rem;">
+          <input type="hidden" name="form-name" value="contact" />
+          <p style="display:none;"><input name="bot-field" /></p>
           <div class="form-group">
             <label for="contact-name">Your Name</label>
-            <input type="text" id="contact-name" placeholder="Your name" required />
+            <input type="text" id="contact-name" name="name" placeholder="Your name" required />
           </div>
           <div class="form-group">
             <label for="contact-email">Your Email</label>
-            <input type="email" id="contact-email" placeholder="So Cora can write back!" required />
+            <input type="email" id="contact-email" name="email" placeholder="So Cora can write back!" required />
           </div>
           <div class="form-group">
             <label for="contact-msg">Message</label>
-            <textarea id="contact-msg" placeholder="Say hi, ask a question, whatever you'd like!" style="min-height:100px;" required></textarea>
+            <textarea id="contact-msg" name="message" placeholder="Say hi, ask a question, whatever you'd like!" style="min-height:100px;" required></textarea>
           </div>
           <button type="submit" class="btn-submit" style="margin-top:0.5rem;">Send Message ✨</button>
           <p class="form-note" style="text-align:center;">I try to reply within 24–48 hours!</p>
@@ -2102,22 +2111,20 @@ TOTAL: $${total}
     }
   }
 
-  // ---- EMAIL via Web3Forms ----
-  const W3F_KEY = '531feb15-2976-4371-9871-26f8582c30e4';
-
+  // ---- EMAIL via Netlify Forms ----
   async function sendEmail(subject, message) {
     try {
-      await fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          access_key: W3F_KEY,
-          subject: subject,
-          message: message,
-          from_name: "Cora's Creations Website"
-        })
+      const params = new URLSearchParams({
+        'form-name': 'order-notification',
+        'subject':   subject,
+        'message':   message
       });
-    } catch(e) { console.warn('Email send failed:', e); }
+      await fetch('/', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body:    params.toString()
+      });
+    } catch(e) { console.warn('Email notification failed:', e); }
   }
 
   // ---- CUSTOM ORDER FORM ----
@@ -2183,16 +2190,19 @@ TOTAL: $${total}
     const name    = document.getElementById('contact-name')?.value || '';
     const email   = document.getElementById('contact-email')?.value || '';
     const message = document.getElementById('contact-msg')?.value || '';
-    const msg = `
-New Message from Website
-
-Name: ${name}
-Email: ${email}
-
-Message:
-${message}
-    `.trim();
-    await sendEmail("Cora's Creations Feedback", msg);
+    try {
+      const params = new URLSearchParams({
+        'form-name': 'contact',
+        'name':    name,
+        'email':   email,
+        'message': message
+      });
+      await fetch('/', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body:    params.toString()
+      });
+    } catch(e) { console.warn('Contact form failed:', e); }
     document.getElementById('contactForm').style.display = 'none';
     document.getElementById('contactSuccess').style.display = 'block';
   }
