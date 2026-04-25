@@ -135,13 +135,30 @@ function moderateImage(imageBuffer, filename, mimetype, apiUser, apiSecret) {
             return;
           }
 
-          // Tightened thresholds — err on the side of blocking
-          const nudeSafe   = (r.nudity?.none ?? 0) > 0.85;
-          const goreSafe   = (r.gore?.prob   ?? 1) < 0.2;
-          const weaponSafe = Object.values(r.weapon?.classes ?? {}).every(p => p < 0.5);
-          const safe       = nudeSafe && goreSafe && weaponSafe;
+          // Check explicit content using correct Sightengine field names
+          // nudity.safe = probability image is SFW (high = safe)
+          // nudity.sexual_activity / sexual_display / erotica = explicit content scores
+          const nudity = r.nudity ?? {};
+          const hasExplicitNudity =
+            (nudity.sexual_activity ?? 0) > 0.1 ||
+            (nudity.sexual_display   ?? 0) > 0.1 ||
+            (nudity.erotica          ?? 0) > 0.15 ||
+            (nudity.safe             ?? 1) < 0.7;
 
-          console.log('Moderation result:', { nudeSafe, goreSafe, weaponSafe, safe });
+          const goreSafe   = (r.gore?.prob ?? 0) < 0.2;
+          const weaponSafe = Object.values(r.weapon?.classes ?? {}).every(p => p < 0.5);
+          const safe       = !hasExplicitNudity && goreSafe && weaponSafe;
+
+          console.log('Moderation result:', {
+            nudity_safe: nudity.safe,
+            sexual_activity: nudity.sexual_activity,
+            sexual_display: nudity.sexual_display,
+            erotica: nudity.erotica,
+            hasExplicitNudity,
+            goreSafe,
+            weaponSafe,
+            safe
+          });
           resolve({ safe, detail: r });
         } catch(e) {
           console.error('Sightengine parse error:', e.message, 'raw:', data.slice(0, 200));
