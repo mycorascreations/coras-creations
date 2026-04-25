@@ -37,11 +37,16 @@ exports.handler = async (event) => {
     const imageBuffer = Buffer.from(fileData, 'base64');
     const modResult   = await moderateImage(imageBuffer, fileName, fileType || 'image/jpeg', sightUser, sightSecret);
 
+    // DEBUG — remove after testing
     if (!modResult.safe) {
       return json(400, {
-        error: 'Your image was flagged for inappropriate content and could not be submitted. Please use a different photo.'
+        error: `BLOCKED — reason: ${modResult.reason || 'content'} | detail: ${JSON.stringify(modResult.detail?.nudity || modResult.detail?.error || modResult.reason)}`
       });
     }
+    // If it passed, return debug info temporarily
+    return json(400, {
+      error: `DEBUG — Sightengine said SAFE. nudity.none=${modResult.detail?.nudity?.none} gore=${modResult.detail?.gore?.prob} reason=${modResult.reason} | Full: ${JSON.stringify(modResult.detail?.nudity)}`
+    });
   }
 
   // ── Step 2: Send email via Resend ─────────────────────────────────────────
