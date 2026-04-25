@@ -103,7 +103,15 @@
       display: inline-block; padding: 0.2rem 0.6rem; border-radius: 20px;
       font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
     }
-    .status-received { background: #1d4ed820; color: #60a5fa; border: 1px solid #1d4ed8; }
+    .status-received        { background: #1d4ed820; color: #60a5fa;  border: 1px solid #1d4ed8; }
+    .status-pending_payment { background: #78350f20; color: #fbbf24;  border: 1px solid #d97706; }
+    .btn-confirm-payment {
+      display: block; margin-top: 0.4rem; padding: 0.3rem 0.7rem;
+      background: linear-gradient(135deg,#059669,#0d9488); color: #fff;
+      border: none; border-radius: 6px; font-size: 0.75rem; font-weight: 600;
+      cursor: pointer; transition: opacity 0.2s;
+    }
+    .btn-confirm-payment:hover { opacity: 0.85; }
 
     .empty-state {
       text-align: center; padding: 4rem 2rem; color: #555;
@@ -303,7 +311,13 @@
           <td class="address-cell">${addr}</td>
           <td class="items-cell">${items}</td>
           <td class="total-cell">$${parseFloat(o.total||0).toFixed(2)}</td>
-          <td><span class="status-badge status-received">${o.status || 'received'}</span></td>
+          <td>
+            <span class="status-badge status-${o.status || 'received'}">${(o.status || 'received').replace('_',' ')}</span>
+            ${o.status === 'pending_payment' ? `
+              <button class="btn-confirm-payment" onclick="confirmPayment('${o.id}')">
+                ✓ Confirm Payment
+              </button>` : ''}
+          </td>
         </tr>`;
     }).join('');
   }
@@ -312,6 +326,22 @@
     if (sortKey === key) sortAsc = !sortAsc;
     else { sortKey = key; sortAsc = true; }
     renderTable();
+  }
+
+  async function confirmPayment(orderId) {
+    if (!confirm('Mark this Venmo order as payment confirmed and ready to fulfill?')) return;
+    try {
+      await db.collection('orders').doc(orderId).update({
+        status: 'received',
+        paymentConfirmedAt: new Date().toISOString()
+      });
+      // Update local data so UI refreshes instantly without a round-trip
+      const order = allOrders.find(o => o.id === orderId);
+      if (order) { order.status = 'received'; order.paymentConfirmedAt = new Date().toISOString(); }
+      renderTable();
+    } catch(e) {
+      alert('Error updating order: ' + e.message);
+    }
   }
 
   // ── CSV Export ────────────────────────────────────

@@ -1040,7 +1040,10 @@
             <div style="display:flex; flex-direction:column; gap:0.85rem;">
               <div class="form-group">
                 <label>Street Address</label>
-                <input type="text" id="bill-address" placeholder="123 Main St" autocomplete="billing street-address" />
+                <div class="autocomplete-wrap">
+                  <input type="text" id="bill-address" placeholder="Start typing your address…" autocomplete="off" />
+                  <div class="autocomplete-list" id="billAddressDropdown"></div>
+                </div>
               </div>
               <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.6rem;">
                 <div class="form-group">
@@ -1132,7 +1135,7 @@
                   </label>
                 </div>
 
-                <button id="confirmOrderBtn" onclick="confirmOrder()" class="btn-submit"
+                <button id="confirmOrderBtn" onclick="confirmOrder('venmo')" class="btn-submit"
                   style="width:100%; margin-top:0.75rem; opacity:0.4; cursor:not-allowed;" disabled>
                   ✨ Confirm Order
                 </button>
@@ -1289,6 +1292,35 @@
           <div class="form-group full">
             <label for="details">Tell me more about your vision!</label>
             <textarea id="details" placeholder="Describe what you're imagining — size, colors, who it's for, any special requests…" required></textarea>
+          </div>
+          <div class="form-group full">
+            <label>Reference Photo or Inspiration (optional)</label>
+            <label for="customAttachment" id="attachLabel" style="
+              display:flex; align-items:center; gap:0.75rem; cursor:pointer;
+              border:2px dashed var(--border); border-radius:10px;
+              padding:1rem 1.25rem; background:var(--bg-card);
+              transition:border-color 0.2s; color:var(--text-muted); font-size:0.88rem;
+            " onmouseover="this.style.borderColor='var(--purple)'" onmouseout="this.style.borderColor=attachFile?'var(--purple)':'var(--border)'">
+              <span style="font-size:1.4rem;">📎</span>
+              <span id="attachLabelText">Click to attach a photo&ensp;<span style="font-size:0.75rem;">(JPG, PNG, HEIC — max 4 MB)</span></span>
+            </label>
+            <input type="file" id="customAttachment" accept="image/*,.heic,.heif" style="display:none;"
+              onchange="
+                const f = this.files[0];
+                window.attachFile = f || null;
+                document.getElementById('attachLabelText').textContent = f ? '📎 ' + f.name : 'Click to attach a photo';
+                document.getElementById('attachLabel').style.borderColor = f ? 'var(--purple)' : 'var(--border)';
+                document.getElementById('attachError').style.display = 'none';
+                if (f && f.size > 4 * 1024 * 1024) {
+                  document.getElementById('attachError').textContent = 'File is too large. Please choose a photo under 4 MB.';
+                  document.getElementById('attachError').style.display = 'block';
+                  this.value = ''; window.attachFile = null;
+                  document.getElementById('attachLabelText').textContent = 'Click to attach a photo';
+                  document.getElementById('attachLabel').style.borderColor = 'var(--border)';
+                }
+              " />
+            <div id="attachError" style="display:none; color:#f87171; font-size:0.82rem; margin-top:0.4rem;"></div>
+            <input type="text" id="customPhotoUrl" placeholder="Or paste a link (Google Photos, Pinterest…)" style="margin-top:0.5rem;" />
           </div>
         </div>
         <div class="form-submit">
@@ -1572,9 +1604,46 @@
     dropdown.classList.remove('open');
   }
 
+  let billAddrTimer;
+  function initBillingPlaces() {
+    const input = document.getElementById('bill-address');
+    if (!input || input._listenerAdded) return;
+    input._listenerAdded = true;
+    input.addEventListener('input', () => {
+      clearTimeout(billAddrTimer);
+      const q = input.value.trim();
+      const dropdown = document.getElementById('billAddressDropdown');
+      if (q.length < 4) { dropdown.classList.remove('open'); return; }
+      billAddrTimer = setTimeout(async () => {
+        try {
+          const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&addressdetails=1&limit=6&countrycodes=us`);
+          const data = await res.json();
+          dropdown.innerHTML = data.map((r, i) =>
+            `<div class="autocomplete-item" onclick="selectBillingAddress(${i})">${r.display_name}</div>`
+          ).join('');
+          dropdown._data = data;
+          dropdown.classList.toggle('open', data.length > 0);
+        } catch(e) {}
+      }, 400);
+    });
+  }
+
+  function selectBillingAddress(i) {
+    const dropdown = document.getElementById('billAddressDropdown');
+    const r = dropdown._data[i];
+    const a = r.address;
+    const street = [(a.house_number || ''), (a.road || '')].filter(Boolean).join(' ');
+    document.getElementById('bill-address').value = street || r.display_name.split(',')[0];
+    document.getElementById('bill-city').value    = a.city || a.town || a.village || '';
+    document.getElementById('bill-state').value   = a.state_code || a.state || '';
+    document.getElementById('bill-zip').value     = a.postcode || '';
+    dropdown.classList.remove('open');
+  }
+
   document.addEventListener('click', e => {
     if (!e.target.closest('.autocomplete-wrap')) {
       document.getElementById('addressDropdown')?.classList.remove('open');
+      document.getElementById('billAddressDropdown')?.classList.remove('open');
     }
   });
 
@@ -1729,13 +1798,14 @@
       try {
         await confirmOrder();
       } catch(orderErr) {
-        // Payment went through but order recording failed — still show success
-        console.error('Order recording error (payment was charged):', orderErr);
+        // Payment went through but UI update failed — still show success
+        console.error('Order UI error (payment was charged):', orderErr);
         document.getElementById('paymentForm').style.display    = 'none';
         document.getElementById('orderConfirmed').style.display = 'block';
         cart = {};
         updateBadge();
       }
+      return; // never fall into the catch below after a successful charge
 
     } catch(e) {
       const amountEl = document.getElementById('payCardAmount');
@@ -1813,8 +1883,9 @@
       // Skip billing — go straight to payment
       showPaymentStep();
     } else {
-      // Show billing address step
+      // Show billing address step and init autocomplete
       document.getElementById('stepBilling').style.display = 'block';
+      setTimeout(() => { try { initBillingPlaces(); } catch(e) {} }, 150);
     }
   }
 
@@ -1872,7 +1943,8 @@
   }
 
 
-  async function confirmOrder() {
+  async function confirmOrder(paymentMethod = 'card') {
+    const isVenmo = paymentMethod === 'venmo';
     document.getElementById('paymentForm').style.display    = 'none';
     document.getElementById('orderConfirmed').style.display = 'block';
 
@@ -1905,7 +1977,7 @@
       name, qty, price, lineTotal: parseFloat((price * qty).toFixed(2))
     }));
 
-    // Save to Firebase database
+    // Build order data
     const orderRecord = {
       orderNumber,
       dateReceived,
@@ -1925,12 +1997,12 @@
       subtotal:        parseFloat(subtotalAmt.toFixed(2)),
       shipping:        shippingCost,
       total:           parseFloat(total),
-      status:          'received',
+      paymentMethod:   isVenmo ? 'venmo' : 'card',
+      status:          isVenmo ? 'pending_payment' : 'received',
       timestamp:       new Date().toISOString()
     };
-    await saveOrderToDatabase(orderRecord);
 
-    // Send email notification
+    // Send email FIRST — must not be blocked by Firebase
     const itemLines = orderItems.map(i => `  • ${i.name} x${i.qty} — $${i.lineTotal.toFixed(2)}`).join('\n');
     const billingSection = sameAsBilling ? '' : `
 BILLING ADDRESS
@@ -1958,14 +2030,37 @@ Subtotal: $${subtotalAmt.toFixed(2)}
 Shipping: ${shippingCost === 0 ? 'FREE' : '$5.99'}
 TOTAL: $${total}
     `.trim();
-    await sendEmail("New Order Cora's Creations", msg);
+    const emailSubject = isVenmo
+      ? "⏳ Venmo Order Pending Payment — Cora's Creations"
+      : "✅ New Order — Cora's Creations";
+    const venmoNote = isVenmo
+      ? `\n⚠️  VENMO ORDER — PENDING PAYMENT VERIFICATION\nCheck your Venmo app before fulfilling this order!\n`
+      : '';
+    try { await sendEmail(emailSubject, venmoNote + msg); }
+    catch(e) { console.warn('Email send failed:', e); }
 
-    // Show order number to customer
+    // Save to Firebase — failure here must not affect anything above
+    try { await saveOrderToDatabase(orderRecord); }
+    catch(e) { console.warn('Firebase save failed:', e); }
+
+    // Show order number and appropriate message to customer
     const confirmedDiv = document.getElementById('orderConfirmed');
-    const onElem = confirmedDiv.querySelector('h3');
-    if (onElem) onElem.insertAdjacentHTML('afterend',
-      `<p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:0.5rem;">Order #<strong style="color:var(--gold-light)">${orderNumber}</strong></p>`
-    );
+    const h3Elem = confirmedDiv.querySelector('h3');
+    if (h3Elem) {
+      if (isVenmo) {
+        h3Elem.textContent = '⏳ Order Received!';
+        h3Elem.insertAdjacentHTML('afterend',
+          `<p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:0.5rem;">Order #<strong style="color:var(--gold-light)">${orderNumber}</strong></p>
+           <div style="background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.4);border-radius:10px;padding:0.85rem 1rem;margin-bottom:1rem;font-size:0.85rem;color:#fbbf24;line-height:1.6;">
+             ⚠️ Your order is <strong>on hold</strong> until we verify your Venmo payment to <strong>@Coras-Creations</strong>. We'll start preparing it as soon as payment is confirmed!
+           </div>`
+        );
+      } else {
+        h3Elem.insertAdjacentHTML('afterend',
+          `<p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:0.5rem;">Order #<strong style="color:var(--gold-light)">${orderNumber}</strong></p>`
+        );
+      }
+    }
 
     cart = {};
     updateBadge();
@@ -2028,25 +2123,56 @@ TOTAL: $${total}
   // ---- CUSTOM ORDER FORM ----
   async function submitForm(e) {
     e.preventDefault();
+    const btn = document.querySelector('#customForm .btn-submit');
+    btn.disabled = true;
+    btn.textContent = 'Sending…';
+
     const name     = (document.getElementById('fname')?.value || '') + ' ' + (document.getElementById('lname')?.value || '');
     const email    = document.getElementById('email')?.value || '';
     const itemType = document.getElementById('item-type')?.value || '';
     const colors   = document.getElementById('colors')?.value || '';
     const budget   = document.getElementById('budget')?.value || '';
     const details  = document.getElementById('details')?.value || '';
-    const msg = `
-New Custom Order Request
+    const photoUrl = document.getElementById('customPhotoUrl')?.value || '';
+    const file     = window.attachFile || null;
 
-Name: ${name.trim()}
-Email: ${email}
-Item Type: ${itemType}
-Colors / Theme: ${colors}
-Budget: ${budget}
+    // Read file as base64 if present
+    let fileData = null, fileName = null, fileType = null;
+    if (file) {
+      try {
+        fileData = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload  = () => resolve(reader.result.split(',')[1]); // strip data URL prefix
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+        fileName = file.name;
+        fileType = file.type;
+      } catch(err) { console.warn('File read error:', err); }
+    }
 
-Vision / Details:
-${details}
-    `.trim();
-    await sendEmail("Cora's Creations Custom Order", msg);
+    try {
+      const res = await fetch('https://coruscating-souffle-9fcf42.netlify.app/.netlify/functions/submit-custom-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name.trim(), email, itemType, colors, budget, details, photoUrl, fileData, fileName, fileType })
+      });
+      const data = await res.json();
+      if (!res.ok || data.error) {
+        btn.disabled = false;
+        btn.textContent = '✨ Send My Request';
+        document.getElementById('attachError').textContent = data.error || 'Something went wrong. Please try again.';
+        document.getElementById('attachError').style.display = 'block';
+        return;
+      }
+    } catch(err) {
+      btn.disabled = false;
+      btn.textContent = '✨ Send My Request';
+      document.getElementById('attachError').textContent = 'Could not send request. Please check your connection and try again.';
+      document.getElementById('attachError').style.display = 'block';
+      return;
+    }
+
     document.getElementById('customForm').style.display = 'none';
     document.getElementById('successMsg').style.display = 'block';
   }
