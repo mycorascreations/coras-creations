@@ -855,12 +855,10 @@
       box-shadow: 0 0 30px var(--glow-teal);
     ">✨ Added to cart!</div>
 
-</div><!-- /pageContent -->
-
     <!-- Cart Modal Overlay -->
     <div id="cartOverlay" onclick="closeCart()" style="
       display:none; position:fixed; inset:0;
-      background:rgba(0,0,0,0.7); z-index:1000; backdrop-filter:blur(4px);
+      background:rgba(0,0,0,0.97); z-index:1000;
     "></div>
 
     <!-- Cart Drawer -->
@@ -1366,6 +1364,8 @@
   <p style="margin-top:0.75rem; font-size:0.75rem;">Made with <span class="footer-heart">♥</span> &amp; a whole lot of glitter &nbsp;·&nbsp; © 2026 Cora's Creations</p>
 </footer>
 
+</div><!-- /pageContent -->
+
 <script>
   // ---- SPARKLES ----
   (function() {
@@ -1547,11 +1547,9 @@
     document.body.style.top      = `-${_cartScrollY}px`;
     document.body.style.width    = '100%';
     document.body.style.overflow = 'hidden';
-    // Hide all page content so nothing bleeds through on iOS Safari.
-    // GPU-composited layers (animated transforms) ignore z-index —
-    // display:none on the wrapper removes them from the compositor entirely.
-    const pc = document.getElementById('pageContent');
-    if (pc) pc.style.display = 'none';
+    // Hide the animated floating elements — their GPU layers bleed through
+    // fixed overlays on iOS Safari regardless of z-index
+    document.querySelectorAll('.hero-dragon, .about-visual').forEach(el => el.style.display = 'none');
   }
 
   function toggleCart() {
@@ -1567,9 +1565,8 @@
     document.body.style.top      = '';
     document.body.style.width    = '';
     document.body.style.overflow = '';
-    // Restore page content
-    const pc = document.getElementById('pageContent');
-    if (pc) pc.style.display = '';
+    // Restore animated elements
+    document.querySelectorAll('.hero-dragon, .about-visual').forEach(el => el.style.display = '');
     window.scrollTo(0, _cartScrollY);
   }
 
