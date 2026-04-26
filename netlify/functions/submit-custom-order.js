@@ -82,6 +82,32 @@ exports.handler = async (event) => {
   const sent = await sendResend(payload, resendKey);
   if (!sent) return json(500, { error: 'Failed to send notification email. Please try again.' });
 
+  // ── Step 3: Save to Firebase Firestore ───────────────────────────────────
+  try {
+    const now = new Date();
+    const dateReceived = now.toLocaleDateString('en-US', { timeZone: 'America/Chicago' });
+    const timeReceived = now.toLocaleTimeString('en-US', { timeZone: 'America/Chicago', hour12: true });
+    const orderNumber  = 'CO-' + Date.now().toString(36).toUpperCase();
+
+    await saveToFirestore({
+      orderNumber,
+      orderType:     'custom',
+      status:        'new_custom',
+      dateReceived,
+      timeReceived,
+      fullName:      name,
+      email,
+      itemType,
+      colors,
+      budget,
+      details,
+      photoUrl:      photoUrl || '',
+      hasAttachment: !!(fileData && fileName),
+    });
+  } catch(e) {
+    console.warn('Firestore save failed (non-fatal):', e.message);
+  }
+
   return json(200, { success: true });
 };
 
@@ -172,6 +198,37 @@ function moderateImage(imageBuffer, filename, mimetype, apiUser, apiSecret) {
       resolve({ safe: false, reason: 'network_error' }); // BLOCK if moderation unreachable
     });
     req.write(multipart);
+    req.end();
+  });
+}
+
+function saveToFirestore(data) {
+  return new Promise((resolve, reject) => {
+    // Build Firestore REST document fields
+    const fields = {};
+    for (const [k, v] of Object.entries(data)) {
+      if (typeof v === 'boolean') fields[k] = { booleanValue: v };
+      else fields[k] = { stringValue: String(v ?? '') };
+    }
+    const body = JSON.stringify({ fields });
+    const apiKey = 'AIzaSyBCXQ8mkQxhSoarijKvFjIjnJ0upfeqoiI';
+    const path   = `/v1/projects/cora-s-creations/databases/(default)/documents/orders?key=${apiKey}`;
+
+    const req = https.request({
+      hostname: 'firestore.googleapis.com',
+      path,
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body) }
+    }, (res) => {
+      let d = '';
+      res.on('data', c => d += c);
+      res.on('end', () => {
+        if (res.statusCode === 200 || res.statusCode === 201) resolve(JSON.parse(d));
+        else reject(new Error(`Firestore ${res.statusCode}: ${d.slice(0,200)}`));
+      });
+    });
+    req.on('error', reject);
+    req.write(body);
     req.end();
   });
 }

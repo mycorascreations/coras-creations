@@ -103,8 +103,11 @@
       display: inline-block; padding: 0.2rem 0.6rem; border-radius: 20px;
       font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
     }
-    .status-received        { background: #1d4ed820; color: #60a5fa;  border: 1px solid #1d4ed8; }
-    .status-pending_payment { background: #78350f20; color: #fbbf24;  border: 1px solid #d97706; }
+    .status-received                    { background: #1d4ed820; color: #60a5fa;  border: 1px solid #1d4ed8; }
+    .status-pending_payment             { background: #78350f20; color: #fbbf24;  border: 1px solid #d97706; }
+    .status-new_custom                  { background: #4c1d9520; color: #c4b5fd;  border: 1px solid #7c3aed; }
+    .status-awaiting_customer_response  { background: #1e3a5f20; color: #7dd3fc;  border: 1px solid #0369a1; }
+    .status-cancelled                   { background: #1f0a0a20; color: #f87171;  border: 1px solid #b91c1c; }
     .btn-confirm-payment {
       display: block; margin-top: 0.4rem; padding: 0.3rem 0.7rem;
       background: linear-gradient(135deg,#059669,#0d9488); color: #fff;
@@ -112,6 +115,12 @@
       cursor: pointer; transition: opacity 0.2s;
     }
     .btn-confirm-payment:hover { opacity: 0.85; }
+    .status-select {
+      display: block; margin-top: 0.4rem; padding: 0.3rem 0.5rem;
+      background: #1a1a2e; border: 1px solid #2a2a4a; border-radius: 6px;
+      color: #e0e0f0; font-size: 0.75rem; cursor: pointer; width: 100%;
+    }
+    .status-select:focus { outline: none; border-color: #a78bfa; }
 
     .empty-state {
       text-align: center; padding: 4rem 2rem; color: #555;
@@ -297,16 +306,40 @@
     // rows
     const tbody = document.getElementById('ordersBody');
     tbody.innerHTML = filtered.map(o => {
-      const items = Array.isArray(o.orderItems)
-        ? o.orderItems.map(i => `${i.name} x${i.qty} — $${(i.price * i.qty).toFixed(2)}`).join('<br/>')
-        : (o.orderItems || '');
-      const shipAddr = [o.streetAddress, o.city, o.state, o.zipCode].filter(Boolean).join(', ');
-      const billAddr = o.billingSameAsShipping
+      const isCustom = o.orderType === 'custom';
+      let items;
+      if (isCustom) {
+        items = `<span style="color:#c4b5fd;font-weight:600;">${o.itemType || 'Custom Item'}</span>`;
+        if (o.colors)  items += `<br/><span style="color:#aaa;font-size:0.78rem;">Colors: ${o.colors}</span>`;
+        if (o.budget)  items += `<br/><span style="color:#aaa;font-size:0.78rem;">Budget: ${o.budget}</span>`;
+        if (o.details) items += `<br/><span style="color:#888;font-size:0.75rem;font-style:italic;">${o.details.slice(0,120)}${o.details.length>120?'…':''}</span>`;
+        if (o.hasAttachment) items += `<br/><span style="color:#059669;font-size:0.75rem;">📎 Photo attached</span>`;
+      } else {
+        items = Array.isArray(o.orderItems)
+          ? o.orderItems.map(i => `${i.name} x${i.qty} — $${(i.price * i.qty).toFixed(2)}`).join('<br/>')
+          : (o.orderItems || '');
+      }
+      const shipAddr = isCustom ? '—' : [o.streetAddress, o.city, o.state, o.zipCode].filter(Boolean).join(', ');
+      const billAddr = isCustom ? '—' : (o.billingSameAsShipping
         ? '<span style="color:#6b7280;font-style:italic;">Same as shipping</span>'
-        : [o.billingAddress, o.billingCity, o.billingState, o.billingZip].filter(Boolean).join(', ') || '<span style="color:#6b7280;font-style:italic;">Same as shipping</span>';
+        : [o.billingAddress, o.billingCity, o.billingState, o.billingZip].filter(Boolean).join(', ') || '<span style="color:#6b7280;font-style:italic;">Same as shipping</span>');
+      const statusLabel = (o.status || 'received').replace(/_/g,' ');
+      const statusCell = isCustom ? `
+        <span class="status-badge status-${o.status || 'new_custom'}">${statusLabel}</span>
+        <select class="status-select" onchange="updateCustomStatus('${o.id}', this.value)">
+          <option value="">— change status —</option>
+          <option value="new_custom">New Custom</option>
+          <option value="awaiting_customer_response">Awaiting Customer Response</option>
+          <option value="pending_payment">Pending Payment</option>
+          <option value="received">Received</option>
+          <option value="cancelled">Cancelled</option>
+        </select>` : `
+        <span class="status-badge status-${o.status || 'received'}">${statusLabel}</span>
+        ${o.status === 'pending_payment' ? `
+          <button class="btn-confirm-payment" onclick="confirmPayment('${o.id}')">✓ Confirm Payment</button>` : ''}`;
       return `
         <tr>
-          <td><span class="order-num">${o.orderNumber || o.id}</span></td>
+          <td><span class="order-num">${o.orderNumber || o.id}</span>${isCustom ? '<br/><span style="color:#7c3aed;font-size:0.7rem;font-weight:600;">CUSTOM</span>' : ''}</td>
           <td class="date-cell">${o.dateReceived || ''}<br/>${o.timeReceived || ''}</td>
           <td>
             <div class="customer-name">${o.fullName || ''}</div>
@@ -315,14 +348,8 @@
           <td class="address-cell">${shipAddr}</td>
           <td class="address-cell">${billAddr}</td>
           <td class="items-cell">${items}</td>
-          <td class="total-cell">$${parseFloat(o.total||0).toFixed(2)}</td>
-          <td>
-            <span class="status-badge status-${o.status || 'received'}">${(o.status || 'received').replace('_',' ')}</span>
-            ${o.status === 'pending_payment' ? `
-              <button class="btn-confirm-payment" onclick="confirmPayment('${o.id}')">
-                ✓ Confirm Payment
-              </button>` : ''}
-          </td>
+          <td class="total-cell">${isCustom ? '—' : '$'+parseFloat(o.total||0).toFixed(2)}</td>
+          <td>${statusCell}</td>
         </tr>`;
     }).join('');
   }
@@ -331,6 +358,21 @@
     if (sortKey === key) sortAsc = !sortAsc;
     else { sortKey = key; sortAsc = true; }
     renderTable();
+  }
+
+  async function updateCustomStatus(orderId, newStatus) {
+    if (!newStatus) return;
+    try {
+      await db.collection('orders').doc(orderId).update({
+        status: newStatus,
+        statusUpdatedAt: new Date().toISOString()
+      });
+      const order = allOrders.find(o => o.id === orderId);
+      if (order) order.status = newStatus;
+      renderTable();
+    } catch(e) {
+      alert('Error updating status: ' + e.message);
+    }
   }
 
   async function confirmPayment(orderId) {
