@@ -2150,6 +2150,28 @@ TOTAL: $${total}
       return;
     }
 
+    // Save to Firebase using existing client SDK
+    try {
+      if (db) {
+        const now = new Date();
+        await db.collection('orders').add({
+          orderNumber:   'CO-' + Date.now().toString(36).toUpperCase(),
+          orderType:     'custom',
+          status:        'new_custom',
+          dateReceived:  now.toLocaleDateString('en-US', { timeZone: 'America/Chicago' }),
+          timeReceived:  now.toLocaleTimeString('en-US', { timeZone: 'America/Chicago', hour12: true }),
+          fullName:      name.trim(),
+          email,
+          itemType,
+          colors,
+          budget,
+          details,
+          photoUrl:      photoUrl || '',
+          hasAttachment: !!(fileData && fileName),
+        });
+      }
+    } catch(e) { console.warn('Custom order Firebase save failed:', e); }
+
     document.getElementById('customForm').style.display = 'none';
     document.getElementById('successMsg').style.display = 'block';
   }
