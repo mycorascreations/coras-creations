@@ -1542,9 +1542,15 @@
     document.body.style.top      = `-${_cartScrollY}px`;
     document.body.style.width    = '100%';
     document.body.style.overflow = 'hidden';
-    // Hide floating emoji elements — iOS GPU-composited layers bleed through
-    // fixed overlays regardless of z-index; display:none is the only reliable fix
-    document.querySelectorAll('.hero-dragon, .about-visual').forEach(el => el.style.display = 'none');
+    // Hide ALL page content so nothing bleeds through on iOS Safari.
+    // iOS GPU-composited layers (animated transforms, etc.) ignore z-index and
+    // show through position:fixed overlays — display:none removes them entirely.
+    document.querySelectorAll('body > *').forEach(el => {
+      if (el.id !== 'cartOverlay' && el.id !== 'cartDrawer' &&
+          el.tagName !== 'SCRIPT' && el.tagName !== 'STYLE') {
+        el.style.display = 'none';
+      }
+    });
   }
 
   function toggleCart() {
@@ -1560,8 +1566,13 @@
     document.body.style.top      = '';
     document.body.style.width    = '';
     document.body.style.overflow = '';
-    // Restore floating emoji elements
-    document.querySelectorAll('.hero-dragon, .about-visual').forEach(el => el.style.display = '');
+    // Restore all hidden page content
+    document.querySelectorAll('body > *').forEach(el => {
+      if (el.id !== 'cartOverlay' && el.id !== 'cartDrawer' &&
+          el.tagName !== 'SCRIPT' && el.tagName !== 'STYLE') {
+        el.style.display = '';
+      }
+    });
     window.scrollTo(0, _cartScrollY);
   }
 
