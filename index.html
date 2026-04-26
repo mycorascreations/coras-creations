@@ -2100,8 +2100,21 @@ TOTAL: $${total}
     const venmoNote = isVenmo
       ? `\n⚠️  VENMO ORDER — PENDING PAYMENT VERIFICATION\nCheck your Venmo app before fulfilling this order!\n`
       : '';
+    // Admin notification
     try { await sendEmail(emailSubject, venmoNote + msg); }
-    catch(e) { console.warn('Email send failed:', e); }
+    catch(e) { console.warn('Admin email failed:', e); }
+
+    // Customer confirmation (only if we have their email)
+    if (custEmail) {
+      const customerMsg = isVenmo
+        ? `Hi ${custName || 'there'},\n\nThanks for your order at Cora's Creations! 🐉✨\n\nYour order #${orderNumber} has been received and is on hold until we verify your Venmo payment to @Coras-Creations.\n\nOnce payment is confirmed we'll start crafting your magical items!\n\nORDER SUMMARY\n${itemLines}\n\nSubtotal: $${subtotalAmt.toFixed(2)}\nShipping: ${shippingCost === 0 ? 'FREE' : '$5.99'}\nTOTAL: $${total}\n\nThank you for supporting a small handmade business! ✨\n— Cora`
+        : `Hi ${custName || 'there'},\n\nThank you for your order at Cora's Creations! 🐉✨\n\nYour order #${orderNumber} has been received and payment confirmed. We'll start crafting your magical items right away!\n\nORDER SUMMARY\n${itemLines}\n\nSubtotal: $${subtotalAmt.toFixed(2)}\nShipping: ${shippingCost === 0 ? 'FREE' : '$5.99'}\nTOTAL: $${total}\n\nShipping to: ${custAddress}, ${custCity}, ${custState} ${custZip}\n\nThank you for supporting a small handmade business! ✨\n— Cora`;
+      const customerSubject = isVenmo
+        ? `Order #${orderNumber} Received — Awaiting Payment`
+        : `Order #${orderNumber} Confirmed — Cora's Creations ✨`;
+      try { await sendEmail(customerSubject, customerMsg, custEmail); }
+      catch(e) { console.warn('Customer email failed:', e); }
+    }
 
     // Save to Firebase — failure here must not affect anything above
     try { await saveOrderToDatabase(orderRecord); }
@@ -2167,13 +2180,20 @@ TOTAL: $${total}
   }
 
   // ---- ORDER EMAIL via Resend (Netlify function) ----
-  async function sendEmail(subject, message) {
+  // 'to' is optional — omit to send to admin, pass address for customer confirmation
+  async function sendEmail(subject, message, to) {
     try {
-      await fetch('https://coruscating-souffle-9fcf42.netlify.app/.netlify/functions/send-notification', {
+      const payload = { subject, message };
+      if (to) payload.to = to;
+      const res = await fetch('https://coruscating-souffle-9fcf42.netlify.app/.netlify/functions/send-notification', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ subject, message })
+        body:    JSON.stringify(payload)
       });
+      if (!res.ok) {
+        const txt = await res.text().catch(() => '');
+        console.warn('Email function returned error', res.status, txt);
+      }
     } catch(e) { console.warn('Email notification failed:', e); }
   }
 

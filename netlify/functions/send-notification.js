@@ -21,12 +21,15 @@ exports.handler = async (event) => {
   try { body = JSON.parse(event.body || '{}'); }
   catch { return json(400, { error: 'Invalid request' }); }
 
-  const { subject, message } = body;
+  const { subject, message, to } = body;
   if (!subject || !message) return json(400, { error: 'Missing subject or message' });
 
   const resendKey   = process.env.RESEND_API_KEY;
   const notifyEmail = process.env.NOTIFICATION_EMAIL || 'mikecpeters30@gmail.com';
   if (!resendKey) return json(500, { error: 'Email service not configured' });
+
+  // 'to' can be a specific address (e.g. customer confirmation) or defaults to admin
+  const recipient = to || notifyEmail;
 
   const htmlBody = `
     <div style="font-family:sans-serif;max-width:600px;margin:0 auto;color:#1a1a1a;">
@@ -39,7 +42,7 @@ exports.handler = async (event) => {
 
   const payload = {
     from:    "Cora's Creations <onboarding@resend.dev>",
-    to:      [notifyEmail],
+    to:      [recipient],
     subject: subject,
     html:    htmlBody
   };
