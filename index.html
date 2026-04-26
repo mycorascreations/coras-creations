@@ -1452,11 +1452,8 @@
     // add item to cart
     if (cart[name]) { cart[name].qty++; } else { cart[name] = { price, qty: 1 }; }
 
-    // update nav badge
+    // update nav badge only — cart stays closed until user clicks it
     updateBadge();
-
-    // open cart drawer
-    openCart();
   }
 
   function renderCart() {
