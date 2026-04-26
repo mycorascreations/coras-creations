@@ -2086,18 +2086,13 @@ TOTAL: $${total}
     }
   }
 
-  // ---- EMAIL via Netlify Forms ----
+  // ---- ORDER EMAIL via Resend (Netlify function) ----
   async function sendEmail(subject, message) {
     try {
-      const params = new URLSearchParams({
-        'form-name': 'order-notification',
-        'subject':   subject,
-        'message':   message
-      });
-      await fetch('/', {
+      await fetch('https://coruscating-souffle-9fcf42.netlify.app/.netlify/functions/send-notification', {
         method:  'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body:    params.toString()
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ subject, message })
       });
     } catch(e) { console.warn('Email notification failed:', e); }
   }
