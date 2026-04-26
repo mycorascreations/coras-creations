@@ -175,7 +175,8 @@
           <th onclick="sortBy('orderNumber')">Order # <span class="sort-arrow">↕</span></th>
           <th onclick="sortBy('dateReceived')">Date <span class="sort-arrow">↕</span></th>
           <th onclick="sortBy('fullName')">Customer <span class="sort-arrow">↕</span></th>
-          <th>Address</th>
+          <th>Shipping Address</th>
+          <th>Billing Address</th>
           <th>Items</th>
           <th onclick="sortBy('total')">Total <span class="sort-arrow">↕</span></th>
           <th>Status</th>
@@ -299,7 +300,10 @@
       const items = Array.isArray(o.orderItems)
         ? o.orderItems.map(i => `${i.name} x${i.qty} — $${(i.price * i.qty).toFixed(2)}`).join('<br/>')
         : (o.orderItems || '');
-      const addr = [o.streetAddress, o.city, o.state, o.zipCode].filter(Boolean).join(', ');
+      const shipAddr = [o.streetAddress, o.city, o.state, o.zipCode].filter(Boolean).join(', ');
+      const billAddr = o.billingSameAsShipping
+        ? '<span style="color:#6b7280;font-style:italic;">Same as shipping</span>'
+        : [o.billingAddress, o.billingCity, o.billingState, o.billingZip].filter(Boolean).join(', ') || '<span style="color:#6b7280;font-style:italic;">Same as shipping</span>';
       return `
         <tr>
           <td><span class="order-num">${o.orderNumber || o.id}</span></td>
@@ -308,7 +312,8 @@
             <div class="customer-name">${o.fullName || ''}</div>
             <div class="email-cell">${o.email || ''}</div>
           </td>
-          <td class="address-cell">${addr}</td>
+          <td class="address-cell">${shipAddr}</td>
+          <td class="address-cell">${billAddr}</td>
           <td class="items-cell">${items}</td>
           <td class="total-cell">$${parseFloat(o.total||0).toFixed(2)}</td>
           <td>
@@ -347,15 +352,20 @@
   // ── CSV Export ────────────────────────────────────
   function exportCSV() {
     if (!allOrders.length) return alert('No orders to export.');
-    const headers = ['Order #','Date','Time','Full Name','Email','Street','City','State','Zip','Items','Subtotal','Shipping','Total','Status'];
+    const headers = ['Order #','Date','Time','Full Name','Email','Ship Street','Ship City','Ship State','Ship Zip','Bill Street','Bill City','Bill State','Bill Zip','Items','Subtotal','Shipping','Total','Status'];
     const rows = allOrders.map(o => {
       const items = Array.isArray(o.orderItems)
         ? o.orderItems.map(i => `${i.name} x${i.qty}`).join(' | ')
         : (o.orderItems || '');
+      const billStreet = o.billingSameAsShipping ? o.streetAddress : (o.billingAddress || o.streetAddress);
+      const billCity   = o.billingSameAsShipping ? o.city          : (o.billingCity    || o.city);
+      const billState  = o.billingSameAsShipping ? o.state         : (o.billingState   || o.state);
+      const billZip    = o.billingSameAsShipping ? o.zipCode       : (o.billingZip     || o.zipCode);
       return [
         o.orderNumber, o.dateReceived, o.timeReceived,
         o.fullName, o.email,
         o.streetAddress, o.city, o.state, o.zipCode,
+        billStreet, billCity, billState, billZip,
         items,
         o.subtotal, o.shipping, o.total, o.status
       ].map(v => `"${String(v||'').replace(/"/g,'""')}"`);
