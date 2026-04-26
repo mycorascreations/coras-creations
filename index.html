@@ -353,6 +353,14 @@
 
     /* ---- ABOUT ---- */
     #about { background: linear-gradient(180deg, transparent, rgba(59,7,100,0.15), transparent); isolation: isolate; }
+
+    /* iOS Safari fix: pause float animations when cart is open so GPU layers
+       don't paint above the fixed overlay regardless of z-index */
+    body.cart-open .hero-dragon,
+    body.cart-open .about-visual {
+      animation: none !important;
+      transform: none !important;
+    }
     .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
     .about-visual {
       display: flex; align-items: center; justify-content: center;
@@ -1534,6 +1542,8 @@
     document.body.style.top      = `-${_cartScrollY}px`;
     document.body.style.width    = '100%';
     document.body.style.overflow = 'hidden';
+    // Pause float animations so iOS GPU layers don't bleed through the overlay
+    document.body.classList.add('cart-open');
   }
 
   function toggleCart() {
@@ -1549,6 +1559,7 @@
     document.body.style.top      = '';
     document.body.style.width    = '';
     document.body.style.overflow = '';
+    document.body.classList.remove('cart-open');
     window.scrollTo(0, _cartScrollY);
   }
 
