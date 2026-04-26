@@ -1790,7 +1790,7 @@
       const amountCents = Math.round(total * 100);
 
       // Send to Netlify function to complete charge
-      const chargeRes = await fetch('https://coruscating-souffle-9fcf42.netlify.app/.netlify/functions/process-payment', {
+      const chargeRes = await fetch('/.netlify/functions/process-payment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sourceId: token, amountCents, currency: 'USD', locationId: SQUARE_LOCATION_ID })
@@ -1870,12 +1870,17 @@
     if (cartItems) cartItems.style.display = 'none';
     if (keepBar)   keepBar.style.display   = 'none';
 
-    // Let the DRAWER itself scroll — most reliable on iOS Safari
+    // Let the DRAWER scroll. iOS won't scroll a position:fixed element when
+    // body is also position:fixed — so we lift the scroll lock here.
+    // The overlay still covers the page so nothing behind is reachable.
+    document.body.style.position = '';
+    document.body.style.top      = '';
+    document.body.style.width    = '';
+    document.body.style.overflow = '';
     if (drawer) {
-      drawer.style.overflowY                = 'auto';
-      drawer.style.webkitOverflowScrolling  = 'touch';
+      drawer.style.overflowY               = 'auto';
+      drawer.style.webkitOverflowScrolling = 'touch';
     }
-    // Remove checkout section's pinned-footer constraints
     if (checkoutSec) {
       checkoutSec.style.flexShrink = '0';
       checkoutSec.style.borderTop  = 'none';
@@ -1900,7 +1905,7 @@
     // Restore cart items and keep-shopping bar
     if (cartItems) cartItems.style.display = '';
     if (keepBar)   keepBar.style.display   = '';
-    // Restore drawer to clip mode (children handle their own scroll)
+    // Restore drawer to clip mode
     if (drawer) {
       drawer.style.overflowY               = 'hidden';
       drawer.style.webkitOverflowScrolling = '';
@@ -1909,6 +1914,14 @@
     if (checkoutSec) {
       checkoutSec.style.flexShrink = '0';
       checkoutSec.style.borderTop  = '';
+    }
+    // Re-apply iOS scroll lock (body.position:fixed) if cart is still open
+    const cartDrawer = document.getElementById('cartDrawer');
+    if (cartDrawer && cartDrawer.style.display === 'flex') {
+      document.body.style.position = 'fixed';
+      document.body.style.top      = `-${_cartScrollY}px`;
+      document.body.style.width    = '100%';
+      document.body.style.overflow = 'hidden';
     }
   }
 
@@ -2179,7 +2192,7 @@ TOTAL: $${total}
     try {
       const payload = { subject, message };
       if (to) payload.to = to;
-      const res = await fetch('https://coruscating-souffle-9fcf42.netlify.app/.netlify/functions/send-notification', {
+      const res = await fetch('/.netlify/functions/send-notification', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify(payload)
@@ -2223,7 +2236,7 @@ TOTAL: $${total}
     }
 
     try {
-      const res = await fetch('https://coruscating-souffle-9fcf42.netlify.app/.netlify/functions/submit-custom-order', {
+      const res = await fetch('/.netlify/functions/submit-custom-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: name.trim(), email, itemType, colors, budget, details, photoUrl, fileData, fileName, fileType })
@@ -2278,7 +2291,7 @@ TOTAL: $${total}
     const email   = document.getElementById('contact-email')?.value || '';
     const message = document.getElementById('contact-msg')?.value || '';
     try {
-      await fetch('https://coruscating-souffle-9fcf42.netlify.app/.netlify/functions/send-notification', {
+      await fetch('/.netlify/functions/send-notification', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
