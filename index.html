@@ -889,7 +889,7 @@
       </div>
 
       <!-- Keep Shopping -->
-      <div style="padding:0.75rem 1.25rem; border-bottom:1px solid var(--border);">
+      <div id="keepShoppingBar" style="padding:0.75rem 1.25rem; border-bottom:1px solid var(--border);">
         <button onclick="closeCart()" type="button" style="
           background:none; border:1px solid var(--border); color:var(--text-muted);
           padding:0.4rem 1rem; border-radius:20px; cursor:pointer; font-size:0.82rem;
@@ -1849,23 +1849,31 @@
   }
 
   function showCheckoutForm() {
-    const formWrap      = document.getElementById('checkoutFormWrap');
-    const payForm       = document.getElementById('paymentForm');
-    const drawer        = document.getElementById('cartDrawer');
-    const cartItems     = document.getElementById('cartItems');
-    const checkoutSec   = document.getElementById('checkoutSection');
+    const formWrap    = document.getElementById('checkoutFormWrap');
+    const payForm     = document.getElementById('paymentForm');
+    const drawer      = document.getElementById('cartDrawer');
+    const cartItems   = document.getElementById('cartItems');
+    const keepBar     = document.getElementById('keepShoppingBar');
+    const checkoutSec = document.getElementById('checkoutSection');
+
     if (formWrap) formWrap.style.display = 'none';
     if (payForm)  payForm.style.display  = 'block';
-    // Collapse the cart items list so the checkout form can use the full drawer height
+
+    // Hide cart list and keep-shopping bar to free up space
     if (cartItems) cartItems.style.display = 'none';
-    // Make the checkout section scrollable and fill the remaining space
-    if (checkoutSec) {
-      checkoutSec.style.flex               = '1';
-      checkoutSec.style.flexShrink         = '';
-      checkoutSec.style.overflowY          = 'auto';
-      checkoutSec.style.webkitOverflowScrolling = 'touch';
-      checkoutSec.style.minHeight          = '0';
+    if (keepBar)   keepBar.style.display   = 'none';
+
+    // Let the DRAWER itself scroll — most reliable on iOS Safari
+    if (drawer) {
+      drawer.style.overflowY                = 'auto';
+      drawer.style.webkitOverflowScrolling  = 'touch';
     }
+    // Remove checkout section's pinned-footer constraints
+    if (checkoutSec) {
+      checkoutSec.style.flexShrink = '0';
+      checkoutSec.style.borderTop  = 'none';
+    }
+
     // Always start at step 1
     document.getElementById('stepShipping').style.display = 'block';
     document.getElementById('stepBilling').style.display  = 'none';
@@ -1873,21 +1881,27 @@
     // Reset billing checkbox to checked by default
     const bsc = document.getElementById('billingSameCheck');
     if (bsc) bsc.checked = true;
-    if (checkoutSec) checkoutSec.scrollTop = 0;
+    if (drawer) drawer.scrollTop = 0;
     setTimeout(() => { try { initPlaces(); } catch(e) {} }, 150);
   }
 
   function resetCartLayout() {
-    // Restore cart items list and un-expand checkout section
     const cartItems   = document.getElementById('cartItems');
+    const keepBar     = document.getElementById('keepShoppingBar');
+    const drawer      = document.getElementById('cartDrawer');
     const checkoutSec = document.getElementById('checkoutSection');
+    // Restore cart items and keep-shopping bar
     if (cartItems) cartItems.style.display = '';
+    if (keepBar)   keepBar.style.display   = '';
+    // Restore drawer to clip mode (children handle their own scroll)
+    if (drawer) {
+      drawer.style.overflowY               = 'hidden';
+      drawer.style.webkitOverflowScrolling = '';
+    }
+    // Restore checkout section border
     if (checkoutSec) {
-      checkoutSec.style.flex               = '';
-      checkoutSec.style.flexShrink         = '0';
-      checkoutSec.style.overflowY          = '';
-      checkoutSec.style.webkitOverflowScrolling = '';
-      checkoutSec.style.minHeight          = '';
+      checkoutSec.style.flexShrink = '0';
+      checkoutSec.style.borderTop  = '';
     }
   }
 
@@ -1910,8 +1924,8 @@
 
     const sameAsBilling = document.getElementById('billingSameCheck').checked;
     document.getElementById('stepShipping').style.display = 'none';
-    const cSec = document.getElementById('checkoutSection');
-    if (cSec) cSec.scrollTop = 0;
+    const cDrawer = document.getElementById('cartDrawer');
+    if (cDrawer) cDrawer.scrollTop = 0;
 
     if (sameAsBilling) {
       // Skip billing — go straight to payment
@@ -1926,8 +1940,8 @@
   function goBackToShipping() {
     document.getElementById('stepBilling').style.display  = 'none';
     document.getElementById('stepShipping').style.display = 'block';
-    const cSec = document.getElementById('checkoutSection');
-    if (cSec) cSec.scrollTop = 0;
+    const cDrawer = document.getElementById('cartDrawer');
+    if (cDrawer) cDrawer.scrollTop = 0;
   }
 
   function proceedFromBilling() {
@@ -1944,15 +1958,15 @@
     }
     errEl.style.display = 'none';
     document.getElementById('stepBilling').style.display = 'none';
-    const cSecB = document.getElementById('checkoutSection');
-    if (cSecB) cSecB.scrollTop = 0;
+    const cDrawerB = document.getElementById('cartDrawer');
+    if (cDrawerB) cDrawerB.scrollTop = 0;
     showPaymentStep();
   }
 
   function goBackFromPayment() {
     document.getElementById('stepPayment').style.display = 'none';
-    const cSecP = document.getElementById('checkoutSection');
-    if (cSecP) cSecP.scrollTop = 0;
+    const cDrawerP = document.getElementById('cartDrawer');
+    if (cDrawerP) cDrawerP.scrollTop = 0;
     const sameAsBilling = document.getElementById('billingSameCheck').checked;
     if (sameAsBilling) {
       document.getElementById('stepShipping').style.display = 'block';
