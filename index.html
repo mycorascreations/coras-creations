@@ -561,6 +561,9 @@
   <input name="subject" /><input name="message" /><input name="bot-field" />
 </form>
 
+<!-- Page content wrapper — hidden as a unit when cart is open (iOS GPU fix) -->
+<div id="pageContent">
+
 <!-- Stars -->
 <div class="sparkles-container" id="sparkles"></div>
 
@@ -851,6 +854,8 @@
       font-weight:700; font-size:0.9rem; z-index:999;
       box-shadow: 0 0 30px var(--glow-teal);
     ">✨ Added to cart!</div>
+
+</div><!-- /pageContent -->
 
     <!-- Cart Modal Overlay -->
     <div id="cartOverlay" onclick="closeCart()" style="
@@ -1542,15 +1547,11 @@
     document.body.style.top      = `-${_cartScrollY}px`;
     document.body.style.width    = '100%';
     document.body.style.overflow = 'hidden';
-    // Hide ALL page content so nothing bleeds through on iOS Safari.
-    // iOS GPU-composited layers (animated transforms, etc.) ignore z-index and
-    // show through position:fixed overlays — display:none removes them entirely.
-    document.querySelectorAll('body > *').forEach(el => {
-      if (el.id !== 'cartOverlay' && el.id !== 'cartDrawer' &&
-          el.tagName !== 'SCRIPT' && el.tagName !== 'STYLE') {
-        el.style.display = 'none';
-      }
-    });
+    // Hide all page content so nothing bleeds through on iOS Safari.
+    // GPU-composited layers (animated transforms) ignore z-index —
+    // display:none on the wrapper removes them from the compositor entirely.
+    const pc = document.getElementById('pageContent');
+    if (pc) pc.style.display = 'none';
   }
 
   function toggleCart() {
@@ -1566,13 +1567,9 @@
     document.body.style.top      = '';
     document.body.style.width    = '';
     document.body.style.overflow = '';
-    // Restore all hidden page content
-    document.querySelectorAll('body > *').forEach(el => {
-      if (el.id !== 'cartOverlay' && el.id !== 'cartDrawer' &&
-          el.tagName !== 'SCRIPT' && el.tagName !== 'STYLE') {
-        el.style.display = '';
-      }
-    });
+    // Restore page content
+    const pc = document.getElementById('pageContent');
+    if (pc) pc.style.display = '';
     window.scrollTo(0, _cartScrollY);
   }
 
