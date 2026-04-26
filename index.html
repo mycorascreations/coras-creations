@@ -1524,6 +1524,7 @@
     if (confirmBtn) { confirmBtn.disabled = true; confirmBtn.style.opacity = '0.4'; confirmBtn.style.cursor = 'not-allowed'; }
     const confirmHint = document.getElementById('confirmOrderHint');
     if (confirmHint) confirmHint.style.display = 'block';
+    resetCartLayout();
     renderCart();
     drawer.style.display  = 'flex';
     overlay.style.display = 'block';
@@ -1837,11 +1838,23 @@
   }
 
   function showCheckoutForm() {
-    const formWrap = document.getElementById('checkoutFormWrap');
-    const payForm  = document.getElementById('paymentForm');
-    const drawer   = document.getElementById('cartDrawer');
+    const formWrap      = document.getElementById('checkoutFormWrap');
+    const payForm       = document.getElementById('paymentForm');
+    const drawer        = document.getElementById('cartDrawer');
+    const cartItems     = document.getElementById('cartItems');
+    const checkoutSec   = document.getElementById('checkoutSection');
     if (formWrap) formWrap.style.display = 'none';
     if (payForm)  payForm.style.display  = 'block';
+    // Collapse the cart items list so the checkout form can use the full drawer height
+    if (cartItems) cartItems.style.display = 'none';
+    // Make the checkout section scrollable and fill the remaining space
+    if (checkoutSec) {
+      checkoutSec.style.flex               = '1';
+      checkoutSec.style.flexShrink         = '';
+      checkoutSec.style.overflowY          = 'auto';
+      checkoutSec.style.webkitOverflowScrolling = 'touch';
+      checkoutSec.style.minHeight          = '0';
+    }
     // Always start at step 1
     document.getElementById('stepShipping').style.display = 'block';
     document.getElementById('stepBilling').style.display  = 'none';
@@ -1849,8 +1862,22 @@
     // Reset billing checkbox to checked by default
     const bsc = document.getElementById('billingSameCheck');
     if (bsc) bsc.checked = true;
-    if (drawer) drawer.scrollTop = 0;
+    if (checkoutSec) checkoutSec.scrollTop = 0;
     setTimeout(() => { try { initPlaces(); } catch(e) {} }, 150);
+  }
+
+  function resetCartLayout() {
+    // Restore cart items list and un-expand checkout section
+    const cartItems   = document.getElementById('cartItems');
+    const checkoutSec = document.getElementById('checkoutSection');
+    if (cartItems) cartItems.style.display = '';
+    if (checkoutSec) {
+      checkoutSec.style.flex               = '';
+      checkoutSec.style.flexShrink         = '0';
+      checkoutSec.style.overflowY          = '';
+      checkoutSec.style.webkitOverflowScrolling = '';
+      checkoutSec.style.minHeight          = '';
+    }
   }
 
   function proceedFromShipping() {
@@ -1872,7 +1899,8 @@
 
     const sameAsBilling = document.getElementById('billingSameCheck').checked;
     document.getElementById('stepShipping').style.display = 'none';
-    document.getElementById('cartDrawer').scrollTop = 0;
+    const cSec = document.getElementById('checkoutSection');
+    if (cSec) cSec.scrollTop = 0;
 
     if (sameAsBilling) {
       // Skip billing — go straight to payment
@@ -1887,7 +1915,8 @@
   function goBackToShipping() {
     document.getElementById('stepBilling').style.display  = 'none';
     document.getElementById('stepShipping').style.display = 'block';
-    document.getElementById('cartDrawer').scrollTop = 0;
+    const cSec = document.getElementById('checkoutSection');
+    if (cSec) cSec.scrollTop = 0;
   }
 
   function proceedFromBilling() {
@@ -1904,13 +1933,15 @@
     }
     errEl.style.display = 'none';
     document.getElementById('stepBilling').style.display = 'none';
-    document.getElementById('cartDrawer').scrollTop = 0;
+    const cSecB = document.getElementById('checkoutSection');
+    if (cSecB) cSecB.scrollTop = 0;
     showPaymentStep();
   }
 
   function goBackFromPayment() {
     document.getElementById('stepPayment').style.display = 'none';
-    document.getElementById('cartDrawer').scrollTop = 0;
+    const cSecP = document.getElementById('checkoutSection');
+    if (cSecP) cSecP.scrollTop = 0;
     const sameAsBilling = document.getElementById('billingSameCheck').checked;
     if (sameAsBilling) {
       document.getElementById('stepShipping').style.display = 'block';
