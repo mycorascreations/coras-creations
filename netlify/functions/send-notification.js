@@ -47,7 +47,7 @@ exports.handler = async (event) => {
     </div>`;
 
   const payload = {
-    from:    "Cora's Creations <onboarding@resend.dev>",
+    from:    "Cora's Creations <orders@mycorascreations.com>",
     to:      [recipient],
     subject: subject,
     html:    htmlBody
