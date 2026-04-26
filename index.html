@@ -2161,18 +2161,15 @@ TOTAL: $${total}
     const email   = document.getElementById('contact-email')?.value || '';
     const message = document.getElementById('contact-msg')?.value || '';
     try {
-      const params = new URLSearchParams({
-        'form-name': 'contact',
-        'name':    name,
-        'email':   email,
-        'message': message
-      });
-      await fetch('/', {
+      await fetch('https://coruscating-souffle-9fcf42.netlify.app/.netlify/functions/send-notification', {
         method:  'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body:    params.toString()
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          subject: `💌 New Message from ${name} — Cora's Creations`,
+          message: `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`
+        })
       });
-    } catch(e) { console.warn('Contact form failed:', e); }
+    } catch(err) { console.warn('Contact form failed:', err); }
     document.getElementById('contactForm').style.display = 'none';
     document.getElementById('contactSuccess').style.display = 'block';
   }
