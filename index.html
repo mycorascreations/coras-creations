@@ -1542,8 +1542,9 @@
     document.body.style.top      = `-${_cartScrollY}px`;
     document.body.style.width    = '100%';
     document.body.style.overflow = 'hidden';
-    // Pause float animations so iOS GPU layers don't bleed through the overlay
-    document.body.classList.add('cart-open');
+    // Hide floating emoji elements — iOS GPU-composited layers bleed through
+    // fixed overlays regardless of z-index; display:none is the only reliable fix
+    document.querySelectorAll('.hero-dragon, .about-visual').forEach(el => el.style.display = 'none');
   }
 
   function toggleCart() {
@@ -1559,7 +1560,8 @@
     document.body.style.top      = '';
     document.body.style.width    = '';
     document.body.style.overflow = '';
-    document.body.classList.remove('cart-open');
+    // Restore floating emoji elements
+    document.querySelectorAll('.hero-dragon, .about-visual').forEach(el => el.style.display = '');
     window.scrollTo(0, _cartScrollY);
   }
 
