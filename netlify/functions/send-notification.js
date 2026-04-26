@@ -26,7 +26,13 @@ exports.handler = async (event) => {
 
   const resendKey   = process.env.RESEND_API_KEY;
   const notifyEmail = process.env.NOTIFICATION_EMAIL || 'mikecpeters30@gmail.com';
-  if (!resendKey) return json(500, { error: 'Email service not configured' });
+
+  console.log('[send-notification] resendKey present:', !!resendKey, '| recipient:', to || notifyEmail);
+
+  if (!resendKey) {
+    console.error('[send-notification] RESEND_API_KEY is not set in environment variables!');
+    return json(500, { error: 'Email service not configured' });
+  }
 
   // 'to' can be a specific address (e.g. customer confirmation) or defaults to admin
   const recipient = to || notifyEmail;
@@ -71,9 +77,15 @@ function sendResend(payload, apiKey) {
     }, (res) => {
       let data = '';
       res.on('data', c => data += c);
-      res.on('end', () => resolve(res.statusCode === 200 || res.statusCode === 201));
+      res.on('end', () => {
+        console.log('[send-notification] Resend status:', res.statusCode, '| body:', data.slice(0, 300));
+        resolve(res.statusCode === 200 || res.statusCode === 201);
+      });
     });
-    req.on('error', () => resolve(false));
+    req.on('error', (err) => {
+      console.error('[send-notification] Resend network error:', err.message);
+      resolve(false);
+    });
     req.write(body);
     req.end();
   });
