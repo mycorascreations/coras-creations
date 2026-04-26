@@ -1788,12 +1788,28 @@
       const shipping = getShipping(subtotal);
       const total    = subtotal + shipping;
       const amountCents = Math.round(total * 100);
+      const orderNum = generateOrderNumber();
 
-      // Send to Netlify function to complete charge
+      // Build order details for server-side email
+      const orderDetails = {
+        customerName:  document.getElementById('sq-name')?.value.trim()    || '',
+        customerEmail: document.getElementById('sq-email')?.value.trim()   || '',
+        orderNumber:   orderNum,
+        items:         Object.entries(cart).map(([name, {qty, price}]) => ({name, qty, price})),
+        subtotal:      subtotal.toFixed(2),
+        shipping:      shipping.toFixed(2),
+        total:         total.toFixed(2),
+        streetAddress: document.getElementById('sq-address')?.value.trim() || '',
+        city:          document.getElementById('sq-city')?.value.trim()    || '',
+        state:         document.getElementById('sq-state')?.value.trim()   || '',
+        zipCode:       document.getElementById('sq-zip')?.value.trim()     || ''
+      };
+
+      // Send to Netlify function to complete charge + trigger server-side emails
       const chargeRes = await fetch('/.netlify/functions/process-payment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sourceId: token, amountCents, currency: 'USD', locationId: SQUARE_LOCATION_ID })
+        body: JSON.stringify({ sourceId: token, amountCents, currency: 'USD', locationId: SQUARE_LOCATION_ID, orderDetails })
       });
       const rawText = await chargeRes.text();
       let chargeData;
@@ -1808,9 +1824,9 @@
         return;
       }
 
-      // Payment successful — confirm order
+      // Payment successful — confirm order (pass pre-generated order number for consistency)
       try {
-        await confirmOrder();
+        await confirmOrder('card', orderNum);
       } catch(orderErr) {
         // Payment went through but UI update failed — still show success
         console.error('Order UI error (payment was charged):', orderErr);
@@ -2014,7 +2030,7 @@
   }
 
 
-  async function confirmOrder(paymentMethod = 'card') {
+  async function confirmOrder(paymentMethod = 'card', preGeneratedOrderNumber = null) {
     const isVenmo = paymentMethod === 'venmo';
     document.getElementById('paymentForm').style.display    = 'none';
     document.getElementById('orderConfirmed').style.display = 'block';
@@ -2036,7 +2052,8 @@
     const subtotalAmt  = Object.values(cart).reduce((s,i) => s + i.price * i.qty, 0);
     const shippingCost = getShipping(subtotalAmt);
     const total        = (subtotalAmt + shippingCost).toFixed(2);
-    const orderNumber  = generateOrderNumber();
+    // Use the pre-generated order number (from card payment) or generate a new one (Venmo)
+    const orderNumber  = preGeneratedOrderNumber || generateOrderNumber();
 
     // Central Time date + time
     const now = new Date();
