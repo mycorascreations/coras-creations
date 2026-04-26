@@ -635,37 +635,37 @@
       <p>Every piece is handcrafted with care — no two are exactly alike.</p>
     </div>
     <div class="categories-grid">
-      <a href="#shop" class="category-card reveal">
+      <a href="#shop" onclick="filterBySection('containers')" class="category-card reveal">
         <img src="flower-dish.jpeg" alt="Containers" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;margin-bottom:1rem;">
         <h3>Containers</h3>
         <p>Beautifully crafted resin containers — perfect for storage and display.</p>
       </a>
-      <a href="#shop" class="category-card reveal">
+      <a href="#shop" onclick="filterBySection('coasters')" class="category-card reveal">
         <img src="Coaster-butterfly.jpeg" alt="Coasters" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;margin-bottom:1rem;">
         <h3>Coasters</h3>
         <p>Ocean-swirl and galaxy resin coasters to protect your surfaces in style.</p>
       </a>
-      <a href="#shop" class="category-card reveal">
+      <a href="#shop" onclick="filterBySection('animal-molds')" class="category-card reveal">
         <img src="galaxy-tray.jpeg" alt="Animal Molds" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;margin-bottom:1rem;">
         <h3>Animal Molds</h3>
         <p>Resin animals in every color — butterflies, foxes, cats &amp; more.</p>
       </a>
-      <a href="#shop" class="category-card reveal">
+      <a href="#shop" onclick="filterBySection('serving-trays')" class="category-card reveal">
         <img src="dragon-figure.jpeg" alt="Serving Trays" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;margin-bottom:1rem;">
         <h3>Serving Trays</h3>
         <p>Stunning resin serving trays — functional art for your home.</p>
       </a>
-      <a href="#shop" class="category-card reveal">
+      <a href="#shop" onclick="filterBySection('trinket-dishes')" class="category-card reveal">
         <img src="dragon-jar.jpeg" alt="Trinket Dishes" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;margin-bottom:1rem;">
         <h3>Trinket Dishes</h3>
         <p>Handcrafted resin containers with lids — stunning storage for little treasures.</p>
       </a>
-      <a href="#shop" class="category-card reveal">
+      <a href="#shop" onclick="filterBySection('3d-dragons')" class="category-card reveal">
         <span class="category-icon">🐉</span>
         <h3>3D Printed Dragons</h3>
         <p>Articulated and decorative dragons fresh off the printer — collectible &amp; poseable.</p>
       </a>
-      <a href="#shop" class="category-card reveal">
+      <a href="#shop" onclick="filterBySection('fidget-spinners')" class="category-card reveal">
         <span class="category-icon">🌀</span>
         <h3>Fidget Spinners</h3>
         <p>Custom 3D printed fidget spinners — satisfying, stylish, and totally unique.</p>
@@ -828,7 +828,7 @@
         </div>
       </div>
 
-      <div class="product-card reveal" data-category="3d">
+      <div class="product-card reveal" data-category="3d" data-section="3d-dragons">
         <div class="product-img" style="background: linear-gradient(135deg,#2d1b00,#7c2d12,#dc2626);">🔥</div>
         <div class="product-body">
           <span class="product-tag tag-3d">3D Printed</span>
@@ -842,7 +842,7 @@
       </div>
 
       <!-- Fidget Spinners -->
-      <div class="product-card reveal" data-category="3d">
+      <div class="product-card reveal" data-category="3d" data-section="fidget-spinners">
         <div class="product-img" style="background: linear-gradient(135deg,#1e1b4b,#3730a3,#818cf8);">🌀</div>
         <div class="product-body">
           <span class="product-tag tag-3d">3D Printed</span>
@@ -855,7 +855,7 @@
         </div>
       </div>
 
-      <div class="product-card reveal" data-category="3d">
+      <div class="product-card reveal" data-category="3d" data-section="fidget-spinners">
         <div class="product-img" style="background: linear-gradient(135deg,#042f2e,#065f46,#34d399);">🌿</div>
         <div class="product-body">
           <span class="product-tag tag-3d">3D Printed</span>
@@ -1430,6 +1430,20 @@
         card.classList.add('hidden');
       }
     });
+  }
+
+  // Called by category cards — filter to a specific section then scroll to shop
+  function filterBySection(section) {
+    // Clear tab active state since we're filtering more granularly
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.product-card').forEach(card => {
+      if (card.dataset.section === section) {
+        card.classList.remove('hidden');
+      } else {
+        card.classList.add('hidden');
+      }
+    });
+    // Scroll happens via the href="#shop" on the <a> tag
   }
 
   // ---- CART STATE ----
