@@ -352,7 +352,7 @@
     .autocomplete-item:hover { background:rgba(124,58,237,0.15); color:var(--text-primary); }
 
     /* ---- ABOUT ---- */
-    #about { background: linear-gradient(180deg, transparent, rgba(59,7,100,0.15), transparent); }
+    #about { background: linear-gradient(180deg, transparent, rgba(59,7,100,0.15), transparent); isolation: isolate; }
     .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
     .about-visual {
       display: flex; align-items: center; justify-content: center;
@@ -847,7 +847,7 @@
     <!-- Cart Modal Overlay -->
     <div id="cartOverlay" onclick="closeCart()" style="
       display:none; position:fixed; inset:0;
-      background:rgba(0,0,0,0.7); z-index:200; backdrop-filter:blur(4px);
+      background:rgba(0,0,0,0.7); z-index:1000; backdrop-filter:blur(4px);
     "></div>
 
     <!-- Cart Drawer -->
@@ -855,7 +855,7 @@
       display:none; position:fixed; top:0; right:0;
       width:min(480px,100vw); height:100vh; height:100dvh;
       background:#110a20; border-left:1px solid var(--border);
-      z-index:201; overflow:hidden;
+      z-index:1001; overflow:hidden;
       box-shadow:-10px 0 40px rgba(0,0,0,0.5);
       flex-direction:column;
       transform:translateZ(0); -webkit-transform:translateZ(0);
@@ -1412,6 +1412,7 @@
 
   // ---- CART STATE ----
   let cart = {};
+  let _cartScrollY = 0; // saved scroll position for iOS scroll-lock
 
   function updateBadge() {
     const total = Object.values(cart).reduce((s, i) => s + i.qty, 0);
@@ -1526,6 +1527,11 @@
     renderCart();
     drawer.style.display  = 'flex';
     overlay.style.display = 'block';
+    // iOS-safe scroll lock: position:fixed preserves scroll on Safari
+    _cartScrollY = window.scrollY;
+    document.body.style.position = 'fixed';
+    document.body.style.top      = `-${_cartScrollY}px`;
+    document.body.style.width    = '100%';
     document.body.style.overflow = 'hidden';
   }
 
@@ -1537,7 +1543,12 @@
   function closeCart() {
     document.getElementById('cartDrawer').style.display  = 'none';
     document.getElementById('cartOverlay').style.display = 'none';
+    // Restore iOS scroll lock
+    document.body.style.position = '';
+    document.body.style.top      = '';
+    document.body.style.width    = '';
     document.body.style.overflow = '';
+    window.scrollTo(0, _cartScrollY);
   }
 
 
