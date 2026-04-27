@@ -1429,6 +1429,11 @@
   // ---- CART STATE ----
   let cart = {};
   let _cartScrollY = 0; // saved scroll position for iOS scroll-lock
+  // iOS Safari needs position:fixed to prevent scroll behind modal.
+  // Desktop (Mac/Windows) only needs overflow:hidden — position:fixed causes
+  // a layout jump that makes the checkout button appear unresponsive.
+  const _isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+                 (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
   function updateBadge() {
     const total = Object.values(cart).reduce((s, i) => s + i.qty, 0);
@@ -1544,11 +1549,15 @@
     renderCart();
     drawer.style.display  = 'flex';
     overlay.style.display = 'block';
-    // iOS-safe scroll lock: position:fixed preserves scroll on Safari
+    // Scroll lock: iOS needs position:fixed (prevents Safari bounce-scroll).
+    // Desktop only needs overflow:hidden — position:fixed causes a layout jump
+    // that makes buttons inside the drawer unresponsive on Mac.
     _cartScrollY = window.scrollY;
-    document.body.style.position = 'fixed';
-    document.body.style.top      = `-${_cartScrollY}px`;
-    document.body.style.width    = '100%';
+    if (_isIOS) {
+      document.body.style.position = 'fixed';
+      document.body.style.top      = `-${_cartScrollY}px`;
+      document.body.style.width    = '100%';
+    }
     document.body.style.overflow = 'hidden';
     // Hide the animated floating elements — their GPU layers bleed through
     // fixed overlays on iOS Safari regardless of z-index
@@ -1563,14 +1572,16 @@
   function closeCart() {
     document.getElementById('cartDrawer').style.display  = 'none';
     document.getElementById('cartOverlay').style.display = 'none';
-    // Restore iOS scroll lock
-    document.body.style.position = '';
-    document.body.style.top      = '';
-    document.body.style.width    = '';
+    // Restore scroll — iOS needs position:fixed cleared + scroll restore
     document.body.style.overflow = '';
+    if (_isIOS) {
+      document.body.style.position = '';
+      document.body.style.top      = '';
+      document.body.style.width    = '';
+      window.scrollTo(0, _cartScrollY);
+    }
     // Restore animated elements
     document.querySelectorAll('.hero-dragon, .about-visual').forEach(el => el.style.display = '');
-    window.scrollTo(0, _cartScrollY);
   }
 
 
@@ -1889,13 +1900,14 @@
     if (cartItems) cartItems.style.display = 'none';
     if (keepBar)   keepBar.style.display   = 'none';
 
-    // Let the DRAWER scroll. iOS won't scroll a position:fixed element when
-    // body is also position:fixed — so we lift the scroll lock here.
-    // The overlay still covers the page so nothing behind is reachable.
-    document.body.style.position = '';
-    document.body.style.top      = '';
-    document.body.style.width    = '';
-    document.body.style.overflow = '';
+    // iOS: lift position:fixed so the drawer can scroll natively.
+    // Desktop: body was never position:fixed so nothing to lift.
+    if (_isIOS) {
+      document.body.style.position = '';
+      document.body.style.top      = '';
+      document.body.style.width    = '';
+      document.body.style.overflow = '';
+    }
     if (drawer) {
       drawer.style.overflowY               = 'auto';
       drawer.style.webkitOverflowScrolling = 'touch';
@@ -1934,12 +1946,14 @@
       checkoutSec.style.flexShrink = '0';
       checkoutSec.style.borderTop  = '';
     }
-    // Re-apply iOS scroll lock (body.position:fixed) if cart is still open
+    // Re-apply scroll lock if cart is still open
     const cartDrawer = document.getElementById('cartDrawer');
     if (cartDrawer && cartDrawer.style.display === 'flex') {
-      document.body.style.position = 'fixed';
-      document.body.style.top      = `-${_cartScrollY}px`;
-      document.body.style.width    = '100%';
+      if (_isIOS) {
+        document.body.style.position = 'fixed';
+        document.body.style.top      = `-${_cartScrollY}px`;
+        document.body.style.width    = '100%';
+      }
       document.body.style.overflow = 'hidden';
     }
   }
