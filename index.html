@@ -867,20 +867,19 @@
     <!-- Cart Drawer -->
     <div id="cartDrawer" style="
       display:none; position:fixed; top:0; right:0;
-      width:min(480px,100vw); height:100vh; height:100dvh;
+      width:min(480px,100vw); height:100dvh;
       background:#110a20; border-left:1px solid var(--border);
-      z-index:1001; overflow:hidden;
+      z-index:1001;
+      overflow-y:auto; overflow-x:hidden;
+      overscroll-behavior:contain;
+      -webkit-overflow-scrolling:touch;
       box-shadow:-10px 0 40px rgba(0,0,0,0.5);
-      flex-direction:column;
-      transform:translateZ(0); -webkit-transform:translateZ(0);
-      will-change:transform; isolation:isolate;
     ">
       <!-- Header -->
       <div style="
         padding:1.5rem; border-bottom:1px solid var(--border);
         display:flex; align-items:center; justify-content:space-between;
-        position:sticky; top:0; background:#110a20; z-index:1;
-        transform:translateZ(0); -webkit-transform:translateZ(0); will-change:transform;
+        position:sticky; top:0; background:#110a20; z-index:2;
       ">
         <h2 style="font-family:'Cinzel',serif; font-size:1.2rem;
           background:linear-gradient(135deg,var(--gold-light),var(--purple-light));
@@ -907,8 +906,8 @@
         </button>
       </div>
 
-      <!-- Cart Items (scrollable middle) -->
-      <div id="cartItems" style="padding:1.25rem; flex:1; overflow-y:auto; min-height:0; -webkit-overflow-scrolling:touch;"></div>
+      <!-- Cart Items -->
+      <div id="cartItems" style="padding:1.25rem;"></div>
 
       <!-- Empty State -->
       <div id="cartEmpty" style="
@@ -919,7 +918,7 @@
       </div>
 
       <!-- Checkout Section — pinned to bottom, never scrolls off screen -->
-      <div id="checkoutSection" style="display:none; padding:1.25rem; padding-bottom:max(1.25rem, env(safe-area-inset-bottom)); border-top:1px solid var(--border); flex-shrink:0; background:#110a20;">
+      <div id="checkoutSection" style="display:none; padding:1.25rem; padding-bottom:max(1.25rem, env(safe-area-inset-bottom)); border-top:1px solid var(--border); background:#110a20; position:sticky; bottom:0; z-index:1;">
 
         <!-- Subtotal + Flat Rate Shipping + Total -->
         <div style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1rem;">
@@ -1547,7 +1546,7 @@
     if (confirmHint) confirmHint.style.display = 'block';
     resetCartLayout();
     renderCart();
-    drawer.style.display  = 'flex';
+    drawer.style.display  = 'block';
     overlay.style.display = 'block';
     // Scroll lock: iOS needs position:fixed (prevents Safari bounce-scroll).
     // Desktop only needs overflow:hidden — position:fixed causes a layout jump
@@ -1566,7 +1565,7 @@
 
   function toggleCart() {
     const drawer = document.getElementById('cartDrawer');
-    if (drawer.style.display === 'flex') { closeCart(); } else { openCart(); }
+    if (drawer.style.display === 'block') { closeCart(); } else { openCart(); }
   }
 
   function closeCart() {
@@ -1886,42 +1885,21 @@
   }
 
   function showCheckoutForm() {
-    const formWrap    = document.getElementById('checkoutFormWrap');
-    const payForm     = document.getElementById('paymentForm');
-    const drawer      = document.getElementById('cartDrawer');
-    const cartItems   = document.getElementById('cartItems');
-    const keepBar     = document.getElementById('keepShoppingBar');
-    const checkoutSec = document.getElementById('checkoutSection');
+    const formWrap  = document.getElementById('checkoutFormWrap');
+    const payForm   = document.getElementById('paymentForm');
+    const drawer    = document.getElementById('cartDrawer');
+    const cartItems = document.getElementById('cartItems');
+    const keepBar   = document.getElementById('keepShoppingBar');
 
-    if (formWrap) formWrap.style.display = 'none';
-    if (payForm)  payForm.style.display  = 'block';
-
-    // Hide cart list and keep-shopping bar to free up space
-    if (cartItems) cartItems.style.display = 'none';
-    if (keepBar)   keepBar.style.display   = 'none';
-
-    // iOS: lift position:fixed so the drawer can scroll natively.
-    // Desktop: body was never position:fixed so nothing to lift.
-    if (_isIOS) {
-      document.body.style.position = '';
-      document.body.style.top      = '';
-      document.body.style.width    = '';
-      document.body.style.overflow = '';
-    }
-    if (drawer) {
-      drawer.style.overflowY               = 'auto';
-      drawer.style.webkitOverflowScrolling = 'touch';
-    }
-    if (checkoutSec) {
-      checkoutSec.style.flexShrink = '0';
-      checkoutSec.style.borderTop  = 'none';
-    }
+    if (formWrap)   formWrap.style.display   = 'none';
+    if (payForm)    payForm.style.display    = 'block';
+    if (cartItems)  cartItems.style.display  = 'none';
+    if (keepBar)    keepBar.style.display    = 'none';
 
     // Always start at step 1
     document.getElementById('stepShipping').style.display = 'block';
     document.getElementById('stepBilling').style.display  = 'none';
     document.getElementById('stepPayment').style.display  = 'none';
-    // Reset billing checkbox to checked by default
     const bsc = document.getElementById('billingSameCheck');
     if (bsc) bsc.checked = true;
     if (drawer) drawer.scrollTop = 0;
@@ -1929,33 +1907,12 @@
   }
 
   function resetCartLayout() {
-    const cartItems   = document.getElementById('cartItems');
-    const keepBar     = document.getElementById('keepShoppingBar');
-    const drawer      = document.getElementById('cartDrawer');
-    const checkoutSec = document.getElementById('checkoutSection');
-    // Restore cart items and keep-shopping bar
+    const cartItems = document.getElementById('cartItems');
+    const keepBar   = document.getElementById('keepShoppingBar');
+    const drawer    = document.getElementById('cartDrawer');
     if (cartItems) cartItems.style.display = '';
     if (keepBar)   keepBar.style.display   = '';
-    // Restore drawer to clip mode
-    if (drawer) {
-      drawer.style.overflowY               = 'hidden';
-      drawer.style.webkitOverflowScrolling = '';
-    }
-    // Restore checkout section border
-    if (checkoutSec) {
-      checkoutSec.style.flexShrink = '0';
-      checkoutSec.style.borderTop  = '';
-    }
-    // Re-apply scroll lock if cart is still open
-    const cartDrawer = document.getElementById('cartDrawer');
-    if (cartDrawer && cartDrawer.style.display === 'flex') {
-      if (_isIOS) {
-        document.body.style.position = 'fixed';
-        document.body.style.top      = `-${_cartScrollY}px`;
-        document.body.style.width    = '100%';
-      }
-      document.body.style.overflow = 'hidden';
-    }
+    if (drawer)    drawer.scrollTop        = 0;
   }
 
   function proceedFromShipping() {
