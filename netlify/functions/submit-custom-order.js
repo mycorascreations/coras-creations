@@ -46,7 +46,7 @@ exports.handler = async (event) => {
 
   // ── Step 2: Send email via Resend ─────────────────────────────────────────
   const resendKey       = process.env.RESEND_API_KEY;
-  const notifyEmail     = process.env.NOTIFICATION_EMAIL || 'mikecpeters30@gmail.com';
+  const notifyEmail     = process.env.NOTIFICATION_EMAIL || 'mikecpeters82@icloud.com';
 
   if (!resendKey) return json(500, { error: 'Email service not configured' });
 

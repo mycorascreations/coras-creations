@@ -66,7 +66,7 @@ exports.handler = async (event) => {
 
     const adminMsg = `New Order Received!\n\nORDER #${orderNumber}\n\nCUSTOMER\nName: ${customerName}\nEmail: ${customerEmail}\n\nSHIPPING ADDRESS\n${streetAddress}\n${city}, ${state} ${zipCode}\n\nORDER ITEMS\n${itemLines}\n\nSubtotal: $${parseFloat(subtotal).toFixed(2)}\nShipping: ${shippingDisplay}\nTOTAL: $${parseFloat(total).toFixed(2)}\n\nPayment: Card (Square) ✅`;
 
-    const notifyEmail = process.env.NOTIFICATION_EMAIL || 'mikecpeters30@gmail.com';
+    const notifyEmail = process.env.NOTIFICATION_EMAIL || 'mikecpeters82@icloud.com';
 
     // Admin notification
     sendResendEmail(

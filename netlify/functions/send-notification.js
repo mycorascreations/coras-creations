@@ -25,7 +25,7 @@ exports.handler = async (event) => {
   if (!subject || !message) return json(400, { error: 'Missing subject or message' });
 
   const resendKey   = process.env.RESEND_API_KEY;
-  const notifyEmail = process.env.NOTIFICATION_EMAIL || 'mikecpeters30@gmail.com';
+  const notifyEmail = process.env.NOTIFICATION_EMAIL || 'mikecpeters82@icloud.com';
 
   console.log('[send-notification] resendKey present:', !!resendKey, '| recipient:', to || notifyEmail);
 

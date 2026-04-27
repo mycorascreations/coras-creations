@@ -422,6 +422,7 @@
       font-family: 'Raleway', sans-serif;
       box-shadow: 0 0 25px var(--glow-teal);
       transition: transform 0.2s, box-shadow 0.3s;
+      touch-action: manipulation; -webkit-tap-highlight-color: transparent;
     }
     .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 0 40px var(--glow-teal); }
     .form-note { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.75rem; }
@@ -855,9 +856,11 @@
       box-shadow: 0 0 30px var(--glow-teal);
     ">✨ Added to cart!</div>
 
-    <!-- Cart Modal Overlay -->
+    <!-- Cart Modal Overlay — only covers the area LEFT of the drawer so it
+         never competes with drawer clicks. Clicking this dark area closes the cart. -->
     <div id="cartOverlay" onclick="closeCart()" style="
-      display:none; position:fixed; inset:0;
+      display:none; position:fixed; top:0; left:0; bottom:0;
+      right:min(480px,100vw);
       background:rgba(0,0,0,0.97); z-index:1000;
     "></div>
 
@@ -916,7 +919,7 @@
       </div>
 
       <!-- Checkout Section — pinned to bottom, never scrolls off screen -->
-      <div id="checkoutSection" style="display:none; padding:1.25rem; border-top:1px solid var(--border); flex-shrink:0; background:#110a20;">
+      <div id="checkoutSection" style="display:none; padding:1.25rem; padding-bottom:max(1.25rem, env(safe-area-inset-bottom)); border-top:1px solid var(--border); flex-shrink:0; background:#110a20;">
 
         <!-- Subtotal + Flat Rate Shipping + Total -->
         <div style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1rem;">
