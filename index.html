@@ -721,26 +721,14 @@
 
       <!-- Coasters -->
       <div class="product-card reveal" data-category="resin" data-section="coasters">
-        <div class="product-img"><img src="Coaster-butterfly.jpeg" alt="Nebula Coaster Set" style="width:100%;height:100%;object-fit:cover;"></div>
-        <div class="product-body">
-          <span class="product-tag tag-resin">Resin</span>
-          <h3>Monarch Butterfly Coaster Set (4)</h3>
-          <p>A set of 4 round resin coasters each featuring a bold monarch butterfly on a warm golden base, with crystal gem-shaped bumps lining the edges.</p>
-          <div class="product-footer">
-            <span class="product-price">$35</span>
-            <button class="btn-cart" onclick="addedToCart(this,'Monarch Butterfly Coaster Set (4)',35)">Add to Cart 🛒</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="product-card reveal" data-category="resin" data-section="coasters">
         <div class="product-img"><img src="Coaster-butterfly.jpeg" alt="Butterfly Coaster" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Monarch Butterfly Coaster (single)</h3>
           <p>A round resin coaster with a vibrant monarch butterfly at its center — golden base with clear crystal gem-shaped bumps around the edge.</p>
+          <p style="color:var(--teal-light); font-size:0.8rem; font-weight:600; margin-top:0.4rem;">🎉 Buy 2–4: save 25% automatically!</p>
           <div class="product-footer">
-            <span class="product-price">$8</span>
+            <span class="product-price">$8 <span style="font-size:0.75rem; color:var(--text-muted); font-weight:400;">($6 each × 2–4)</span></span>
             <button class="btn-cart" onclick="addedToCart(this,'Monarch Butterfly Coaster (single)',8)">Add to Cart 🛒</button>
           </div>
         </div>
@@ -804,33 +792,7 @@
         </div>
       </div>
 
-      <div class="product-card reveal" data-category="3d" data-section="3d-dragons">
-        <div class="product-img" style="background: linear-gradient(135deg,#2d1b00,#7c2d12,#dc2626);">🔥</div>
-        <div class="product-body">
-          <span class="product-tag tag-3d">3D Printed</span>
-          <h3>Fire Dragon (Display)</h3>
-          <p>Fierce display dragon in fiery reds and oranges — printed in stunning detail.</p>
-          <div class="product-footer">
-            <span class="product-price">$20</span>
-            <button class="btn-cart" onclick="addedToCart(this,'Fire Dragon (Display)',20)">Add to Cart 🛒</button>
-          </div>
-        </div>
-      </div>
-
       <!-- Fidget Spinners -->
-      <div class="product-card reveal" data-category="3d" data-section="fidget-spinners">
-        <div class="product-img" style="background: linear-gradient(135deg,#1e1b4b,#3730a3,#818cf8);">🌀</div>
-        <div class="product-body">
-          <span class="product-tag tag-3d">3D Printed</span>
-          <h3>Galaxy Fidget Spinner</h3>
-          <p>Smooth-spinning 3-blade fidget spinner in galactic purple — satisfying and stylish.</p>
-          <div class="product-footer">
-            <span class="product-price">$30</span>
-            <button class="btn-cart" onclick="addedToCart(this,'Galaxy Fidget Spinner',30)">Add to Cart 🛒</button>
-          </div>
-        </div>
-      </div>
-
       <div class="product-card reveal" data-category="3d" data-section="fidget-spinners">
         <div class="product-img" style="background: linear-gradient(135deg,#042f2e,#065f46,#34d399);">🌿</div>
         <div class="product-body">
@@ -925,6 +887,10 @@
           <div style="display:flex; justify-content:space-between; font-size:0.95rem;">
             <span style="color:var(--text-muted);">Subtotal</span>
             <span id="cartSubtotal" style="color:var(--text-primary); font-weight:600;">$0</span>
+          </div>
+          <div id="coasterDiscountRow" style="display:none; justify-content:space-between; font-size:0.9rem;">
+            <span style="color:var(--teal-light);">🎉 Coaster set discount (25%)</span>
+            <span id="coasterDiscountAmt" style="color:var(--teal-light); font-weight:600;"></span>
           </div>
           <div style="display:flex; align-items:center; gap:0.5rem; padding:0.5rem 0.75rem; background:var(--bg-card); border-radius:8px; border:1px solid var(--border);">
             <span style="font-size:1rem;">📦</span>
@@ -1502,11 +1468,34 @@
           </div>
         </div>`;
     }).join('');
-    const shipping = getShipping(subtotal);
-    const total    = subtotal + shipping;
+    const discount  = getCoasterDiscount(cart);
+    const discountRow = document.getElementById('coasterDiscountRow');
+    const discountAmt = document.getElementById('coasterDiscountAmt');
+    if (discount > 0) {
+      discountRow.style.display = 'flex';
+      discountAmt.textContent   = '−$' + discount.toFixed(2);
+    } else {
+      discountRow.style.display = 'none';
+    }
+    const discountedSubtotal = subtotal - discount;
+    const shipping = getShipping(discountedSubtotal);
+    const total    = discountedSubtotal + shipping;
     subtotalEl.textContent = '$' + subtotal.toFixed(2);
     document.getElementById('cartShipping').textContent = shipping === 0 ? 'FREE 🎉' : '$5.99';
     document.getElementById('cartTotal').textContent    = '$' + total.toFixed(2);
+  }
+
+  // Returns 25% off coasters when cart has 2–4 coasters total
+  function getCoasterDiscount(cartObj) {
+    let coasterQty = 0;
+    let coasterSubtotal = 0;
+    for (const [name, { price, qty }] of Object.entries(cartObj)) {
+      if (name.toLowerCase().includes('coaster')) {
+        coasterQty      += qty;
+        coasterSubtotal += price * qty;
+      }
+    }
+    return (coasterQty >= 2 && coasterQty <= 4) ? coasterSubtotal * 0.25 : 0;
   }
 
   function changeQty(name, delta) {
@@ -1797,9 +1786,11 @@
       }
 
       const token    = result.token;
-      const subtotal = Object.values(cart).reduce((s, i) => s + i.price * i.qty, 0);
-      const shipping = getShipping(subtotal);
-      const total    = subtotal + shipping;
+      const subtotal  = Object.values(cart).reduce((s, i) => s + i.price * i.qty, 0);
+      const discount  = getCoasterDiscount(cart);
+      const discountedSubtotal = subtotal - discount;
+      const shipping = getShipping(discountedSubtotal);
+      const total    = discountedSubtotal + shipping;
       const amountCents = Math.round(total * 100);
       const orderNum = generateOrderNumber();
 
@@ -1810,6 +1801,7 @@
         orderNumber:   orderNum,
         items:         Object.entries(cart).map(([name, {qty, price}]) => ({name, qty, price})),
         subtotal:      subtotal.toFixed(2),
+        discount:      discount > 0 ? discount.toFixed(2) : undefined,
         shipping:      shipping.toFixed(2),
         total:         total.toFixed(2),
         streetAddress: document.getElementById('sq-address')?.value.trim() || '',
