@@ -365,7 +365,7 @@
     .about-visual {
       display: flex; align-items: center; justify-content: center;
       background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: 24px; aspect-ratio: 1;
+      border-radius: 24px; aspect-ratio: 3/4;
       font-size: 8rem;
       animation: float 4s ease-in-out infinite;
       box-shadow: 0 0 40px var(--glow-purple);
@@ -524,7 +524,7 @@
       .menu-overlay.open { display: block; }
 
       .about-grid { grid-template-columns: 1fr; gap: 2rem; }
-      .about-visual { font-size: 5rem; max-width: 280px; margin: 0 auto; }
+      .about-visual { font-size: 5rem; max-width: 320px; margin: 0 auto; }
       .form-grid { grid-template-columns: 1fr; }
       .form-card { padding: 2rem 1.25rem; }
     }
@@ -1145,7 +1145,10 @@
 <section id="about">
   <div class="section-inner">
     <div class="about-grid">
-      <div class="about-visual reveal">🧙‍♀️</div>
+      <div class="about-visual reveal" style="overflow:hidden; padding:0;">
+        <img src="cora-creator.jpeg" alt="Cora working at her resin art station"
+          style="width:100%; height:100%; object-fit:cover; object-position:center top; border-radius:24px;">
+      </div>
       <div class="about-text reveal">
         <h2>Meet the Creator</h2>
         <p>Hi, I'm <strong>Cora</strong>! I'm a young artist with a passion for bringing magical things to life. I started making resin art because I loved how you could trap color, glitter, and light inside something beautiful — like catching a little piece of a galaxy in your hands.</p>
