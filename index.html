@@ -272,8 +272,17 @@
 
     .products-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      grid-template-columns: repeat(4, 1fr);
       gap: 1.75rem;
+    }
+    @media (max-width: 1100px) {
+      .products-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 750px) {
+      .products-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 480px) {
+      .products-grid { grid-template-columns: 1fr; }
     }
     .product-card {
       background: var(--bg-card);
@@ -578,12 +587,12 @@
     <div class="hamburger" onclick="toggleMenu()" id="hamburger">
       <span></span><span></span><span></span>
     </div>
-    <a href="#home" class="nav-logo">Cora's Creations</a>
+    <a href="#pg1" onclick="showPage(1);return false;" class="nav-logo">Cora's Creations</a>
     <ul class="nav-links">
-      <li><a href="#shop">Shop</a></li>
-      <li><a href="#about">About</a></li>
-      <li><a href="#custom">Custom Orders</a></li>
-      <li><a href="#contact">Contact</a></li>
+      <li><a href="#pg2" onclick="showPage(2);return false;">Shop</a></li>
+      <li><a href="#pg3" onclick="showPage(3);return false;">About</a></li>
+      <li><a href="#pg4" onclick="showPage(4);return false;">Custom Orders</a></li>
+      <li><a href="#pg5" onclick="showPage(5);return false;">Contact</a></li>
     </ul>
     <!-- Cart on RIGHT -->
     <div class="nav-right">
@@ -613,11 +622,13 @@
 
 <!-- Mobile Menu — slides from left -->
 <div class="mobile-menu" id="mobileMenu">
-  <a href="#shop"   onclick="toggleMenu()">🛍️ Shop</a>
-  <a href="#about"  onclick="toggleMenu()">🧙‍♀️ About</a>
-  <a href="#custom" onclick="toggleMenu()">✨ Custom Orders</a>
-  <a href="#contact"onclick="toggleMenu()">📧 Contact</a>
+  <a href="#pg2" onclick="showPage(2);toggleMenu()">🛍️ Shop</a>
+  <a href="#pg3" onclick="showPage(3);toggleMenu()">🧙‍♀️ About</a>
+  <a href="#pg4" onclick="showPage(4);toggleMenu()">✨ Custom Orders</a>
+  <a href="#pg5" onclick="showPage(5);toggleMenu()">📧 Contact</a>
 </div>
+
+<div class="page-section active" id="pg1">
 
 <!-- HERO -->
 <section class="hero" id="home">
@@ -632,8 +643,8 @@
       and fantastical 3D printed treasures, made with love.
     </p>
     <div class="cta-buttons">
-      <a href="#shop" class="btn btn-primary">Shop the Collection</a>
-      <a href="#custom" class="btn btn-secondary">Custom Orders</a>
+      <a href="#pg2" onclick="showPage(2);return false;" class="btn btn-primary">Shop the Collection</a>
+      <a href="#pg4" onclick="showPage(4);return false;" class="btn btn-secondary">Custom Orders</a>
     </div>
   </div>
 </section>
@@ -647,59 +658,63 @@
       <p>Every piece is handcrafted with care — no two are exactly alike.</p>
     </div>
     <div class="categories-grid">
-      <a href="#shop" onclick="filterBySection('containers')" class="category-card reveal">
-        <img src="IMG_1806.jpeg" alt="Containers" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;margin-bottom:1rem;">
+      <a href='#pg2' onclick=\"filterBySection('containers')\" class="category-card reveal">
+        <img loading="lazy" src="IMG_1806.jpeg" alt="Containers" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;margin-bottom:1rem;">
         <h3>Containers</h3>
         <p>Beautifully crafted resin lidded containers — perfect for storage and display.</p>
       </a>
-      <a href="#shop" onclick="filterBySection('coasters')" class="category-card reveal">
-        <img src="doublebutterfly.jpeg" alt="Coasters" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;margin-bottom:1rem;">
+      <a href='#pg2' onclick=\"filterBySection('coasters')\" class="category-card reveal">
+        <img loading="lazy" src="doublebutterfly.jpeg" alt="Coasters" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;margin-bottom:1rem;">
         <h3>Coasters</h3>
         <p>Resin coasters in every style — from butterflies to galaxies.</p>
       </a>
-      <a href="#shop" onclick="filterBySection('animal-molds')" class="category-card reveal">
-        <img src="Animal1.jpeg" alt="Animal Molds" style="width:100%;aspect-ratio:1;object-fit:cover;object-position:top;border-radius:10px;margin-bottom:1rem;">
+      <a href='#pg2' onclick=\"filterBySection('animal-molds')\" class="category-card reveal">
+        <img loading="lazy" src="Animal1.jpeg" alt="Animal Molds" style="width:100%;aspect-ratio:1;object-fit:cover;object-position:top;border-radius:10px;margin-bottom:1rem;">
         <h3>Animal Figures</h3>
         <p>Handcrafted resin animal figures — each one unique and full of personality.</p>
       </a>
-      <a href="#shop" onclick="filterBySection('serving-trays')" class="category-card reveal">
-        <img src="IMG_1189.jpeg" alt="Serving Trays" style="width:100%;aspect-ratio:1;object-fit:cover;object-position:center 20%;border-radius:10px;margin-bottom:1rem;">
+      <a href='#pg2' onclick=\"filterBySection('serving-trays')\" class="category-card reveal">
+        <img loading="lazy" src="IMG_1189.jpeg" alt="Serving Trays" style="width:100%;aspect-ratio:1;object-fit:cover;object-position:center 20%;border-radius:10px;margin-bottom:1rem;">
         <h3>Serving Trays</h3>
         <p>Stunning resin serving trays — functional art for your home.</p>
       </a>
-      <a href="#shop" onclick="filterBySection('trinket-dishes')" class="category-card reveal">
-        <img src="IMG_1172.jpeg" alt="Trinket Dishes" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;margin-bottom:1rem;">
+      <a href='#pg2' onclick=\"filterBySection('trinket-dishes')\" class="category-card reveal">
+        <img loading="lazy" src="IMG_1172.jpeg" alt="Trinket Dishes" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;margin-bottom:1rem;">
         <h3>Trinket Dishes</h3>
         <p>Resin dishes, bowls, and heart trays — beautiful homes for little treasures.</p>
       </a>
-      <a href="#shop" onclick="filterBySection('labels')" class="category-card reveal">
-        <img src="Bag2.jpeg" alt="Labels &amp; Tags" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;margin-bottom:1rem;">
+      <a href='#pg2' onclick=\"filterBySection('labels')\" class="category-card reveal">
+        <img loading="lazy" src="Bag2.jpeg" alt="Labels &amp; Tags" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;margin-bottom:1rem;">
         <h3>Labels &amp; Tags</h3>
         <p>Handmade resin and 3D printed bag tags — cute, colorful, and totally unique.</p>
       </a>
-      <a href="#shop" onclick="filterBySection('seasonal')" class="category-card reveal">
-        <img src="Season2.jpeg" alt="Seasonal" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;margin-bottom:1rem;">
+      <a href='#pg2' onclick=\"filterBySection('seasonal')\" class="category-card reveal">
+        <img loading="lazy" src="Season2.jpeg" alt="Seasonal" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;margin-bottom:1rem;">
         <h3>Seasonal</h3>
         <p>Holiday and seasonal creations — Halloween, Christmas, and more.</p>
       </a>
-      <a href="#shop" onclick="filterBySection('3d-dragons')" class="category-card reveal">
-        <img src="Dragon1.jpeg" alt="3D Printed Dragons" style="width:100%;aspect-ratio:1;object-fit:cover;object-position:top;border-radius:10px;margin-bottom:1rem;">
+      <a href='#pg2' onclick=\"filterBySection('3d-dragons')\" class="category-card reveal">
+        <img loading="lazy" src="Dragon1.jpeg" alt="3D Printed Dragons" style="width:100%;aspect-ratio:1;object-fit:cover;object-position:top;border-radius:10px;margin-bottom:1rem;">
         <h3>3D Printed Dragons</h3>
         <p>Articulated and decorative dragons fresh off the printer — collectible &amp; poseable.</p>
       </a>
-      <a href="#shop" onclick="filterBySection('3d-animals')" class="category-card reveal">
-        <img src="3dAnimal1.jpeg" alt="3D Animals" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;margin-bottom:1rem;">
+      <a href='#pg2' onclick=\"filterBySection('3d-animals')\" class="category-card reveal">
+        <img loading="lazy" src="3dAnimal1.jpeg" alt="3D Animals" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;margin-bottom:1rem;">
         <h3>3D Printed Animals</h3>
         <p>Fully articulated 3D printed animals — pandas, gorillas, and more.</p>
       </a>
-      <a href="#shop" onclick="filterBySection('fidget-spinners')" class="category-card reveal">
-        <img src="Fidget1.jpeg" alt="Fidgets" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;margin-bottom:1rem;">
+      <a href='#pg2' onclick=\"filterBySection('fidget-spinners')\" class="category-card reveal">
+        <img loading="lazy" src="Fidget1.jpeg" alt="Fidgets" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;margin-bottom:1rem;">
         <h3>Fidgets</h3>
         <p>Custom 3D printed fidget spinners and fidgets — satisfying, stylish, unique.</p>
       </a>
     </div>
   </div>
 </section>
+
+</div><!-- /pg1 -->
+
+<div class="page-section" id="pg2">
 
 <!-- SHOP -->
 <section id="shop">
@@ -721,7 +736,7 @@
 
       <!-- Containers -->
       <div class="product-card reveal" data-category="resin" data-section="containers">
-        <div class="product-img"><img src="IMG_1806.jpeg" alt="Dragon Scale Lidded Container" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="IMG_1806.jpeg" alt="Dragon Scale Lidded Container" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Dragon Scale Lidded Container</h3>
@@ -734,7 +749,7 @@
       </div>
 
       <div class="product-card reveal" data-category="resin" data-section="containers">
-        <div class="product-img"><img src="IMG_1190.jpeg" alt="Coral Dragon Scale Container" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="IMG_1190.jpeg" alt="Coral Dragon Scale Container" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Coral Dragon Scale Container</h3>
@@ -749,7 +764,7 @@
 
       <!-- Coasters -->
       <div class="product-card reveal" data-category="resin" data-section="coasters">
-        <div class="product-img"><img src="IMG_1147.jpeg" alt="Monarch Butterfly Coaster" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="IMG_1147.jpeg" alt="Monarch Butterfly Coaster" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Monarch Butterfly Coaster</h3>
@@ -763,7 +778,7 @@
       </div>
 
       <div class="product-card reveal" data-category="resin" data-section="coasters">
-        <div class="product-img"><img src="doublebutterfly.jpeg" alt="Double Monarch Coaster" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="doublebutterfly.jpeg" alt="Double Monarch Coaster" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Double Monarch Coaster</h3>
@@ -777,7 +792,7 @@
       </div>
 
       <div class="product-card reveal" data-category="resin" data-section="coasters">
-        <div class="product-img"><img src="Coaster1.jpeg" alt="Midnight Blue Glitter Coaster" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="Coaster1.jpeg" alt="Midnight Blue Glitter Coaster" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Midnight Blue Glitter Coaster</h3>
@@ -791,7 +806,7 @@
       </div>
 
       <div class="product-card reveal" data-category="resin" data-section="coasters">
-        <div class="product-img"><img src="Coaster2.jpeg" alt="Autumn Ruffled Coaster" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="Coaster2.jpeg" alt="Autumn Ruffled Coaster" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Autumn Ruffled Coaster</h3>
@@ -805,7 +820,7 @@
       </div>
 
       <div class="product-card reveal" data-category="resin" data-section="coasters">
-        <div class="product-img"><img src="IMG_1162.jpeg" alt="Violet Galaxy Coaster" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="IMG_1162.jpeg" alt="Violet Galaxy Coaster" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Violet Galaxy Coaster</h3>
@@ -819,7 +834,7 @@
       </div>
 
       <div class="product-card reveal" data-category="resin" data-section="coasters">
-        <div class="product-img"><img src="IMG_1197.jpeg" alt="Sweet Heart Coaster" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="IMG_1197.jpeg" alt="Sweet Heart Coaster" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Sweet Heart Coaster</h3>
@@ -833,7 +848,7 @@
       </div>
 
       <div class="product-card reveal" data-category="resin" data-section="coasters">
-        <div class="product-img"><img src="coaster-butterfly.jpeg" alt="Butterfly Coaster" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="coaster-butterfly.jpeg" alt="Butterfly Coaster" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Butterfly Coaster</h3>
@@ -848,7 +863,7 @@
 
       <!-- Animal Molds -->
       <div class="product-card reveal" data-category="resin" data-section="animal-molds">
-        <div class="product-img"><img src="Animal1.jpeg" alt="Spotted Bull" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="Animal1.jpeg" alt="Spotted Bull" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Spotted Bull</h3>
@@ -861,7 +876,7 @@
       </div>
 
         <div class="product-card reveal" data-category="resin" data-section="animal-molds">
-          <div class="product-img"><img src="Animal2.jpeg" alt="Fiery Axolotl" style="width:100%;height:100%;object-fit:cover;"></div>
+          <div class="product-img"><img loading="lazy" src="Animal2.jpeg" alt="Fiery Axolotl" style="width:100%;height:100%;object-fit:cover;"></div>
           <div class="product-body">
             <span class="product-tag tag-resin">Resin</span>
             <h3>Fiery Axolotl</h3>
@@ -875,7 +890,7 @@
       </div>
 
       <div class="product-card reveal" data-category="resin" data-section="animal-molds">
-        <div class="product-img"><img src="animal3.jpeg" alt="Amber Fox" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="animal3.jpeg" alt="Amber Fox" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Amber Fox</h3>
@@ -888,7 +903,7 @@
       </div>
 
       <div class="product-card reveal" data-category="resin" data-section="animal-molds">
-        <div class="product-img"><img src="Animal4.jpeg" alt="Midnight Panther" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="Animal4.jpeg" alt="Midnight Panther" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Midnight Panther</h3>
@@ -901,7 +916,7 @@
       </div>
 
       <div class="product-card reveal" data-category="resin" data-section="animal-molds">
-        <div class="product-img"><img src="IMG_1160.jpeg" alt="Ruby Cat" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="IMG_1160.jpeg" alt="Ruby Cat" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Ruby Cat</h3>
@@ -914,7 +929,7 @@
       </div>
 
         <div class="product-card reveal" data-category="resin" data-section="animal-molds">
-          <div class="product-img"><img src="IMG_1169.jpeg" alt="Sunburst Axolotl" style="width:100%;height:100%;object-fit:cover;"></div>
+          <div class="product-img"><img loading="lazy" src="IMG_1169.jpeg" alt="Sunburst Axolotl" style="width:100%;height:100%;object-fit:cover;"></div>
           <div class="product-body">
             <span class="product-tag tag-resin">Resin</span>
             <h3>Sunburst Axolotl</h3>
@@ -929,7 +944,7 @@
 
       <!-- Trinket Dishes -->
       <div class="product-card reveal" data-category="resin" data-section="trinket-dishes">
-        <div class="product-img"><img src="IMG_1145.jpeg" alt="Pastel Bloom Trinket Dish" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="IMG_1145.jpeg" alt="Pastel Bloom Trinket Dish" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Pastel Bloom Trinket Dish</h3>
@@ -942,7 +957,7 @@
       </div>
 
       <div class="product-card reveal" data-category="resin" data-section="trinket-dishes">
-        <div class="product-img"><img src="IMG_1170.jpeg" alt="Stardust Bear Dish" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="IMG_1170.jpeg" alt="Stardust Bear Dish" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Stardust Tray</h3>
@@ -955,7 +970,7 @@
       </div>
 
       <div class="product-card reveal" data-category="resin" data-section="trinket-dishes">
-        <div class="product-img"><img src="IMG_1172.jpeg" alt="Pressed Rose Heart Dish" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="IMG_1172.jpeg" alt="Pressed Rose Heart Dish" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Pressed Rose Heart Dish</h3>
@@ -968,7 +983,7 @@
       </div>
 
       <div class="product-card reveal" data-category="resin" data-section="trinket-dishes">
-        <div class="product-img"><img src="IMG_1173.jpeg" alt="Flower Heart Dish" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="IMG_1173.jpeg" alt="Flower Heart Dish" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Flower Heart Dish</h3>
@@ -981,7 +996,7 @@
       </div>
 
       <div class="product-card reveal" data-category="resin" data-section="trinket-dishes">
-        <div class="product-img"><img src="IMG_1174.jpeg" alt="Galaxy Square Dish" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="IMG_1174.jpeg" alt="Galaxy Square Dish" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Galaxy Square Dish</h3>
@@ -994,7 +1009,7 @@
       </div>
 
       <div class="product-card reveal" data-category="resin" data-section="trinket-dishes">
-        <div class="product-img"><img src="IMG_1175.jpeg" alt="Golden Bee Dish" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="IMG_1175.jpeg" alt="Golden Bee Dish" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Golden Bee Dish</h3>
@@ -1007,7 +1022,7 @@
       </div>
 
       <div class="product-card reveal" data-category="resin" data-section="trinket-dishes">
-        <div class="product-img"><img src="IMG_1177.jpeg" alt="Pressed Flower Hex Dish" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="IMG_1177.jpeg" alt="Pressed Flower Hex Dish" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Pressed Flower Hex Dish</h3>
@@ -1020,7 +1035,7 @@
       </div>
 
       <div class="product-card reveal" data-category="resin" data-section="trinket-dishes">
-        <div class="product-img"><img src="IMG_1182.jpeg" alt="Amethyst Bloom Bowl" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="IMG_1182.jpeg" alt="Amethyst Bloom Bowl" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Amethyst Bloom Bowl</h3>
@@ -1033,7 +1048,7 @@
       </div>
 
       <div class="product-card reveal" data-category="resin" data-section="trinket-dishes">
-        <div class="product-img"><img src="IMG_1183.jpeg" alt="Checker Petal Bowl" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="IMG_1183.jpeg" alt="Checker Petal Bowl" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Checker Petal Bowl</h3>
@@ -1046,7 +1061,7 @@
       </div>
 
         <div class="product-card reveal" data-category="resin" data-section="trinket-dishes">
-          <div class="product-img"><img src="IMG_1195.jpeg" alt="Sky Blue Bud Makeup Holder" style="width:100%;height:100%;object-fit:cover;"></div>
+          <div class="product-img"><img loading="lazy" src="IMG_1195.jpeg" alt="Sky Blue Bud Makeup Holder" style="width:100%;height:100%;object-fit:cover;"></div>
           <div class="product-body">
             <span class="product-tag tag-resin">Resin</span>
             <h3>Sky Blue Bud Makeup Holder</h3>
@@ -1060,7 +1075,7 @@
       </div>
 
         <div class="product-card reveal" data-category="resin" data-section="trinket-dishes">
-          <div class="product-img"><img src="IMG_1196.jpeg" alt="Ocean Spoon Rest" style="width:100%;height:100%;object-fit:cover;"></div>
+          <div class="product-img"><img loading="lazy" src="IMG_1196.jpeg" alt="Ocean Spoon Rest" style="width:100%;height:100%;object-fit:cover;"></div>
           <div class="product-body">
             <span class="product-tag tag-resin">Resin</span>
             <h3>Ocean Spoon Rest</h3>
@@ -1074,7 +1089,7 @@
       </div>
 
       <div class="product-card reveal" data-category="resin" data-section="trinket-dishes">
-        <div class="product-img"><img src="IMG_1181.jpeg" alt="Bow Tag" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="IMG_1181.jpeg" alt="Bow Tag" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Bow Tag</h3>
@@ -1088,7 +1103,7 @@
 
       <!-- Serving Trays -->
       <div class="product-card reveal" data-category="resin" data-section="serving-trays">
-        <div class="product-img"><img src="IMG_1148.jpeg" alt="Whirlpool Serving Board" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="IMG_1148.jpeg" alt="Whirlpool Serving Board" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Whirlpool Serving Board</h3>
@@ -1101,7 +1116,7 @@
       </div>
 
       <div class="product-card reveal" data-category="resin" data-section="serving-trays">
-        <div class="product-img"><img src="IMG_1185.jpeg" alt="Black Gold Charcuterie Board" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="IMG_1185.jpeg" alt="Black Gold Charcuterie Board" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Black Gold Charcuterie Board</h3>
@@ -1114,7 +1129,7 @@
       </div>
 
       <div class="product-card reveal" data-category="resin" data-section="serving-trays">
-        <div class="product-img"><img src="IMG_1186.jpeg" alt="Botanical Garden Board" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="IMG_1186.jpeg" alt="Botanical Garden Board" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Botanical Garden Board</h3>
@@ -1127,7 +1142,7 @@
       </div>
 
       <div class="product-card reveal" data-category="resin" data-section="serving-trays">
-        <div class="product-img"><img src="IMG_1188.jpeg" alt="Peacock &amp; Butterfly Board" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="IMG_1188.jpeg" alt="Peacock &amp; Butterfly Board" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Peacock &amp; Butterfly Board</h3>
@@ -1140,7 +1155,7 @@
       </div>
 
         <div class="product-card reveal" data-category="resin" data-section="serving-trays">
-          <div class="product-img"><img src="IMG_1189.jpeg" alt="Honeybee Serving Tray" style="width:100%;height:100%;object-fit:cover;"></div>
+          <div class="product-img"><img loading="lazy" src="IMG_1189.jpeg" alt="Honeybee Serving Tray" style="width:100%;height:100%;object-fit:cover;"></div>
           <div class="product-body">
             <span class="product-tag tag-resin">Resin</span>
             <h3>Honeybee Serving Tray</h3>
@@ -1154,7 +1169,7 @@
       </div>
 
         <div class="product-card reveal" data-category="resin" data-section="serving-trays">
-          <div class="product-img"><img src="IMG_1191.jpeg" alt="Copper Bloom Serving Tray" style="width:100%;height:100%;object-fit:cover;"></div>
+          <div class="product-img"><img loading="lazy" src="IMG_1191.jpeg" alt="Copper Bloom Serving Tray" style="width:100%;height:100%;object-fit:cover;"></div>
           <div class="product-body">
             <span class="product-tag tag-resin">Resin</span>
             <h3>Copper Bloom Serving Tray</h3>
@@ -1169,7 +1184,7 @@
 
         <div class="product-card reveal" data-category="resin" data-section="serving-trays">
           <div class="product-img" style="background:#000;">
-            <img src="IMG_1193.jpeg" alt="Coffee Bean Tray" style="width:100%;height:100%;object-fit:cover;object-position:center top;">
+            <img loading="lazy" src="IMG_1193.jpeg" alt="Coffee Bean Tray" style="width:100%;height:100%;object-fit:cover;object-position:center top;">
           </div>
           <div class="product-body">
             <span class="product-tag tag-resin">Resin</span>
@@ -1185,7 +1200,7 @@
 
       <!-- Labels & Tags -->
       <div class="product-card reveal" data-category="resin" data-section="labels">
-        <div class="product-img"><img src="Bag1.jpeg" alt="Teal Shimmer Bag Tag" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="Bag1.jpeg" alt="Teal Shimmer Bag Tag" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Teal Shimmer Bag Tag</h3>
@@ -1198,7 +1213,7 @@
       </div>
 
       <div class="product-card reveal" data-category="resin" data-section="labels">
-        <div class="product-img"><img src="Bag2.jpeg" alt="Green Cat Bag Tag" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="Bag2.jpeg" alt="Green Cat Bag Tag" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Green Cat Bag Tag</h3>
@@ -1211,7 +1226,7 @@
       </div>
 
       <div class="product-card reveal" data-category="resin" data-section="labels">
-        <div class="product-img"><img src="Bag3.jpeg" alt="Sunset Bag Tag" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="Bag3.jpeg" alt="Sunset Bag Tag" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Sunset Bag Tag</h3>
@@ -1224,7 +1239,7 @@
       </div>
 
       <div class="product-card reveal" data-category="resin" data-section="labels">
-        <div class="product-img"><img src="IMG_1178.jpeg" alt="Confetti Slim Tag" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="IMG_1178.jpeg" alt="Confetti Slim Tag" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Confetti Slim Tag</h3>
@@ -1237,7 +1252,7 @@
       </div>
 
       <div class="product-card reveal" data-category="resin" data-section="labels">
-        <div class="product-img"><img src="IMG_1179.jpeg" alt="Scalloped Confetti Tag" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="IMG_1179.jpeg" alt="Scalloped Confetti Tag" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Scalloped Confetti Tag</h3>
@@ -1250,7 +1265,7 @@
       </div>
 
       <div class="product-card reveal" data-category="resin" data-section="labels">
-        <div class="product-img"><img src="IMG_1198.jpeg" alt="Custom Name Tag" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="IMG_1198.jpeg" alt="Custom Name Tag" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Custom Name Tag</h3>
@@ -1263,7 +1278,7 @@
       </div>
 
       <div class="product-card reveal" data-category="resin" data-section="labels">
-        <div class="product-img"><img src="IMG_1200.jpeg" alt="Colorful Dot Tag" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="IMG_1200.jpeg" alt="Colorful Dot Tag" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Colorful Dot Tag</h3>
@@ -1276,7 +1291,7 @@
       </div>
 
       <div class="product-card reveal" data-category="3d" data-section="labels">
-        <div class="product-img"><img src="IMG_1157.jpeg" alt="Spider Tag" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="IMG_1157.jpeg" alt="Spider Tag" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-3d">3D Printed</span>
           <h3>Spider Tag</h3>
@@ -1289,7 +1304,7 @@
       </div>
 
       <div class="product-card reveal" data-category="3d" data-section="labels">
-        <div class="product-img"><img src="IMG_1167.jpeg" alt="Ornate Frame Tag" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="IMG_1167.jpeg" alt="Ornate Frame Tag" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-3d">3D Printed</span>
           <h3>Ornate Frame Tag</h3>
@@ -1303,7 +1318,7 @@
 
       <!-- Seasonal -->
       <div class="product-card reveal" data-category="resin" data-section="seasonal">
-        <div class="product-img"><img src="season1.jpeg" alt="Halloween Spooky Coaster" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="season1.jpeg" alt="Halloween Spooky Coaster" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Halloween Spooky Coaster</h3>
@@ -1316,7 +1331,7 @@
       </div>
 
       <div class="product-card reveal" data-category="resin" data-section="seasonal">
-        <div class="product-img"><img src="IMG_1199.jpeg" alt="Halloween Ghost Tag" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="IMG_1199.jpeg" alt="Halloween Ghost Tag" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Halloween Ghost Tag</h3>
@@ -1329,7 +1344,7 @@
       </div>
 
       <div class="product-card reveal" data-category="resin" data-section="seasonal">
-        <div class="product-img"><img src="IMG_1156.jpeg" alt="Skull &amp; Crossbones Tombstone" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="IMG_1156.jpeg" alt="Skull &amp; Crossbones Tombstone" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Skull &amp; Crossbones Tombstone</h3>
@@ -1342,7 +1357,7 @@
       </div>
 
       <div class="product-card reveal" data-category="resin" data-section="seasonal">
-        <div class="product-img"><img src="IMG_1168.jpeg" alt="RIP Tombstone" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="IMG_1168.jpeg" alt="RIP Tombstone" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>RIP Tombstone</h3>
@@ -1355,7 +1370,7 @@
       </div>
 
       <div class="product-card reveal" data-category="resin" data-section="seasonal">
-        <div class="product-img"><img src="season4.jpeg" alt="Here Lies Tombstone" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="season4.jpeg" alt="Here Lies Tombstone" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Here Lies Tombstone</h3>
@@ -1368,7 +1383,7 @@
       </div>
 
       <div class="product-card reveal" data-category="resin" data-section="seasonal">
-        <div class="product-img"><img src="Season2.jpeg" alt="Crystal Christmas Tree Gnome" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="Season2.jpeg" alt="Crystal Christmas Tree Gnome" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Crystal Christmas Tree Gnome</h3>
@@ -1381,7 +1396,7 @@
       </div>
 
       <div class="product-card reveal" data-category="resin" data-section="seasonal">
-        <div class="product-img"><img src="IMG_1159.jpeg" alt="Rosy Christmas Tree Gnome" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="IMG_1159.jpeg" alt="Rosy Christmas Tree Gnome" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Rosy Christmas Tree Gnome</h3>
@@ -1394,7 +1409,7 @@
       </div>
 
       <div class="product-card reveal" data-category="resin" data-section="seasonal">
-        <div class="product-img"><img src="IMG_1163.jpeg" alt="Christmas Gnome with Gift" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="IMG_1163.jpeg" alt="Christmas Gnome with Gift" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Christmas Gnome with Gift</h3>
@@ -1407,7 +1422,7 @@
       </div>
 
       <div class="product-card reveal" data-category="resin" data-section="seasonal">
-        <div class="product-img"><img src="Season3.jpeg" alt="Halloween Black Cat" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="Season3.jpeg" alt="Halloween Black Cat" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Halloween Black Cat</h3>
@@ -1420,7 +1435,7 @@
       </div>
 
       <div class="product-card reveal" data-category="resin" data-section="seasonal">
-        <div class="product-img"><img src="IMG_1166.jpeg" alt="Peppermint Square Dish" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="IMG_1166.jpeg" alt="Peppermint Square Dish" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Peppermint Square Dish</h3>
@@ -1433,7 +1448,7 @@
       </div>
 
       <div class="product-card reveal" data-category="resin" data-section="seasonal">
-        <div class="product-img"><img src="IMG_1171.jpeg" alt="Candy Cane Heart Dish" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="IMG_1171.jpeg" alt="Candy Cane Heart Dish" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Candy Cane Heart Dish</h3>
@@ -1446,7 +1461,7 @@
       </div>
 
         <div class="product-card reveal" data-category="resin" data-section="seasonal">
-          <div class="product-img"><img src="IMG_1176.jpeg" alt="Candy Cane Coaster Set" style="width:100%;height:100%;object-fit:cover;"></div>
+          <div class="product-img"><img loading="lazy" src="IMG_1176.jpeg" alt="Candy Cane Coaster Set" style="width:100%;height:100%;object-fit:cover;"></div>
           <div class="product-body">
             <span class="product-tag tag-resin">Resin</span>
             <h3>Candy Cane Coaster Set</h3>
@@ -1460,7 +1475,7 @@
       </div>
 
         <div class="product-card reveal" data-category="resin" data-section="seasonal">
-          <div class="product-img"><img src="IMG_1194.jpeg" alt="Candy Cane Holiday Tray" style="width:100%;height:100%;object-fit:cover;"></div>
+          <div class="product-img"><img loading="lazy" src="IMG_1194.jpeg" alt="Candy Cane Holiday Tray" style="width:100%;height:100%;object-fit:cover;"></div>
           <div class="product-body">
             <span class="product-tag tag-resin">Resin</span>
             <h3>Candy Cane Holiday Tray</h3>
@@ -1474,7 +1489,7 @@
       </div>
 
       <div class="product-card reveal" data-category="resin" data-section="seasonal">
-        <div class="product-img"><img src="IMG_1201.jpeg" alt="Peppermint Petal Bowl" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="IMG_1201.jpeg" alt="Peppermint Petal Bowl" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Peppermint Petal Bowl</h3>
@@ -1487,7 +1502,7 @@
       </div>
 
       <div class="product-card reveal" data-category="resin" data-section="seasonal">
-        <div class="product-img"><img src="IMG_1184.jpeg" alt="Rudolph Reindeer" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="IMG_1184.jpeg" alt="Rudolph Reindeer" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Rudolph Reindeer</h3>
@@ -1500,7 +1515,7 @@
       </div>
 
       <div class="product-card reveal" data-category="resin" data-section="seasonal">
-        <div class="product-img"><img src="IMG_1187.jpeg" alt="Lucky Shamrock Board" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="IMG_1187.jpeg" alt="Lucky Shamrock Board" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Lucky Shamrock Board</h3>
@@ -1514,7 +1529,7 @@
 
       <!-- 3D Dragons -->
         <div class="product-card reveal" data-category="3d" data-section="3d-dragons">
-          <div class="product-img"><img src="Dragon1.jpeg" alt="Crystal Blue Articulated Dragon" style="width:100%;height:100%;object-fit:cover;"></div>
+          <div class="product-img"><img loading="lazy" src="Dragon1.jpeg" alt="Crystal Blue Articulated Dragon" style="width:100%;height:100%;object-fit:cover;"></div>
           <div class="product-body">
             <span class="product-tag tag-3d">3D Printed</span>
             <h3>Crystal Blue Articulated Dragon</h3>
@@ -1529,8 +1544,8 @@
 
       <div class="product-card reveal" data-category="3d" data-section="3d-dragons">
           <div class="product-img" style="display:flex;gap:2px;background:#000;">
-            <img src="Dragon2.1.jpeg" alt="Ice Dragon Display" style="width:50%;height:100%;object-fit:contain;background:#0a0612;">
-            <img src="Dragon2.2.jpeg" alt="Ice Dragon Display angle 2" style="width:50%;height:100%;object-fit:contain;background:#0a0612;">
+            <img loading="lazy" src="Dragon2.1.jpeg" alt="Ice Dragon Display" style="width:50%;height:100%;object-fit:contain;background:#0a0612;">
+            <img loading="lazy" src="Dragon2.2.jpeg" alt="Ice Dragon Display angle 2" style="width:50%;height:100%;object-fit:contain;background:#0a0612;">
           </div>
           <div class="product-body">
             <span class="product-tag tag-3d">3D Printed</span>
@@ -1545,7 +1560,7 @@
 
       <!-- 3D Animals -->
       <div class="product-card reveal" data-category="3d" data-section="3d-animals">
-        <div class="product-img"><img src="3dAnimal1.jpeg" alt="White Articulated Panda" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="3dAnimal1.jpeg" alt="White Articulated Panda" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-3d">3D Printed</span>
           <h3>White Articulated Panda</h3>
@@ -1558,7 +1573,7 @@
       </div>
 
       <div class="product-card reveal" data-category="3d" data-section="3d-animals">
-        <div class="product-img"><img src="3danimal2.jpeg" alt="Blue Articulated Panda" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="3danimal2.jpeg" alt="Blue Articulated Panda" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-3d">3D Printed</span>
           <h3>Blue Articulated Panda</h3>
@@ -1572,7 +1587,7 @@
 
       <!-- 3D Castle -->
         <div class="product-card reveal" data-category="3d" data-section="3d-animals">
-          <div class="product-img"><img src="Castle1.jpeg" alt="Fantasy Castle Display" style="width:100%;height:100%;object-fit:cover;"></div>
+          <div class="product-img"><img loading="lazy" src="Castle1.jpeg" alt="Fantasy Castle Display" style="width:100%;height:100%;object-fit:cover;"></div>
           <div class="product-body">
             <span class="product-tag tag-3d">3D Printed</span>
             <h3>Fantasy Castle Display</h3>
@@ -1587,7 +1602,7 @@
 
       <!-- Fidget Spinners -->
       <div class="product-card reveal" data-category="3d" data-section="fidget-spinners">
-        <div class="product-img"><img src="Fidget1.jpeg" alt="Red 3-Blade Spinner" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="Fidget1.jpeg" alt="Red 3-Blade Spinner" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-3d">3D Printed</span>
           <h3>Red 3-Blade Spinner</h3>
@@ -1600,7 +1615,7 @@
       </div>
 
       <div class="product-card reveal" data-category="3d" data-section="fidget-spinners">
-        <div class="product-img"><img src="Fidget2.jpeg" alt="Red Gyro Fidget" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="Fidget2.jpeg" alt="Red Gyro Fidget" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-3d">3D Printed</span>
           <h3>Red Gyro Fidget</h3>
@@ -1613,7 +1628,7 @@
       </div>
 
       <div class="product-card reveal" data-category="3d" data-section="fidget-spinners">
-        <div class="product-img"><img src="Fidget3.jpeg" alt="Pink Infinity Cube" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-img"><img loading="lazy" src="Fidget3.jpeg" alt="Pink Infinity Cube" style="width:100%;height:100%;object-fit:cover;"></div>
         <div class="product-body">
           <span class="product-tag tag-3d">3D Printed</span>
           <h3>Pink Infinity Cube</h3>
@@ -1627,8 +1642,8 @@
 
       <div class="product-card reveal" data-category="3d" data-section="fidget-spinners">
         <div class="product-img" style="display:flex;gap:2px;background:#000;">
-          <img src="Fidget3.1.jpeg" alt="Glow Dragon Wing Fidget" style="width:50%;height:100%;object-fit:contain;background:#0a0612;">
-          <img src="fidget3.2.jpeg" alt="Sunshine Fidget Ball" style="width:50%;height:100%;object-fit:contain;background:#0a0612;">
+          <img loading="lazy" src="Fidget3.1.jpeg" alt="Glow Dragon Wing Fidget" style="width:50%;height:100%;object-fit:contain;background:#0a0612;">
+          <img loading="lazy" src="fidget3.2.jpeg" alt="Sunshine Fidget Ball" style="width:50%;height:100%;object-fit:contain;background:#0a0612;">
         </div>
         <div class="product-body">
           <span class="product-tag tag-3d">3D Printed</span>
@@ -1976,12 +1991,16 @@
   </div>
 </section>
 
+</div><!-- /pg2 -->
+
+<div class="page-section" id="pg3">
+
 <!-- ABOUT -->
 <section id="about">
   <div class="section-inner">
     <div class="about-grid">
       <div class="about-visual reveal" style="overflow:hidden; padding:0;">
-        <img src="IMG_1873.jpeg" alt="Cora working at her resin art station"
+        <img loading="lazy" src="IMG_1873.jpeg" alt="Cora working at her resin art station"
           style="width:100%; height:100%; object-fit:cover; object-position:center top; border-radius:24px;">
       </div>
       <div class="about-text reveal">
@@ -2026,6 +2045,10 @@
     </div>
   </div>
 </section>
+
+</div><!-- /pg3 -->
+
+<div class="page-section" id="pg4">
 
 <!-- CUSTOM ORDER -->
 <section id="custom">
@@ -2124,6 +2147,10 @@
   </div>
 </section>
 
+</div><!-- /pg4 -->
+
+<div class="page-section" id="pg5">
+
 <!-- CONTACT -->
 <section id="contact">
   <div class="section-inner">
@@ -2170,6 +2197,28 @@
   <p style="margin-top:0.75rem; font-size:0.75rem;">Made with <span class="footer-heart">♥</span> &amp; a whole lot of glitter &nbsp;·&nbsp; © 2026 Cora's Creations</p>
 </footer>
 
+</div><!-- /pg5 -->
+
+
+<!-- Bottom Page Navigation -->
+<nav id="pageNav" aria-label="Page navigation">
+  <button class="page-nav-btn active" id="nav1" onclick="showPage(1)">
+    <span class="nav-icon">🏠</span>Shop
+  </button>
+  <button class="page-nav-btn" id="nav2" onclick="showPage(2)">
+    <span class="nav-icon">🛍️</span>Browse
+  </button>
+  <button class="page-nav-btn" id="nav3" onclick="showPage(3)">
+    <span class="nav-icon">🧙‍♀️</span>About
+  </button>
+  <button class="page-nav-btn" id="nav4" onclick="showPage(4)">
+    <span class="nav-icon">✨</span>Custom
+  </button>
+  <button class="page-nav-btn" id="nav5" onclick="showPage(5)">
+    <span class="nav-icon">📧</span>Contact
+  </button>
+</nav>
+
 </div><!-- /pageContent -->
 
 <script>
@@ -2202,6 +2251,21 @@
 
   // Scroll reveal disabled — all content visible by default
 
+
+  // ---- PAGINATION ----
+  let currentPage = 1;
+
+  function showPage(n) {
+    document.querySelectorAll('.page-section').forEach(function(p) { p.classList.remove('active'); });
+    var pg = document.getElementById('pg' + n);
+    if (pg) pg.classList.add('active');
+    document.querySelectorAll('.page-nav-btn').forEach(function(b) { b.classList.remove('active'); });
+    var navBtn = document.getElementById('nav' + n);
+    if (navBtn) navBtn.classList.add('active');
+    window.scrollTo(0, 0);
+    currentPage = n;
+  }
+
   // ---- PRODUCT FILTER ----
   function filterProducts(cat, btn) {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -2217,6 +2281,7 @@
 
   // Called by category cards — filter to a specific section then scroll to shop
   function filterBySection(section) {
+    showPage(2);
     // Clear tab active state since we're filtering more granularly
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.product-card').forEach(card => {
