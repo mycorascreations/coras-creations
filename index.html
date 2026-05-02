@@ -299,6 +299,12 @@
       display: flex; align-items: center; justify-content: center;
       font-size: 5rem;
       position: relative; overflow: hidden;
+      background: var(--bg-deep);
+    }
+    .product-img img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
     }
     .product-img::after {
       content: '';
@@ -874,16 +880,15 @@
         </div>
       </div>
 
-        <div class="product-card reveal" data-category="resin" data-section="animal-molds">
-          <div class="product-img"><img loading="lazy" src="Animal2.jpeg" alt="Fiery Axolotl" style="width:100%;height:100%;object-fit:cover;"></div>
-          <div class="product-body">
-            <span class="product-tag tag-resin">Resin</span>
-            <h3>Fiery Axolotl</h3>
-            <p>A striking resin axolotl with a dramatic red and orange flowing mane, deep glossy body, and vivid green base — fierce and magical.</p>
-            <div class="product-footer">
-              <span class="product-price">$12</span>
-              <button class="btn-cart" onclick="addedToCart(this,'Fiery Axolotl',12)">Add to Cart 🛒</button>
-            </div>
+      <div class="product-card reveal" data-category="resin" data-section="animal-molds">
+        <div class="product-img"><img loading="lazy" src="Animal2.jpeg" alt="Fiery Axolotl" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="product-body">
+          <span class="product-tag tag-resin">Resin</span>
+          <h3>Fiery Axolotl</h3>
+          <p>A striking resin axolotl with a dramatic red and orange flowing mane, deep glossy body, and vivid green base — fierce and magical.</p>
+          <div class="product-footer">
+            <span class="product-price">$12</span>
+            <button class="btn-cart" onclick="addedToCart(this,'Fiery Axolotl',12)">Add to Cart 🛒</button>
           </div>
         </div>
       </div>
