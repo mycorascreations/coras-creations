@@ -1848,24 +1848,6 @@
 </div><!-- /pg5 -->
 
 
-<!-- Bottom Page Navigation -->
-<nav id="pageNav" aria-label="Page navigation">
-  <button class="page-nav-btn active" id="nav1" onclick="showPage(1);setTimeout(function(){document.getElementById('categories').scrollIntoView({behavior:'smooth'});},50);">
-    <span class="nav-icon">🏷️</span>Products
-  </button>
-  <button class="page-nav-btn" id="nav2" onclick="showPage(2)">
-    <span class="nav-icon">🛍️</span>Catalog
-  </button>
-  <button class="page-nav-btn" id="nav3" onclick="showPage(3)">
-    <span class="nav-icon">🧙‍♀️</span>About
-  </button>
-  <button class="page-nav-btn" id="nav4" onclick="showPage(4)">
-    <span class="nav-icon">✨</span>Custom
-  </button>
-  <button class="page-nav-btn" id="nav5" onclick="showPage(5)">
-    <span class="nav-icon">📧</span>Contact
-  </button>
-</nav>
 
 </div><!-- /pageContent -->
 
@@ -1928,9 +1910,9 @@
       <div style="display:flex;flex-direction:column;gap:0.65rem;">
         <input id="sq-name" type="text" placeholder="Full Name" style="background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:0.7rem 0.9rem;color:var(--text-primary);font-size:0.9rem;width:100%;">
         <input id="sq-email" type="email" placeholder="Email Address" style="background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:0.7rem 0.9rem;color:var(--text-primary);font-size:0.9rem;width:100%;">
-        <div style="position:relative;">
+        <div class="autocomplete-wrap">
           <input id="sq-address" type="text" placeholder="Street Address" autocomplete="off" style="background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:0.7rem 0.9rem;color:var(--text-primary);font-size:0.9rem;width:100%;">
-          <div id="addrSuggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;z-index:50;max-height:180px;overflow-y:auto;"></div>
+          <div id="addressDropdown" class="autocomplete-list"></div>
         </div>
         <div style="display:grid;grid-template-columns:1fr 80px 90px;gap:0.5rem;">
           <input id="sq-city"  type="text" placeholder="City"  style="background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:0.7rem 0.9rem;color:var(--text-primary);font-size:0.9rem;">
@@ -1953,9 +1935,9 @@
     <div id="stepBilling" style="display:none;">
       <h3 style="font-family:'Cinzel',serif;color:var(--gold-light);font-size:1rem;margin-bottom:1rem;">💳 Billing Address</h3>
       <div style="display:flex;flex-direction:column;gap:0.65rem;">
-        <div style="position:relative;">
+        <div class="autocomplete-wrap">
           <input id="bill-address" type="text" placeholder="Street Address" autocomplete="off" style="background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:0.7rem 0.9rem;color:var(--text-primary);font-size:0.9rem;width:100%;">
-          <div id="billSuggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;z-index:50;max-height:180px;overflow-y:auto;"></div>
+          <div id="billAddressDropdown" class="autocomplete-list"></div>
         </div>
         <div style="display:grid;grid-template-columns:1fr 80px 90px;gap:0.5rem;">
           <input id="bill-city"  type="text" placeholder="City"  style="background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:0.7rem 0.9rem;color:var(--text-primary);font-size:0.9rem;">
@@ -1987,11 +1969,11 @@
         </div>
         <div id="paymentConfirmWrap" style="display:none;">
           <label style="display:flex;align-items:flex-start;gap:0.6rem;font-size:0.85rem;color:var(--text-muted);cursor:pointer;margin-bottom:0.75rem;">
-            <input id="paymentConfirmCheck" type="checkbox" onchange="toggleConfirmBtn(this)" style="margin-top:3px;accent-color:var(--purple);">
+            <input id="paymentConfirmCheck" type="checkbox" onchange="toggleConfirmBtn()" style="margin-top:3px;accent-color:var(--purple);">
             I have sent my Venmo payment to @Coras-Creations
           </label>
         </div>
-        <button onclick="document.getElementById('paymentConfirmWrap').style.display='block';this.style.display='none';" style="width:100%;padding:0.85rem;border:none;border-radius:12px;cursor:pointer;font-weight:700;background:linear-gradient(135deg,#008CFF,#0066cc);color:#fff;margin-bottom:0.5rem;">I've Sent Payment via Venmo ✓</button>
+        <button onclick="payWithVenmo()" style="width:100%;padding:0.85rem;border:none;border-radius:12px;cursor:pointer;font-weight:700;background:linear-gradient(135deg,#008CFF,#0066cc);color:#fff;margin-bottom:0.5rem;">Pay with Venmo 💙</button>
         <button id="confirmOrderBtn" onclick="confirmOrder('venmo')" disabled style="width:100%;padding:0.85rem;border:none;border-radius:12px;cursor:not-allowed;font-weight:700;background:linear-gradient(135deg,var(--purple),var(--rose));color:#fff;opacity:0.4;">Confirm Order</button>
         <p id="confirmOrderHint" style="font-size:0.75rem;color:var(--text-muted);text-align:center;margin-top:0.4rem;">Confirm only after sending Venmo payment</p>
       </div>
