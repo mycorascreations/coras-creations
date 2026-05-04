@@ -598,9 +598,9 @@
     <div class="hamburger" onclick="toggleMenu()" id="hamburger">
       <span></span><span></span><span></span>
     </div>
-    <a href="#pg1" onclick="showPage(1);return false;" class="nav-logo">Cora's Creations</a>
+    <a href="#pg1" onclick="showPage(1);window.scrollTo({top:0,behavior:'smooth'});return false;" class="nav-logo">Cora's Creations</a>
     <ul class="nav-links">
-      <li><a href="#pg1" onclick="showPage(1);return false;">Products</a></li>
+      <li><a href="#categories" onclick="showPage(1);setTimeout(function(){document.getElementById('categories').scrollIntoView({behavior:'smooth'});},50);return false;">Products</a></li>
       <li><a href="#pg2" onclick="showPage(2);return false;">Catalog</a></li>
       <li><a href="#pg3" onclick="showPage(3);return false;">About</a></li>
       <li><a href="#pg4" onclick="showPage(4);return false;">Custom Orders</a></li>
@@ -634,7 +634,7 @@
 
 <!-- Mobile Menu — slides from left -->
 <div class="mobile-menu" id="mobileMenu">
-  <a href="#pg1" onclick="showPage(1);toggleMenu()">🏷️ Products</a>
+  <a href="#categories" onclick="showPage(1);setTimeout(function(){document.getElementById('categories').scrollIntoView({behavior:'smooth'});},50);toggleMenu()">🏷️ Products</a>
   <a href="#pg2" onclick="showPage(2);toggleMenu()">🛍️ Catalog</a>
   <a href="#pg3" onclick="showPage(3);toggleMenu()">🧙‍♀️ About</a>
   <a href="#pg4" onclick="showPage(4);toggleMenu()">✨ Custom Orders</a>
@@ -655,10 +655,6 @@
       Where <strong>magic meets craft</strong> — unique resin art, enchanted home décor,<br>
       and fantastical 3D printed treasures, made with love.
     </p>
-    <div class="cta-buttons">
-      <a href="#pg2" onclick="showPage(2);return false;" class="btn btn-primary">Shop the Collection</a>
-      <a href="#pg4" onclick="showPage(4);return false;" class="btn btn-secondary">Custom Orders</a>
-    </div>
   </div>
 </section>
 
@@ -1854,7 +1850,7 @@
 
 <!-- Bottom Page Navigation -->
 <nav id="pageNav" aria-label="Page navigation">
-  <button class="page-nav-btn active" id="nav1" onclick="showPage(1)">
+  <button class="page-nav-btn active" id="nav1" onclick="showPage(1);setTimeout(function(){document.getElementById('categories').scrollIntoView({behavior:'smooth'});},50);">
     <span class="nav-icon">🏷️</span>Products
   </button>
   <button class="page-nav-btn" id="nav2" onclick="showPage(2)">
@@ -1872,6 +1868,154 @@
 </nav>
 
 </div><!-- /pageContent -->
+
+<!-- ===== CART OVERLAY ===== -->
+<div id="cartOverlay" onclick="closeCart()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:800;backdrop-filter:blur(4px);"></div>
+
+<!-- ===== CART DRAWER ===== -->
+<div id="cartDrawer" style="display:none;position:fixed;top:0;right:0;bottom:0;width:min(420px,100vw);background:var(--bg-mid);border-left:1px solid var(--border);z-index:900;overflow-y:auto;flex-direction:column;">
+
+  <!-- Header -->
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg-mid);z-index:10;">
+    <h2 style="font-family:'Cinzel',serif;font-size:1.1rem;color:var(--gold-light);margin:0;">🛒 Your Cart</h2>
+    <button onclick="closeCart()" style="background:none;border:none;color:var(--text-muted);font-size:1.5rem;cursor:pointer;line-height:1;">&times;</button>
+  </div>
+
+  <!-- Cart items view -->
+  <div id="checkoutFormWrap" style="padding:1rem 1.5rem;flex:1;">
+    <div id="cartEmpty" style="text-align:center;padding:3rem 1rem;color:var(--text-muted);">
+      <div style="font-size:3rem;margin-bottom:1rem;">🛒</div>
+      <p>Your cart is empty.<br>Add something magical!</p>
+    </div>
+    <div id="cartItems"></div>
+    <div id="checkoutSection" style="display:none;margin-top:1rem;">
+      <!-- Totals -->
+      <div style="border-top:1px solid var(--border);padding-top:1rem;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;font-size:0.9rem;">
+          <span style="color:var(--text-muted);">Subtotal</span>
+          <span id="cartSubtotal" style="color:var(--text-primary);font-weight:600;">$0.00</span>
+        </div>
+        <div id="coasterDiscountRow" style="display:none;justify-content:space-between;margin-bottom:0.5rem;font-size:0.9rem;">
+          <span style="color:var(--gold-light);">🎉 Coaster discount (25%)</span>
+          <span id="coasterDiscountAmt" style="color:var(--gold-light);font-weight:600;"></span>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;font-size:0.9rem;">
+          <span style="color:var(--text-muted);">Shipping</span>
+          <span id="cartShipping" style="color:var(--text-primary);font-weight:600;">$5.99</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:1.05rem;font-weight:700;border-top:1px solid var(--border);padding-top:0.75rem;margin-top:0.5rem;">
+          <span style="color:var(--text-primary);">Total</span>
+          <span id="cartTotal" style="color:var(--gold-light);">$0.00</span>
+        </div>
+        <p style="font-size:0.72rem;color:var(--text-muted);margin-top:0.4rem;">Free shipping on orders over $50</p>
+      </div>
+      <button onclick="showCheckoutForm()" style="
+        width:100%;margin-top:1rem;padding:0.9rem;border:none;border-radius:12px;cursor:pointer;font-size:1rem;font-weight:700;
+        background:linear-gradient(135deg,var(--purple),var(--rose));color:#fff;
+      ">Checkout ✨</button>
+      <div id="keepShoppingBar" style="text-align:center;margin-top:0.75rem;">
+        <button onclick="closeCart()" style="background:none;border:none;color:var(--text-muted);font-size:0.85rem;cursor:pointer;text-decoration:underline;">Keep Shopping</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Multi-step checkout form -->
+  <div id="paymentForm" style="display:none;padding:1rem 1.5rem;">
+
+    <!-- Step 1: Shipping -->
+    <div id="stepShipping">
+      <h3 style="font-family:'Cinzel',serif;color:var(--gold-light);font-size:1rem;margin-bottom:1rem;">📦 Shipping Address</h3>
+      <div style="display:flex;flex-direction:column;gap:0.65rem;">
+        <input id="sq-name" type="text" placeholder="Full Name" style="background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:0.7rem 0.9rem;color:var(--text-primary);font-size:0.9rem;width:100%;">
+        <input id="sq-email" type="email" placeholder="Email Address" style="background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:0.7rem 0.9rem;color:var(--text-primary);font-size:0.9rem;width:100%;">
+        <div style="position:relative;">
+          <input id="sq-address" type="text" placeholder="Street Address" autocomplete="off" style="background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:0.7rem 0.9rem;color:var(--text-primary);font-size:0.9rem;width:100%;">
+          <div id="addrSuggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;z-index:50;max-height:180px;overflow-y:auto;"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 80px 90px;gap:0.5rem;">
+          <input id="sq-city"  type="text" placeholder="City"  style="background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:0.7rem 0.9rem;color:var(--text-primary);font-size:0.9rem;">
+          <input id="sq-state" type="text" placeholder="State" style="background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:0.7rem 0.9rem;color:var(--text-primary);font-size:0.9rem;">
+          <input id="sq-zip"   type="text" placeholder="ZIP"   style="background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:0.7rem 0.9rem;color:var(--text-primary);font-size:0.9rem;">
+        </div>
+        <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.85rem;color:var(--text-muted);cursor:pointer;">
+          <input id="billingSameCheck" type="checkbox" checked style="accent-color:var(--purple);">
+          Billing address same as shipping
+        </label>
+      </div>
+      <p id="shippingError" style="display:none;color:#f87171;font-size:0.8rem;margin-top:0.5rem;"></p>
+      <button onclick="proceedFromShipping()" style="width:100%;margin-top:1rem;padding:0.85rem;border:none;border-radius:12px;cursor:pointer;font-weight:700;background:linear-gradient(135deg,var(--purple),var(--teal));color:#fff;">Continue →</button>
+      <div style="text-align:center;margin-top:0.6rem;">
+        <button onclick="resetCartLayout();document.getElementById('paymentForm').style.display='none';document.getElementById('checkoutFormWrap').style.display='block';" style="background:none;border:none;color:var(--text-muted);font-size:0.82rem;cursor:pointer;text-decoration:underline;">← Back to Cart</button>
+      </div>
+    </div>
+
+    <!-- Step 2: Billing (shown only if different) -->
+    <div id="stepBilling" style="display:none;">
+      <h3 style="font-family:'Cinzel',serif;color:var(--gold-light);font-size:1rem;margin-bottom:1rem;">💳 Billing Address</h3>
+      <div style="display:flex;flex-direction:column;gap:0.65rem;">
+        <div style="position:relative;">
+          <input id="bill-address" type="text" placeholder="Street Address" autocomplete="off" style="background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:0.7rem 0.9rem;color:var(--text-primary);font-size:0.9rem;width:100%;">
+          <div id="billSuggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;z-index:50;max-height:180px;overflow-y:auto;"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 80px 90px;gap:0.5rem;">
+          <input id="bill-city"  type="text" placeholder="City"  style="background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:0.7rem 0.9rem;color:var(--text-primary);font-size:0.9rem;">
+          <input id="bill-state" type="text" placeholder="State" style="background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:0.7rem 0.9rem;color:var(--text-primary);font-size:0.9rem;">
+          <input id="bill-zip"   type="text" placeholder="ZIP"   style="background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:0.7rem 0.9rem;color:var(--text-primary);font-size:0.9rem;">
+        </div>
+      </div>
+      <p id="billingError" style="display:none;color:#f87171;font-size:0.8rem;margin-top:0.5rem;"></p>
+      <button onclick="proceedFromBilling()" style="width:100%;margin-top:1rem;padding:0.85rem;border:none;border-radius:12px;cursor:pointer;font-weight:700;background:linear-gradient(135deg,var(--purple),var(--teal));color:#fff;">Continue →</button>
+      <div style="text-align:center;margin-top:0.6rem;">
+        <button onclick="goBackToShipping()" style="background:none;border:none;color:var(--text-muted);font-size:0.82rem;cursor:pointer;text-decoration:underline;">← Back</button>
+      </div>
+    </div>
+
+    <!-- Step 3: Payment -->
+    <div id="stepPayment" style="display:none;">
+      <h3 style="font-family:'Cinzel',serif;color:var(--gold-light);font-size:1rem;margin-bottom:1rem;">💜 Payment</h3>
+      <!-- Payment tabs -->
+      <div style="display:flex;gap:0.5rem;margin-bottom:1rem;">
+        <button id="tabVenmo" onclick="selectPayTab('venmo')" style="flex:1;padding:0.6rem;border-radius:8px;cursor:pointer;font-size:0.85rem;font-weight:600;border:2px solid #008CFF;background:rgba(0,140,255,0.15);color:#fff;">Venmo</button>
+        <button id="tabCard"  onclick="selectPayTab('card')"  style="flex:1;padding:0.6rem;border-radius:8px;cursor:pointer;font-size:0.85rem;font-weight:600;border:2px solid var(--border);background:transparent;color:var(--text-muted);">Credit Card</button>
+      </div>
+      <!-- Venmo panel -->
+      <div id="panelVenmo">
+        <div style="background:rgba(0,140,255,0.08);border:1px solid rgba(0,140,255,0.3);border-radius:12px;padding:1rem;text-align:center;margin-bottom:1rem;">
+          <div style="font-size:2rem;margin-bottom:0.5rem;">💙</div>
+          <p style="font-size:0.9rem;color:var(--text-primary);font-weight:600;">Send payment to <strong style="color:#60a5fa;">@Coras-Creations</strong></p>
+          <p style="font-size:0.8rem;color:var(--text-muted);margin-top:0.4rem;">Include your order items in the Venmo note.</p>
+        </div>
+        <div id="paymentConfirmWrap" style="display:none;">
+          <label style="display:flex;align-items:flex-start;gap:0.6rem;font-size:0.85rem;color:var(--text-muted);cursor:pointer;margin-bottom:0.75rem;">
+            <input id="paymentConfirmCheck" type="checkbox" onchange="toggleConfirmBtn(this)" style="margin-top:3px;accent-color:var(--purple);">
+            I have sent my Venmo payment to @Coras-Creations
+          </label>
+        </div>
+        <button onclick="document.getElementById('paymentConfirmWrap').style.display='block';this.style.display='none';" style="width:100%;padding:0.85rem;border:none;border-radius:12px;cursor:pointer;font-weight:700;background:linear-gradient(135deg,#008CFF,#0066cc);color:#fff;margin-bottom:0.5rem;">I've Sent Payment via Venmo ✓</button>
+        <button id="confirmOrderBtn" onclick="confirmOrder('venmo')" disabled style="width:100%;padding:0.85rem;border:none;border-radius:12px;cursor:not-allowed;font-weight:700;background:linear-gradient(135deg,var(--purple),var(--rose));color:#fff;opacity:0.4;">Confirm Order</button>
+        <p id="confirmOrderHint" style="font-size:0.75rem;color:var(--text-muted);text-align:center;margin-top:0.4rem;">Confirm only after sending Venmo payment</p>
+      </div>
+      <!-- Card panel -->
+      <div id="panelCard" style="display:none;">
+        <div id="sq-card-loading" style="color:var(--text-muted);font-size:0.85rem;margin-bottom:0.75rem;">Loading card form…</div>
+        <div id="sq-card-container" style="margin-bottom:0.75rem;"></div>
+        <p id="sq-card-error" style="display:none;color:#f87171;font-size:0.8rem;margin-bottom:0.5rem;"></p>
+        <button id="payCardBtn" onclick="payWithCard()" style="width:100%;padding:0.85rem;border:none;border-radius:12px;cursor:pointer;font-weight:700;background:linear-gradient(135deg,var(--purple),var(--rose));color:#fff;">Pay <span id="payCardAmount"></span> by Card</button>
+      </div>
+      <div style="text-align:center;margin-top:0.75rem;">
+        <button onclick="goBackFromPayment()" style="background:none;border:none;color:var(--text-muted);font-size:0.82rem;cursor:pointer;text-decoration:underline;">← Back</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Order confirmed -->
+  <div id="orderConfirmed" style="display:none;padding:2rem 1.5rem;text-align:center;">
+    <div style="font-size:3.5rem;margin-bottom:1rem;">🐉✨</div>
+    <h3 style="font-family:'Cinzel',serif;color:var(--gold-light);margin-bottom:0.75rem;">Order Confirmed!</h3>
+    <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:1.5rem;">Thank you! Cora will start crafting your magical items right away.</p>
+    <button onclick="closeCart()" style="padding:0.85rem 2rem;border:none;border-radius:12px;cursor:pointer;font-weight:700;background:linear-gradient(135deg,var(--purple),var(--teal));color:#fff;">Continue Shopping ✨</button>
+  </div>
+</div>
 
 <script>
   // ---- SPARKLES ----
