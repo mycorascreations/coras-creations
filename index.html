@@ -2785,7 +2785,9 @@
       shipping:        shippingCost,
       total:           parseFloat(total),
       paymentMethod:   isVenmo ? 'venmo' : 'card',
-      status:          isVenmo ? 'pending_payment' : 'received',
+      status:          isVenmo ? 'venmo_confirmed' : 'received',
+      venmoPaymentConfirmed: isVenmo ? true : null,
+      venmoHandle:     isVenmo ? '@Coras-Creations' : null,
       timestamp:       new Date().toISOString()
     };
 
@@ -2839,9 +2841,20 @@ TOTAL: $${total}
       catch(e) { console.warn('Customer email failed:', e); }
     }
 
-    // Save to Firebase — failure here must not affect anything above
-    try { await saveOrderToDatabase(orderRecord); }
-    catch(e) { console.warn('Firebase save failed:', e); }
+    // Save to Firebase — retry once on failure
+    let dbSaved = false;
+    try {
+      const docId = await saveOrderToDatabase(orderRecord);
+      if (docId) dbSaved = true;
+    } catch(e) { console.warn('Firebase save attempt 1 failed:', e); }
+    if (!dbSaved) {
+      await new Promise(r => setTimeout(r, 1500));
+      try {
+        const docId = await saveOrderToDatabase(orderRecord);
+        if (docId) dbSaved = true;
+      } catch(e) { console.warn('Firebase save attempt 2 failed:', e); }
+    }
+    if (!dbSaved) console.error('Order could not be saved to database:', orderRecord);
 
     // Show order number and appropriate message to customer
     const confirmedDiv = document.getElementById('orderConfirmed');
@@ -2891,15 +2904,17 @@ TOTAL: $${total}
   }
 
   async function saveOrderToDatabase(orderRecord) {
-    if (!db || firebaseConfig.apiKey === 'YOUR_API_KEY') return null;
-    try {
-      const docRef = await db.collection('orders').add(orderRecord);
-      console.log('Order saved:', docRef.id);
-      return docRef.id;
-    } catch(e) {
-      console.warn('Database save failed:', e);
+    if (!db || firebaseConfig.apiKey === 'YOUR_API_KEY') {
+      console.warn('Firebase not ready — db:', db);
       return null;
     }
+    // Strip null fields so Firestore doesn't reject them
+    const cleanRecord = Object.fromEntries(
+      Object.entries(orderRecord).filter(([_, v]) => v !== null && v !== undefined)
+    );
+    const docRef = await db.collection('orders').add(cleanRecord);
+    console.log('Order saved to Firebase:', docRef.id);
+    return docRef.id;
   }
 
   // ---- ORDER EMAIL via Resend (Netlify function) ----
