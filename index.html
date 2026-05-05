@@ -650,7 +650,7 @@
     <p class="hero-eyebrow">✦ Handmade Resin &amp; 3D Printed Art ✦</p>
     <h1>Cora's Creations</h1>
     <p style="font-family:'Cinzel',serif; font-size:0.85rem; letter-spacing:0.2em; color:var(--gold); text-transform:uppercase; margin-top:-0.5rem; margin-bottom:0.5rem; opacity:0.85;">⚠ Under Development ⚠</p>
-    <span class="hero-dragon">🐉</span>
+    <img src="mainicon.jpeg" alt="Cora's Creations" class="hero-dragon" style="width:160px;height:160px;object-fit:contain;border-radius:50%;border:2px solid var(--gold);box-shadow:0 0 30px var(--glow-gold);">
     <p class="hero-tagline">
       Where <strong>magic meets craft</strong> — unique resin art, enchanted home décor,<br>
       and fantastical 3D printed treasures, made with love.
@@ -1145,7 +1145,7 @@
       </div>
 
       <div class="product-card reveal" data-category="resin" data-section="serving-trays">
-      <div class="product-img"><img loading="lazy" src="IMG_1189.jpeg" alt="Honeybee Serving Tray" style="width:100%;height:100%;object-fit:cover;object-position:center 15%;transform:scale(1.35) translateY(-12%);"></div>
+      <div class="product-img"><img loading="lazy" src="mirror.jpeg" alt="Honeybee Serving Tray" style="width:100%;height:100%;object-fit:cover;object-position:center 15%;transform:scale(1.35) translateY(-12%);"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Honeybee Serving Tray</h3>
@@ -1158,7 +1158,7 @@
       </div>
 
       <div class="product-card reveal" data-category="resin" data-section="serving-trays">
-      <div class="product-img"><img loading="lazy" src="IMG_1191.jpeg" alt="Copper Bloom Serving Tray" style="width:100%;height:100%;object-fit:cover;object-position:center 15%;transform:scale(1.35) translateY(-12%);"></div>
+      <div class="product-img"><img loading="lazy" src="blueflower.jpeg" alt="Copper Bloom Serving Tray" style="width:100%;height:100%;object-fit:cover;object-position:center 15%;transform:scale(1.35) translateY(-12%);"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Copper Bloom Serving Tray</h3>
@@ -1171,7 +1171,7 @@
       </div>
 
       <div class="product-card reveal" data-category="resin" data-section="serving-trays">
-      <div class="product-img"><img loading="lazy" src="IMG_1193.jpeg" alt="Coffee Bean Tray" style="width:100%;height:100%;object-fit:cover;object-position:center 15%;transform:scale(1.35) translateY(-12%);"></div>
+      <div class="product-img"><img loading="lazy" src="coffee.jpeg" alt="Coffee Bean Tray" style="width:100%;height:100%;object-fit:cover;object-position:center 15%;transform:scale(1.35) translateY(-12%);"></div>
         <div class="product-body">
           <span class="product-tag tag-resin">Resin</span>
           <h3>Coffee Bean Tray</h3>
@@ -1540,6 +1540,20 @@
         </div>
       </div>
 
+
+      <div class="product-card reveal" data-category="3d" data-section="3d-dragons">
+      <div class="product-img"><img loading="lazy" src="extradragon.jpeg" alt="Extra Dragon" style="width:100%;height:100%;object-fit:contain;padding:12px;"></div>
+        <div class="product-body">
+          <span class="product-tag tag-3d">3D Printed</span>
+          <h3>Extra Dragon</h3>
+          <p>A detailed 3D printed dragon — bold colors and articulated design make this one a standout collectible.</p>
+          <div class="product-footer">
+            <span class="product-price">$15</span>
+            <button class="btn-cart" onclick="addedToCart(this,'Extra Dragon',15)">Add to Cart 🛒</button>
+          </div>
+        </div>
+      </div>
+
       <!-- 3D Animals -->
       <div class="product-card reveal" data-category="3d" data-section="3d-animals">
       <div class="product-img"><img loading="lazy" src="3dAnimal1.jpeg" alt="White Articulated Panda" style="width:100%;height:100%;object-fit:contain;padding:12px;"></div>
@@ -1869,6 +1883,7 @@
       <div style="font-size:3rem;margin-bottom:1rem;">🛒</div>
       <p>Your cart is empty.<br>Add something magical!</p>
     </div>
+    <div id="orderSummaryLabel" style="display:none;font-family:'Cinzel',serif;font-size:0.8rem;color:var(--text-muted);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:0.5rem;">✨ Order Summary</div>
     <div id="cartItems"></div>
     <div id="checkoutSection" style="display:none;margin-top:1rem;">
       <!-- Totals -->
@@ -1904,6 +1919,12 @@
   <!-- Multi-step checkout form -->
   <div id="paymentForm" style="display:none;padding:1rem 1.5rem;">
 
+    <!-- Compact total bar (shown during checkout steps) -->
+    <div id="checkoutTotalBar" style="display:none;justify-content:space-between;align-items:center;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:0.55rem 0.9rem;margin-bottom:1rem;font-size:0.9rem;">
+      <span style="color:var(--text-muted);">Order Total</span>
+      <span id="checkoutTotalAmt" style="color:var(--gold-light);font-weight:700;"></span>
+    </div>
+
     <!-- Step 1: Shipping -->
     <div id="stepShipping">
       <h3 style="font-family:'Cinzel',serif;color:var(--gold-light);font-size:1rem;margin-bottom:1rem;">📦 Shipping Address</h3>
@@ -1927,7 +1948,7 @@
       <p id="shippingError" style="display:none;color:#f87171;font-size:0.8rem;margin-top:0.5rem;"></p>
       <button onclick="proceedFromShipping()" style="width:100%;margin-top:1rem;padding:0.85rem;border:none;border-radius:12px;cursor:pointer;font-weight:700;background:linear-gradient(135deg,var(--purple),var(--teal));color:#fff;">Continue →</button>
       <div style="text-align:center;margin-top:0.6rem;">
-        <button onclick="resetCartLayout();document.getElementById('paymentForm').style.display='none';document.getElementById('checkoutFormWrap').style.display='block';" style="background:none;border:none;color:var(--text-muted);font-size:0.82rem;cursor:pointer;text-decoration:underline;">← Back to Cart</button>
+        <button onclick="document.getElementById('paymentForm').style.display='none';resetCartLayout();" style="background:none;border:none;color:var(--text-muted);font-size:0.82rem;cursor:pointer;text-decoration:underline;">← Back to Cart</button>
       </div>
     </div>
 
@@ -2193,6 +2214,10 @@
     document.getElementById('checkoutFormWrap').style.display = 'block';
     document.getElementById('paymentForm').style.display      = 'none';
     document.getElementById('orderConfirmed').style.display   = 'none';
+    const osl = document.getElementById('orderSummaryLabel');
+    const ctb = document.getElementById('checkoutTotalBar');
+    if (osl) osl.style.display = 'none';
+    if (ctb) ctb.style.display = 'none';
     // Reset multi-step form back to step 1
     const stepShip = document.getElementById('stepShipping');
     const stepBill = document.getElementById('stepBilling');
@@ -2558,16 +2583,26 @@
   }
 
   function showCheckoutForm() {
-    const formWrap  = document.getElementById('checkoutFormWrap');
-    const payForm   = document.getElementById('paymentForm');
-    const drawer    = document.getElementById('cartDrawer');
-    const cartItems = document.getElementById('cartItems');
-    const keepBar   = document.getElementById('keepShoppingBar');
+    const payForm        = document.getElementById('paymentForm');
+    const drawer         = document.getElementById('cartDrawer');
+    const keepBar        = document.getElementById('keepShoppingBar');
+    const checkoutSec    = document.getElementById('checkoutSection');
+    const orderSumLabel  = document.getElementById('orderSummaryLabel');
+    const totalBar       = document.getElementById('checkoutTotalBar');
+    const totalBarAmt    = document.getElementById('checkoutTotalAmt');
 
-    if (formWrap)   formWrap.style.display   = 'none';
-    if (payForm)    payForm.style.display    = 'block';
-    if (cartItems)  cartItems.style.display  = 'none';
-    if (keepBar)    keepBar.style.display    = 'none';
+    // Hide the totals+button row but keep cartItems visible as order summary
+    if (checkoutSec)   checkoutSec.style.display   = 'none';
+    if (keepBar)       keepBar.style.display        = 'none';
+    if (orderSumLabel) orderSumLabel.style.display  = 'block';
+    if (payForm)       payForm.style.display        = 'block';
+
+    // Mirror the cart total into the compact bar
+    if (totalBar && totalBarAmt) {
+      const cartTotalEl = document.getElementById('cartTotal');
+      totalBarAmt.textContent = cartTotalEl ? cartTotalEl.textContent : '';
+      totalBar.style.display = 'flex';
+    }
 
     // Always start at step 1
     document.getElementById('stepShipping').style.display = 'block';
@@ -2580,12 +2615,15 @@
   }
 
   function resetCartLayout() {
-    const cartItems = document.getElementById('cartItems');
     const keepBar   = document.getElementById('keepShoppingBar');
     const drawer    = document.getElementById('cartDrawer');
-    if (cartItems) cartItems.style.display = '';
-    if (keepBar)   keepBar.style.display   = '';
-    if (drawer)    drawer.scrollTop        = 0;
+    const orderSumLabel = document.getElementById('orderSummaryLabel');
+    const totalBar  = document.getElementById('checkoutTotalBar');
+    if (keepBar)       keepBar.style.display        = '';
+    if (orderSumLabel) orderSumLabel.style.display  = 'none';
+    if (totalBar)      totalBar.style.display       = 'none';
+    if (drawer)        drawer.scrollTop             = 0;
+    renderCart(); // restores checkoutSection visibility
   }
 
   function proceedFromShipping() {
